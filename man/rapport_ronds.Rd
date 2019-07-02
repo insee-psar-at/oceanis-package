@@ -1,0 +1,54 @@
+\name{rapport_ronds}
+\alias{rapport_ronds}
+\title{
+	Ratio between radius and value for 'leaflet' maps
+}
+\description{
+	Returns the ratio between the area of the largest circle and the maximum value of the volume data for 'leaflet' maps.
+}
+\usage{
+rapport_ronds(map)
+}
+\arguments{
+  \item{map}{
+	objet leaflet.
+}
+}
+\details{
+	Le rapport n'a pas d'unite. Il s'agit d'une valeur relative.
+	
+	Le calcul du rapport sert a comparer plusieurs cartes en ronds proportionnels entre elles puisque la valeur du rapport est fonction du volume a representer.
+	
+	La formule utilisee pour calculer le rapport est : (pi*(rayonRond)^2)/max_var
+	
+	Il peut y avoir une legere difference entre la valeur du rapport passee en parametre de la fonction \code{leaflet_ronds} et la valeur renvoyee par la fonction \code{rapport_ronds}. Cette difference s'explique par l'arrondi de pi a 6 chiffres apres la virgule.
+}
+\value{
+	Retourne un numerique.
+}
+\seealso{
+	\code{\link{leaflet_ronds}, \link{leaflet_ronds_classes}, \link{leaflet_classes_ronds}}
+}
+\examples{
+data("donnees_monoloc")
+data("depm")
+
+# Ronds proportionnels
+map <- leaflet_ronds(data = donnees_monoloc, fondMaille = depm, idData = "COD_DEP",
+					 varVolume = "POP_2015")
+\donttest{
+ map
+}
+rapport_ronds(map)
+# [1] 1924095
+
+# Ronds proportionnels
+map <- leaflet_ronds(data = donnees_monoloc, fondMaille = depm, idData = "COD_DEP",
+varVolume = "POP_2015", rapportRond = 1900000)
+\donttest{
+ map
+}
+rapport_ronds(map)
+# [1] 1900022
+}
+\keyword{documentation}
