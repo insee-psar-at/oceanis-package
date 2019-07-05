@@ -8,7 +8,7 @@ Description: Creating maps for statistical analysis such as proportional circles
 	- Create maps in a web environment where the parameters are modifiable on the fly ('shiny' and 'leaflet' technology).
 	- Create interactive maps through zoom and pop-up ('leaflet' technology).
 	- Create frozen maps with the possibility to add labels.
-License: GPL (>=2.0)
+License: GPL (>= 2.0) | file LICENSE
 LazyLoad: yes
 URL: https://github.com/insee-psar-at/oceanis-package/
 BugReports: https://github.com/insee-psar-at/oceanis-package/issues
