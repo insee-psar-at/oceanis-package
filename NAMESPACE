@@ -11,7 +11,6 @@ export(
 "distrib_variable",
 "recup_palette",
 "coordonnees_etiquettes",
-"lecture_fichier",
 "export_qgis_ronds","export_qgis_classes","export_qgis_ronds_classes","export_qgis_classes_ronds","export_qgis_typo","export_qgis_oursins","export_qgis_joignantes","export_qgis_saphirs",
 "export_png","export_jpeg","export_pdf"
 )
@@ -273,12 +272,8 @@ import(leaflet.extras)
 import(classInt)
 import(units)
 import(grDevices)
-import(readODS)
-import(xlsx)
 import(ggplot2)
 import(dplyr)
 import(graphics)
 import(mapview)
 import(tidyr)
-import(munsell)
-import(lwgeom)

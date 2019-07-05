@@ -13,9 +13,9 @@
 	
 	Type : Package
 	
-	Version : 0.5
+	Version : 0.8.6
 	
-	Date : 2019-02-15
+	Date : 2019-07-05
 	
 	License : GPL(>=2.0)
 	
@@ -34,14 +34,14 @@
 	
 	D'autres fonctions existent pour completer l'offre :
 	
-	Des fonctions pour exporter une carte leaflet en projet Qgis, des fonctions pour modifier son apparence, des fonctions permettant de creer ses propres zonages (connus ou a facon) a partir de tableaux de donnees ou d'importer un fichier de donnees quelque soit son extension (.dbf, .xls, .ods, .csv ou .rds).
+	Des fonctions pour exporter une carte leaflet en projet Qgis, des fonctions pour modifier son apparence, des fonctions permettant de creer ses propres zonages (connus ou a facon) a partir de tableaux de donnees.
 	
 	
 	Un exemple possible d'enchainement de fonctions :
 	
 	1- Chargement du package oceanis (\code{library(oceanis)})
 	
-	2- Chargement des donnees avec la fonction \code{lecture_fichier()}
+	2- Chargement des donnees avec la fonction \code{import()} du package \code{rio}
 	
 	3- Chargement des fonds de carte avec la fonction \code{read_sf()} du package \code{sf}
 	
