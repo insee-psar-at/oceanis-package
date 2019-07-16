@@ -1,4 +1,5 @@
 \name{leaflet}
+\alias{leaflet_fonds_simples}
 \alias{leaflet_ronds}
 \alias{leaflet_classes}
 \alias{leaflet_ronds_classes}
@@ -14,6 +15,8 @@
 	Create interactive maps for statistical analysis by 'leaflet' (zoom + pop-up).
 }
 \usage{
+leaflet_fonds_simples(listFonds)
+
 leaflet_ronds(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL, idData,
 varVolume, rayonRond = NULL, rapportRond = NULL, dom = "0", fondChx = NULL)
 
@@ -53,6 +56,9 @@ filtreVol = 0, dom = "0")
 }
   \item{fondMaille}{
 	objet sf. Fond de carte.
+}
+  \item{listFonds}{
+	list d'objets sf. Liste de fonds de carte.
 }
   \item{typeMaille}{
 	chaine de caracteres (character). Type de maille issus d'un zonage administratifs ou d'etudes ("REG", "DEP", "UU", "AU", "ZE", "BV", "EPCI" ou "COM").
@@ -145,6 +151,10 @@ filtreVol = 0, dom = "0")
 	Si vous sauvegardez le resultat dans une variable, la carte ne s'affichera qu'a l'execution de cette variable (voir exemples).
 	
   \describe{
+  	\item{Fonds simples}{
+		Il s'agit d'une carte sans analyse avec uniquement des fonds. Le premier fond de la liste est positionne derriere la carte et le dernier fond de la liste devant. La personnalisation des fonds se fait avec la fonction \code{set_fonds_simples}.
+	}
+	
 	\item{Ronds proportionnels}{
 		L'interieur des cercles est de couleur orange (couleur par defaut) pour representer les valeurs positives de la variable en volume et bleu pour les valeurs negatives.
 		
@@ -210,13 +220,15 @@ filtreVol = 0, dom = "0")
 	
 	\code{\link{distrib_variable},}
 	
-	\code{\link{add_legende_ronds}, \link{add_legende_classes}, \link{add_legende_typo},}
+	\code{\link{add_legende_ronds}, \link{add_legende_classes}, \link{add_legende_typo}, \link{add_legende_typo_symboles},}
 	
 	\code{\link{add_legende_joignantes}, \link{add_legende_saphirs},}
 	
 	\code{\link{coord_legende},}
 	
 	\code{\link{add_source}, \link{add_titre}, \link{add_fond_osm},}
+	
+	\code{\link{set_fonds_simples},}
 	
 	\code{\link{export_qgis_ronds}, \link{export_qgis_classes}, \link{export_qgis_ronds_classes}, \link{export_qgis_classes_ronds},}
 	

@@ -35,10 +35,10 @@ function(fondMaille,groupe,idMaille,idGroupe,libGroupe,fondContour=NULL,dom="0")
     }
     
     zonage_a_facon <- merge(zonage_a_facon,groupe,by.x="CODE",by.y=idMaille)
-    if(length(names(zonage_a_facon)[grep("..y",names(zonage_a_facon))])>1)
+    if(length(names(zonage_a_facon)[grep("[.]y",names(zonage_a_facon))])>1)
     {
-      zonage_a_facon <- zonage_a_facon[,-grep("..y",names(zonage_a_facon))]
-      names(zonage_a_facon)[grep("..x",names(zonage_a_facon))]<-sub(".x","",names(zonage_a_facon)[grep("..x",names(zonage_a_facon))])
+      zonage_a_facon <- zonage_a_facon[,-grep("[.]y",names(zonage_a_facon))]
+      names(zonage_a_facon)[grep("[.]x",names(zonage_a_facon))]<-sub(".x","",names(zonage_a_facon)[grep("[.]x",names(zonage_a_facon))])
     }
     
     zonage_a_facon <- st_sf(zonage_a_facon[,c("CODE","LIBELLE",idGroupe,libGroupe,"geometry")],stringsAsFactors = FALSE)

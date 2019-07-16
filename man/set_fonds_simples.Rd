@@ -1,0 +1,52 @@
+\name{set_fonds_simples}
+\alias{set_fonds_simples}
+\title{
+	Modify the style of 'leaflet' map's.
+}
+\description{
+	Modify the style of 'leaflet' map's.
+}
+\usage{
+set_fonds_simples(map, colRemplissageFonds = NULL, colBordureFonds = NULL,
+transparenceFonds = NULL, epaisseurFonds = NULL)
+}
+\arguments{
+  \item{map}{
+	objet leaflet.
+}
+  \item{colRemplissageFonds}{
+	vecteur de caracteres (character). Le vecteur comporte des couleurs nommees (par exemple "black") ou hexadecimal (par exemple "#000000"). Colore l'interieur du fond. Par defaut a NULL.
+}
+  \item{colBordureFonds}{
+	vecteur de caracteres (character). Le vecteur comporte des couleurs nommees (par exemple "black") ou hexadecimal (par exemple "#000000"). Colore la bordure du fond. Par defaut a NULL.
+}
+  \item{transparenceFonds}{
+	valeur numerique (numeric). Le vecteur comporte les valeurs numeriques pour la transparence (valeur comprise entre 0 - transparent - et 1 - opaque). Par defaut a NULL.
+}
+  \item{epaisseurFonds}{
+	valeur numerique (numeric). Le vecteur comporte les valeurs numeriques pour l'epaiseeur de la bordure des fonds. Par defaut a NULL.
+}
+}
+\value{
+	Retourne un objet leaflet.
+}
+\seealso{
+	\code{\link{leaflet_fonds_simples}}
+	
+	\code{\link{leaflet_ronds} \link{leaflet_classes} \link{leaflet_ronds_classes} \link{leaflet_classes_ronds}}
+	
+	\code{\link{leaflet_typo} \link{leaflet_oursins} \link{leaflet_joignantes} \link{leaflet_saphirs}}
+}
+\examples{
+data("regm")
+data("fram")
+
+# Fonds simples
+map <- leaflet_fonds_simples(listFonds = list(fram, regm[regm$CODE == '93',]))
+map <- set_fonds_simples(map, colRemplissageFonds = c("white","grey"),
+colBordureFonds = c("grey","black"), transparenceFonds = c(1,0.6), epaisseurFonds = c(1,3))
+\donttest{
+ map
+}
+}
+\keyword{documentation}

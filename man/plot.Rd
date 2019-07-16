@@ -4,6 +4,7 @@
 \alias{plot_ronds_classes}
 \alias{plot_classes_ronds}
 \alias{plot_typo}
+\alias{plot_typo_symboles}
 \alias{plot_oursins}
 \alias{plot_joignantes}
 \alias{plot_saphirs}
@@ -52,6 +53,10 @@ varTypo, titreLeg = "", xLeg = NULL, yLeg = NULL, titreCarte = "",
 sourceCarte = "", etiquettes = NULL, paletteTypo = NULL, labels = NULL,
 colBorder = "white")
 
+plot_typo_symboles(fondPoints, listFonds, dom = "0", types = NULL, couleurs = NULL,
+tailles = NULL, epaisseurs = NULL, titreLeg = "", xLeg = NULL, yLeg = NULL,
+titreCarte = "", sourceCarte = "", etiquettes = NULL, labels = NULL)
+
 plot_oursins(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL,
 idDataDepart, idDataArrivee, varFlux, filtreVol = 0, filtreDist = 100,
 filtreMajeurs = 10, decalageAllerRetour = 0, decalageCentroid = 0,
@@ -87,8 +92,14 @@ colBorder = "white",  colBorderMaille = "black")
   \item{fondSousAnalyse}{
 	list d'objets sf. Liste de fonds de carte a ajouter en-dessous de l'analyse. Par exemple, un fond de mer et des pays frontaliers. Par defaut a NULL.
 }
+  \item{fondPoints}{
+	objets sf. Fond de points.
+}
   \item{fondSurAnalyse}{
 	list d'objets sf. Liste de fonds de carte a ajouter au-dessus de l'analyse. Par exemple, un fond de departement. Par defaut a NULL.
+}
+  \item{listFonds}{
+	list d'objets sf. Liste de fonds de carte a ajouter.
 }
   \item{idData}{
 	chaine de caracteres (character). Variable identifiant la maille.
@@ -161,6 +172,18 @@ colBorder = "white",  colBorderMaille = "black")
 }
   \item{fondChx}{
 	objet sf. Fond des chefs-lieux. Pour les ronds proportionnels avec une maille communale uniquement, choix entre position du centre des ronds sur les centroides des communes (NULL par defaut) ou sur les chefs-lieux (chx) des communes.
+}
+  \item{types}{
+	vecteur de numeriques (numeric). Par defaut a NULL. Voir details.
+}
+  \item{couleurs}{
+	vecteur de caracteres (character). Par defaut a NULL. Voir details.
+}
+  \item{tailles}{
+	vecteur de numeriques (numeric). Par defaut a NULL. Voir details.
+}
+  \item{epaisseurs}{
+	vecteur de numeriques (numeric). Par defaut a NULL. Voir details.
 }
   \item{titreLeg}{
 	chaine de caracteres (character). Titre de la legende.
@@ -280,6 +303,14 @@ colBorder = "white",  colBorderMaille = "black")
 		Meme conseil que pour les analyses en classes. Le choix des couleurs ne doit pas etre un degrade si il n'existe pas de classement dans les modalites.
 		
 		Il est possible de specifier ses propres labels sans avoir besoin de modifier les noms de variables dans la table de donnees.
+	}
+	
+	\item{Typologie en symboles}{
+		Les fonds de carte doivent etre passes en list et peuvent etre personnalises (voir ci-dessous modifier l'apparence des fonds).
+		
+		Les parametres types, couleurs, tailles et epaisseurs sont des vecteurs de meme longueur. Chaque element correspond a un point du fond fourni. Verifier bien l'ordre des points pour modifier leur apparence ensuite.
+		
+		Il existe differents types de points (voir l'aide de ?graphics::points).
 	}
 	
 	\item{Oursins}{

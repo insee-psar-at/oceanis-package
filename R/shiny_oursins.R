@@ -659,14 +659,12 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
           m <- leaflet(padding = 0,
                        options = leafletOptions(
                          preferCanvas = TRUE,
-                         transition = 2,
-                         minZoom = 6,
-                         maxZoom = 10
+                         transition = 2
                        )) %>%
             
             setMapWidgetStyle(list(background = "#AFC9E0")) %>%
             
-            addTiles_insee(attribution = paste0("<a href=\"http://www.insee.fr\">\u00A9 IGN - INSEE ",format(Sys.time(), format = "%Y"),"</a>")) %>%
+            addTiles_insee(attribution = paste0("<a href=\"http://www.insee.fr\">OCEANIS - \u00A9 IGN - INSEE ",format(Sys.time(), format = "%Y"),"</a>")) %>%
             
             fitBounds(lng1 = min(list_bbox_ou()[[1]]),
                       lat1 = min(list_bbox_ou()[[2]]),

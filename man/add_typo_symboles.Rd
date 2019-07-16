@@ -1,0 +1,70 @@
+\name{add_typo_symboles}
+\alias{add_typo_symboles}
+
+\title{
+	Add symbols on a 'leaflet' map
+}
+\description{
+	Add a symbols on a 'leaflet' map for typology.
+}
+\usage{
+add_typo_symboles(map, fondPoints, types = NULL, couleurs = NULL, tailles = NULL,
+epaisseurs = NULL)
+}
+
+\arguments{
+  \item{map}{
+	objet leaflet.
+}
+  \item{fondPoints}{
+	objets sf. Fond de points.
+}
+  \item{types}{
+	vecteur de numeriques (numeric). Par defaut a NULL. Voir details.
+}
+  \item{couleurs}{
+	vecteur de caracteres (character). Par defaut a NULL. Voir details.
+}
+  \item{tailles}{
+	vecteur de numeriques (numeric). Par defaut a NULL. Voir details.
+}
+  \item{epaisseurs}{
+	vecteur de numeriques (numeric). Par defaut a NULL. Voir details.
+}
+}
+\details{
+	Pour ajouter des symboles a la carte leaflet, il faut fournir un fond de points et si besoin preciser le type des points (par defaut un carre plein - voir l'aide de ?graphics::points), leurs couleurs (par defaut rouge), leurs tailles (par defaut 30) et l'epaisseur de la bordure du symbole si ce dernier n'est pas plein.
+
+	Attention a l'ordre des elements des vecteurs qui doivent correspondre a l'ordre du fond de points.
+}
+\value{
+	Retourne un objet de type leaflet.
+}
+\seealso{
+	\code{\link{coord_legende}}
+	
+	\code{\link{leaflet_fonds_simples}}
+	
+	\code{\link{leaflet_ronds} \link{leaflet_classes} \link{leaflet_ronds_classes} \link{leaflet_classes_ronds} \link{leaflet_typo}}
+	
+	\code{\link{leaflet_oursins} \link{leaflet_joignantes} \link{leaflet_saphirs}}
+}
+\examples{
+data("depm")
+data("regm")
+
+# Typologie en symboles
+map <- leaflet_fonds_simples(listFonds = list(depm))
+points <- suppressWarnings(sf::st_centroid(depm[depm$CODE=="75",]))
+points <- rbind(points,suppressWarnings(sf::st_centroid(depm[depm$CODE=="13",])))
+points <- rbind(points,suppressWarnings(sf::st_centroid(depm[depm$CODE=="69",])))
+types <- c(16,15,15)
+couleurs <- c("blue","red","red")
+tailles <- c(25,20,20)
+map <- add_typo_symboles(map, fondPoints=points, types = types,
+couleurs = couleurs, tailles = tailles)
+\donttest{
+ map
+}
+}
+\keyword{documentation}

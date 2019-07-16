@@ -24,6 +24,8 @@ set_style_oursins(map, epaisseur = 2, colTrait = "black")
 	Retourne un objet leaflet.
 }
 \seealso{
+	\code{\link{leaflet_fonds_simples}}
+
 	\code{\link{leaflet_ronds} \link{leaflet_classes} \link{leaflet_ronds_classes} \link{leaflet_classes_ronds}}
 	
 	\code{\link{leaflet_typo} \link{leaflet_oursins} \link{leaflet_joignantes} \link{leaflet_saphirs}}

@@ -2,6 +2,7 @@
 \alias{add_legende_ronds}
 \alias{add_legende_classes}
 \alias{add_legende_typo}
+\alias{add_legende_typo_symboles}
 \alias{add_legende_joignantes}
 \alias{add_legende_saphirs}
 
@@ -19,6 +20,9 @@ add_legende_classes(map, titre = NULL, lng = NULL, lat = NULL, typeLegende = 1,
 					zoom = 8)
 
 add_legende_typo(map, titre = NULL, lng = NULL, lat = NULL, labels = NULL,
+					zoom = 8)
+					
+add_legende_typo_symboles(map, titre = NULL, lng = NULL, lat = NULL, labels = NULL,
 					zoom = 8)
 
 add_legende_joignantes(map, titre = NULL, lng = NULL, lat = NULL, dom = "0",
@@ -84,9 +88,11 @@ add_legende_saphirs(map, titre = NULL, lng = NULL, lat = NULL, dom = "0", precis
 \seealso{
 	\code{\link{coord_legende}}
 	
-	\code{\link{leaflet_ronds}, \link{leaflet_classes}, \link{leaflet_ronds_classes}, \link{leaflet_classes_ronds}, \link{leaflet_typo},}
+	\code{\link{leaflet_fonds_simples}}
 	
-	\code{\link{leaflet_oursins}, \link{leaflet_joignantes}, \link{leaflet_saphirs}}
+	\code{\link{leaflet_ronds} \link{leaflet_classes} \link{leaflet_ronds_classes} \link{leaflet_classes_ronds} \link{leaflet_typo}}
+	
+	\code{\link{leaflet_oursins} \link{leaflet_joignantes} \link{leaflet_saphirs}}
 }
 \examples{
 data("depm")

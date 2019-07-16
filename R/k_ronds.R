@@ -7,10 +7,10 @@ function(fond_carto_k,fond_carto_elargi_k,variable_jointure_fond_carto_k,donnees
     fond_carto_k <- fond_carto_k[as.data.frame(fond_carto_k)[,variable_jointure_fond_carto_k] %in% donnees_k[,variable_jointure_donnees_k],]
     base <- merge(as.data.frame(fond_carto_k)[,-length(names(fond_carto_k))],donnees_k,by.x=variable_jointure_fond_carto_k,by.y=variable_jointure_donnees_k)
     
-    if(length(names(base)[grep("..y",names(base))])>0)
+    if(length(names(base)[grep("[.]y",names(base))])>0)
     {
-      base2 <- base[,-grep("..y",names(base))]
-      names(base)[grep("..x",names(base))]<-sub(".x","",names(base)[grep("..x",names(base))])
+      base2 <- base[,-grep("[.]y",names(base))]
+      names(base)[grep("[.]x",names(base))]<-sub(".x","",names(base)[grep("[.]x",names(base))])
     }
     if(nrow(base)>0)
     {
@@ -45,10 +45,10 @@ function(fond_carto_k,fond_carto_elargi_k,variable_jointure_fond_carto_k,donnees
       fond_carto_elargi_k <- fond_carto_elargi_k[as.data.frame(fond_carto_elargi_k)[,variable_jointure_fond_carto_k] %in% donnees_k[,variable_jointure_donnees_k],]
       
       base_elargi <- merge(as.data.frame(fond_carto_elargi_k)[,-length(names(fond_carto_elargi_k))],donnees_k,by.x=variable_jointure_fond_carto_k,by.y=variable_jointure_donnees_k)
-      if (length(names(base_elargi)[grep("..y",names(base_elargi))])>0)
+      if (length(names(base_elargi)[grep("[.]y",names(base_elargi))])>0)
       {
-        base_elargi <- base_elargi[,-grep("..y",names(base_elargi))]
-        names(base_elargi)[grep("..x",names(base_elargi))]<-sub(".x","",names(base_elargi)[grep("..x",names(base_elargi))])
+        base_elargi <- base_elargi[,-grep("[.]y",names(base_elargi))]
+        names(base_elargi)[grep("[.]x",names(base_elargi))]<-sub(".x","",names(base_elargi)[grep("[.]x",names(base_elargi))])
       }
       
       base_elargi <- base_elargi[abs(base_elargi[,variable_a_representer_k])>=0,]
