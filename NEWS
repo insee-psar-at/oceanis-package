@@ -1,0 +1,24 @@
+Changes in version 0.9.0
+
+FEATURES
+
+- Ajout de la fonction leaflet_fonds_simples permettant de créer une carte leaflet sans analyse. Il est possible à partir de cette fonction d'afficher plusieurs fonds, à organiser dans une liste passée en paramètre.
+
+- Ajout de la fonction set_fonds_simples permettant de modifier l'apparence des fonds d'une carte leaflet créée à partir de la fonction leaflet_fonds_simples.
+
+- Ajout de la fonction add_typo_symboles permettant d'ajouter une typologie de symboles sur une carte leaflet créée à partir de la fonction leaflet_fonds_simples.
+
+- Ajout de la fonction add_legende_typo_symboles permettant d'ajouter une légende à une carte leaflet en typologie de symboles.
+
+- Ajout de la fonction plot_typo_symboles permettant de créer une carte plot en typologie de symboles.
+
+
+Changes in version 0.8.6
+
+FEATURES
+
+- Suppression de la fonction lecture_fichier. Pour importer les données, il est recommandé d'utiliser la fonction import du package rio.
+
+- Création d'un repo du package oceanis sur github. Ajout des adresses URL dans le fichier DESCRIPTION.
+
+- Création du badge "Awesome official statistics software".
