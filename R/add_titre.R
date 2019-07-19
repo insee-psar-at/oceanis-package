@@ -1,14 +1,21 @@
 add_titre <-
-function(map, titre, sousTitre=NULL)
+function(map, titre, sousTitre=NULL, map_leaflet = NULL)
   {
-    msg_error1<-msg_error2 <- NULL
+    msg_error1<-msg_error2<-msg_error3 <- NULL
     
-    if(any(!any(class(map) %in% "leaflet"),!any(class(map) %in% "htmlwidget"))) msg_error1 <- "La carte doit etre un objet leaflet / "
+    if (any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
     if(!is.null(titre)) if(any(class(titre)!="character")) msg_error2 <- "Le titre doit etre de type caractere / "
-    
-    if(any(!is.null(msg_error1),!is.null(msg_error2)))
+    if (!is.null(map_leaflet)) if (any(!any(class(map_leaflet) %in% "leaflet"), !any(class(map_leaflet) %in% "htmlwidget"))) msg_error3 <- "La carte doit etre un objet leaflet / "
+      
+    if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3)))
     {
-      stop(simpleError(paste0(msg_error1,msg_error2)))
+      stop(simpleError(paste0(msg_error1,msg_error2,msg_error3)))
+    }
+    
+    if(!is.null(map_leaflet))
+    {
+      map_proxy <- map
+      map <- map_leaflet
     }
     
     idx_titre <- NULL
@@ -24,7 +31,6 @@ function(map, titre, sousTitre=NULL)
     
     tag.map.title <- tags$style(HTML("
                                      .leaflet-control.map-title {
-                                     position: fixed !important;
                                      left: 8%;
                                      text-align: center;
                                      background: rgba(255,255,255,0.75);
@@ -32,10 +38,9 @@ function(map, titre, sousTitre=NULL)
                                      font-size: 16px;
                                      }
                                      "))
-    
+    #position: fixed !important;
     tag.map.subtitle <- tags$style(HTML("
                                         .leaflet-control.map-subtitle {
-                                        position: fixed !important;
                                         left: 15%;
                                         top: 10%;
                                         text-align: center;
@@ -43,10 +48,9 @@ function(map, titre, sousTitre=NULL)
                                         font-size: 14px;
                                         }
                                         "))
-    
     if(!is.null(titre))
     {
-      titre <- iconv(titre,"latin1","utf8")
+      # titre <- iconv(titre,"latin1","utf8")
       
       title <- tags$div(
         tag.map.title, HTML(titre)
@@ -54,7 +58,7 @@ function(map, titre, sousTitre=NULL)
       
       if(!is.null(sousTitre))
       {
-        sousTitre <- iconv(sousTitre,"latin1","utf8")
+        # sousTitre <- iconv(sousTitre,"latin1","utf8")
         
         subtitle <- tags$div(
           tag.map.subtitle, HTML(sousTitre)
@@ -63,7 +67,9 @@ function(map, titre, sousTitre=NULL)
       
       if(is.null(idx_titre)) # on n'a pas encore mis de titre
       {
+        if(!is.null(map_leaflet)) map <- map_proxy
         map <- addControl(map = map, title, position = "topleft", className="map-title")
+        if(!is.null(map_leaflet)) map_proxy <- map
       }else # un titre existe deja, on le remplace
       {
         ancien_titre <- map$x$calls[[idx_titre]]$args[[1]]
@@ -76,7 +82,11 @@ function(map, titre, sousTitre=NULL)
       
       if(is.null(idx_soustitre)) # on n'a pas mis de sous-titre
       {
-        if(!is.null(sousTitre)) map <- addControl(map = map, subtitle, position = "topleft", className="map-subtitle")
+        if(!is.null(sousTitre))
+        {
+          if(!is.null(map_leaflet)) map <- map_proxy
+          map <- addControl(map = map, subtitle, position = "topleft", className="map-subtitle")
+        }
       }else # un sous-titre existe deja
       {
         if(!is.null(sousTitre)) # on le remplace

@@ -70,10 +70,12 @@ function(map,paletteTypo=NULL,colBorder="white")
       map$x$calls[[idx_carte]]$args[[4]]$color <- colBorder
     }
     
-    for(i in 1:length(idx_legende))
+    if(legende)
     {
-      map$x$calls[[idx_legende[i]]]$args[[4]]$fillColor <- paletteTypo[i]
+      for(i in 1:length(idx_legende))
+      {
+        map$x$calls[[idx_legende[i]]]$args[[4]]$fillColor <- paletteTypo[i]
+      }
     }
-    
     return(map)
   }

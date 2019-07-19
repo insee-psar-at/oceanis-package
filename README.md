@@ -35,23 +35,23 @@ La vignette propose notamment un exemple de scénario de réalisation de cartes 
 Ci-dessous quelques exemples de cartes réalisées avec le package _oceanis_ :
 
 - Fonction _shiny_classes_ronds_
-![](vignettes/images/readme_shiny_ac_rp.PNG)
+![](vignettes/images/readme_shiny_ac_rp.png)
 
 - Fonction _shiny_saphirs_
-![](vignettes/images/readme_shiny_fs.PNG)
+![](vignettes/images/readme_shiny_fs.png)
 
 - Fonctions _leaflet_ronds_classes_, _add_legende_classes_ et _add_legende_ronds_
-![](vignettes/images/readme_leaflet_rp_ac.PNG)
+![](vignettes/images/readme_leaflet_rp_ac.png)
 
 - Fonctions _leaflet_typo_ et _add_legende_typo_
-![](vignettes/images/readme_leaflet_typo.PNG)
+![](vignettes/images/readme_leaflet_typo.png)
 
 - Fonctions _leaflet_fonds_simples_, _add_typo_symboles_ et _add_legende_typo_symboles_
-![](vignettes/images/readme_leaflet_typo_symbole.PNG)
+![](vignettes/images/readme_leaflet_typo_symbole.png)
 
 - Fonctions _leaflet_joignantes_ et _add_legende_joignantes_
-![](vignettes/images/readme_leaflet_fj.PNG)
+![](vignettes/images/readme_leaflet_fj.png)
 
 - Fonctions _plot_classes_ronds_ et _coordonnees_etiquettes_
-![](vignettes/images/readme_plot_ac_rp.PNG)
+![](vignettes/images/readme_plot_ac_rp.png)
 

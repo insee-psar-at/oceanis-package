@@ -1,11 +1,11 @@
 plot_typo_symboles <-
-function(fondPoints,listFonds,dom="0",types=NULL,couleurs=NULL,tailles=NULL,epaisseurs=NULL,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,labels=NULL)
+function(fondPoints,listFonds,dom="0",types=NULL,couleurs=NULL,tailles=NULL,epaisseurs=NULL,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,labels=NULL,xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
     # Verification des parametres
     
-    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15 <- NULL
+    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17 <- NULL
     
     if(any(!any(class(fondPoints) %in% "sf"),!any(class(fondPoints) %in% "data.frame"))) msg_error1 <- "Le fond de points doit etre un objet sf / "
     if(any(!any(class(listFonds[[1]]) %in% "sf"),!any(class(listFonds[[1]]) %in% "data.frame"))) msg_error2 <- "La liste des fonds doit etre une liste d'objets sf / "
@@ -22,14 +22,16 @@ function(fondPoints,listFonds,dom="0",types=NULL,couleurs=NULL,tailles=NULL,epai
     if(!is.null(etiquettes)) if(!any(class(etiquettes) %in% "character" | class(etiquettes) %in% "data.frame")) msg_error13 <- "La table des etiquettes peut etre soit un vecteur caractere soit un data.frame (voir aide) / "
     if(!dom %in% c("0","971","972","973","974","976")) msg_error14 <- "La variable dom doit etre '0', '971', '972', '973', '974' ou '976' / "
     if(!is.null(labels)) if(any(class(labels)!="character")) msg_error15 <- "Les labels doivent etre un vecteur de type caractere / "
+    if(!is.null(xlim)) if(any(class(xlim)!="numeric")) msg_error16 <- "La variable xlim doit etre de type numerique / "
+    if(!is.null(ylim)) if(any(class(ylim)!="numeric")) msg_error17 <- "La variable yim doit etre de type numerique / "
     
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
            !is.null(msg_error9),!is.null(msg_error10),!is.null(msg_error11),!is.null(msg_error12),
-           !is.null(msg_error13),!is.null(msg_error14),!is.null(msg_error15)))
+           !is.null(msg_error13),!is.null(msg_error14),!is.null(msg_error15),!is.null(msg_error16),!is.null(msg_error17)))
     {
       stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6,msg_error7,msg_error8,
-                              msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15)))
+                              msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,msg_error16,msg_error17)))
     }
     
     names(fondPoints)[1] <- "CODE"
@@ -91,6 +93,9 @@ function(fondPoints,listFonds,dom="0",types=NULL,couleurs=NULL,tailles=NULL,epai
       tableEtiquettes <- table_etiquettes(listFonds[[1]],etiquettes)
     }
     
+    if(is.null(xlim)) xlim <- c(st_bbox(fondMaille)$xmin,st_bbox(fondMaille)$xmax+x_marge*3)
+    if(is.null(ylim)) ylim <- c(st_bbox(fondMaille)$ymin,st_bbox(fondMaille)$ymax+y_marge*3)
+    
     par(mai=c(0,0,0,0))
     
     for(i in 1:length(listFonds))
@@ -102,7 +107,13 @@ function(fondPoints,listFonds,dom="0",types=NULL,couleurs=NULL,tailles=NULL,epai
       
       if(i==1)
       {
-        plot(st_geometry(listFonds[[1]]),col=colFond,border=colBorder,lwd=epaisseur)
+        if(is.null(xlim) | is.null(ylim))
+        {
+          plot(st_geometry(listFonds[[1]]),col=colFond,border=colBorder,lwd=epaisseur)
+        }else
+        {
+          plot(st_geometry(listFonds[[1]]),xlim=xlim,ylim=ylim,col=colFond,border=colBorder,lwd=epaisseur)
+        }
       }else
       {
         plot(st_geometry(listFonds[[i]]),col=colFond,border=colBorder,lwd=epaisseur,add=T)

@@ -1,14 +1,21 @@
 add_source <-
-function(map, source)
+function(map, source, map_leaflet = NULL)
   {
-    msg_error1<-msg_error2 <- NULL
+    msg_error1<-msg_error2<-msg_error3 <- NULL
     
-    if(any(!any(class(map) %in% "leaflet"),!any(class(map) %in% "htmlwidget"))) msg_error1 <- "La carte doit etre un objet leaflet / "
-    if(!is.null(source)) if(any(class(source)!="character")) msg_error2 <- "La source doit etre de type caractere / "
+    if (any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
+    if(!is.null(source)) if(any(class(titre)!="character")) msg_error2 <- "La source doit etre de type caractere / "
+    if (!is.null(map_leaflet)) if (any(!any(class(map_leaflet) %in% "leaflet"), !any(class(map_leaflet) %in% "htmlwidget"))) msg_error3 <- "La carte doit etre un objet leaflet / "
     
-    if(any(!is.null(msg_error1),!is.null(msg_error2)))
+    if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3)))
     {
-      stop(simpleError(paste0(msg_error1,msg_error2)))
+      stop(simpleError(paste0(msg_error1,msg_error2,msg_error3)))
+    }
+    
+    if(!is.null(map_leaflet))
+    {
+      map_proxy <- map
+      map <- map_leaflet
     }
     
     idx_source <- NULL
@@ -39,6 +46,7 @@ function(map, source)
       
       if(is.null(idx_source)) # on n'a pas encore mis de source
       {
+        if(!is.null(map_leaflet)) map <- map_proxy
         map <- addControl(map = map, sourc, position = "bottomright", className="map-sourc")
       }else # une source existe deja, on la remplace
       {

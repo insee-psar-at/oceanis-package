@@ -1,11 +1,11 @@
 plot_classes <-
-function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRatio,methode="kmeans",nbClasses=3,bornes=NULL,precisionLegClasses=1,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="white")
+function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRatio,methode="kmeans",nbClasses=3,bornes=NULL,precisionLegClasses=1,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="white",xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
     # Verification des parametres
     
-    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20<-msg_error21<-msg_error22<-msg_error23<-msg_error24<-msg_error25 <- NULL
+    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20<-msg_error21<-msg_error22<-msg_error23<-msg_error24<-msg_error25<-msg_error26<-msg_error27 <- NULL
     
     if(any(class(data)!="data.frame")) msg_error1 <- "Les donnees doivent etre dans un data.frame / "
     if(any(!any(class(fondMaille) %in% "sf"),!any(class(fondMaille) %in% "data.frame"))) msg_error2 <- "Le fond de maille doit etre un objet sf / "
@@ -27,24 +27,27 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
     if(!is.null(palettePos)) if(any(class(palettePos)!="character")) msg_error18 <- "La palette des classes doit etre un vecteur de type caractere / "
     if(!is.null(paletteNeg)) if(any(class(paletteNeg)!="character")) msg_error19 <- "La palette des classes doit etre un vecteur de type caractere / "
     if(any(class(colBorder)!="character")) msg_error20 <- "La couleur de la bordure doit etre de type caractere (nommee ou hexadecimal) / "
+    if(!is.null(xlim)) if(any(class(xlim)!="numeric")) msg_error21 <- "La variable xlim doit etre de type numerique / "
+    if(!is.null(ylim)) if(any(class(ylim)!="numeric")) msg_error22 <- "La variable yim doit etre de type numerique / "
     
-    if(length(names(data))<2) msg_error21 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et la variable a representer / "
-    if(length(names(fondMaille))<3) msg_error22 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
+    if(length(names(data))<2) msg_error23 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et la variable a representer / "
+    if(length(names(fondMaille))<3) msg_error24 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
     
-    if(!any(names(data) %in% idData))  msg_error23 <- "La variable identifiant les donnees n'existe pas dans la table des donnees / "
-    if(!any(names(data) %in% varRatio))  msg_error24 <- "La variable a representer n'existe pas dans la table des donnees / "
-    if(!methode %in% c("kmeans","fisher","jenks","quantile")) msg_error25 <- "Le nom de la methode doit etre 'kmeans', 'fisher', 'jenks' ou 'quantile' / "
+    if(!any(names(data) %in% idData))  msg_error25 <- "La variable identifiant les donnees n'existe pas dans la table des donnees / "
+    if(!any(names(data) %in% varRatio))  msg_error26 <- "La variable a representer n'existe pas dans la table des donnees / "
+    if(!methode %in% c("kmeans","fisher","jenks","quantile")) msg_error27 <- "Le nom de la methode doit etre 'kmeans', 'fisher', 'jenks' ou 'quantile' / "
     
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
            !is.null(msg_error9),!is.null(msg_error10),!is.null(msg_error11),!is.null(msg_error12),
            !is.null(msg_error13),!is.null(msg_error14),!is.null(msg_error15),!is.null(msg_error16),
            !is.null(msg_error17),!is.null(msg_error18),!is.null(msg_error19),!is.null(msg_error20),
-           !is.null(msg_error21),!is.null(msg_error22),!is.null(msg_error23),!is.null(msg_error24),!is.null(msg_error25)))
+           !is.null(msg_error21),!is.null(msg_error22),!is.null(msg_error23),!is.null(msg_error24),
+           !is.null(msg_error25),!is.null(msg_error26),!is.null(msg_error27)))
     {
       stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6,msg_error7,msg_error8,
                               msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,
-                              msg_error16,msg_error17,msg_error18,msg_error19,msg_error20,msg_error21,msg_error22,msg_error23,msg_error24,msg_error25)))
+                              msg_error16,msg_error17,msg_error18,msg_error19,msg_error20,msg_error21,msg_error22,msg_error23,msg_error24,msg_error25,msg_error26,msg_error27)))
     }
     
     names(data)[names(data)==idData] <- "CODE"
@@ -212,8 +215,11 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
       tableEtiquettes <- table_etiquettes(fondMaille,etiquettes)
     }
     
+    if(is.null(xlim)) xlim <- c(st_bbox(fondMaille)$xmin,st_bbox(fondMaille)$xmax+x_marge*3)
+    if(is.null(ylim)) ylim <- c(st_bbox(fondMaille)$ymin,st_bbox(fondMaille)$ymax+y_marge*3)
+    
     par(mai=c(0,0,0,0))
-    plot(st_geometry(fondMaille),xlim=c(st_bbox(fondMaille)$xmin,st_bbox(fondMaille)$xmax+x_marge*3),ylim=c(st_bbox(fondMaille)$ymin,st_bbox(fondMaille)$ymax+y_marge*3),border=colBorder)
+    plot(st_geometry(fondMaille),xlim=xlim,ylim=ylim,border=colBorderMaille)
     
     if(!is.null(fondSousAnalyse))
     {

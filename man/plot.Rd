@@ -19,14 +19,15 @@ plot_ronds(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL, idDa
 varVolume, rayonRond = NULL, rapportRond = NULL, dom = "0", fondChx = NULL,
 precisionLegRonds = 0, titreLeg = "", xLeg = NULL, yLeg = NULL,
 titreCarte = "", sourceCarte = "", etiquettes = NULL, colPos = "#CD853F",
-colNeg = "#6495ED", colBorder = "white", colBorderMaille = "black")
+colNeg = "#6495ED", colBorder = "white", colBorderMaille = "black",
+xlim = NULL, ylim = NULL)
 
 plot_classes(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL, idData,
 varRatio,  methode = "kmeans", nbClasses = 3, bornes = NULL,
 precisionLegClasses = 1, titreLeg = "", xLeg = NULL, yLeg = NULL,
 titreCarte = "", sourceCarte = "", etiquettes = NULL,
 stylePalette = "defaut", palettePos = NULL, paletteNeg = NULL,
-colBorder = "white")
+colBorder = "white", xlim = NULL, ylim = NULL)
 
 plot_ronds_classes(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL,
 idData, varVolume, varRatio, rayonRond = NULL, rapportRond = NULL,
@@ -36,7 +37,8 @@ fondChx = NULL, titreLegRonds = "", titreLegClasses = "",
 xLegRonds = NULL, yLegRonds = NULL, xLegClasses = NULL,
 yLegClasses = NULL, titreCarte = "", sourceCarte = "",
 etiquettes = NULL, stylePalette = "defaut", palettePos = NULL,
-paletteNeg = NULL, colBorder = "white", colBorderMaille = "black")
+paletteNeg = NULL, colBorder = "white", colBorderMaille = "black",
+xlim = NULL, ylim = NULL)
 
 plot_classes_ronds(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL,
 idData, varVolume, varRatio, rayonRond = NULL, rapportRond = NULL,
@@ -46,22 +48,24 @@ fondChx = NULL, titreLegRonds = "", titreLegClasses = "",
 xLegRonds = NULL, yLegRonds = NULL, xLegClasses = NULL,
 yLegClasses = NULL, titreCarte = "", sourceCarte = "",
 etiquettes = NULL, stylePalette = "defaut", palettePos = NULL,
-paletteNeg = NULL, colBorder = "white", colBorderRonds = "#303030")
+paletteNeg = NULL, colBorder = "white", colBorderRonds = "#303030",
+xlim = NULL, ylim = NULL)
 
 plot_typo(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL, idData,
 varTypo, titreLeg = "", xLeg = NULL, yLeg = NULL, titreCarte = "",
 sourceCarte = "", etiquettes = NULL, paletteTypo = NULL, labels = NULL,
-colBorder = "white")
+colBorder = "white", xlim = NULL, ylim = NULL)
 
 plot_typo_symboles(fondPoints, listFonds, dom = "0", types = NULL, couleurs = NULL,
 tailles = NULL, epaisseurs = NULL, titreLeg = "", xLeg = NULL, yLeg = NULL,
-titreCarte = "", sourceCarte = "", etiquettes = NULL, labels = NULL)
+titreCarte = "", sourceCarte = "", etiquettes = NULL, labels = NULL,
+xlim = NULL, ylim = NULL)
 
 plot_oursins(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL,
 idDataDepart, idDataArrivee, varFlux, filtreVol = 0, filtreDist = 100,
 filtreMajeurs = 10, decalageAllerRetour = 0, decalageCentroid = 0,
 titreCarte = "", sourceCarte = "", etiquettes = NULL, epaisseur = 2,
-colTrait = "black", colBorderMaille = "black")
+colTrait = "black", colBorderMaille = "black", xlim = NULL, ylim = NULL)
 
 plot_joignantes(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL,
 typeMaille, idDataDepart, idDataArrivee, varFlux,
@@ -70,14 +74,14 @@ filtreMajeurs = 10, decalageAllerRetour = 0, decalageCentroid = 0,
 dom = "0", precisionLegFleches = 0, titreLeg = "",
 xLeg = NULL, yLeg = NULL, titreCarte = "", sourceCarte = "",
 etiquettes = NULL, colFleche = "#CD853F",
-colBorder = "white", colBorderMaille = "black")
+colBorder = "white", colBorderMaille = "black", xlim = NULL, ylim = NULL)
 
 plot_saphirs(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL,
 typeMaille, idDataDepart, idDataArrivee, varFlux, largeurFlecheMax = NULL,
 direction = "Ent", filtreVol = 0, dom = "0",  precisionLegFleches = 0,
 titreLeg = "", xLeg = NULL, yLeg = NULL, titreCarte = "", sourceCarte = "",
 etiquettes = NULL, colEntree = "#CD853F", colSortie = "#6495ED",
-colBorder = "white",  colBorderMaille = "black")
+colBorder = "white",  colBorderMaille = "black", xlim = NULL, ylim = NULL)
 }
 \arguments{
 \item{data}{
@@ -266,6 +270,12 @@ colBorder = "white",  colBorderMaille = "black")
   \item{colSortie}{
 	chaine de caracteres (character). Couleur nommee (par exemple "blue") ou hexadecimal (par exemple "#0000FF"). Par defaut "#6495ED".
 }
+  \item{xlim}{
+	vecteur de numeriques (numeric). Coordonnees xmin et xmax de la carte. Par defaut a NULL.
+}
+  \item{ylim}{
+	vecteur de numerique (numeric). Coordonnees ymin et ymax de la carte. Par defaut a NULL.
+}
 }
 \details{
 	Les cartes en sortie "plot" ne sont pas interactives. Il faut eviter de zoomer sur la carte au risque de voir apparaitre des decalages entre les couches.
@@ -381,6 +391,8 @@ colBorder = "white",  colBorderMaille = "black")
 				- Pour afficher la carte avec les etiquettes formatees, il faut passer ce tableau dans le parametre "etiquettes" de la fonction plot.
 		}
 	}
+	
+	Il est tout de meme possible de zoomer sur la carte en specifiant les parametres xlim et ylim. Par defaut, la carte est centree sur le fond de maille. Pour connaitre les limites par defaut, executer la fonction \code{sf::st_bbox(fondMaille)}
 }
 \value{
 	Retourne un objet sf. Il s'agit du fond des ronds (ronds proportionnels, classes dans ronds proportionnels, ronds sur analyse en classes), de la maille (analyse en classes, typologie) ou des fleches (oursins, fleches joignantes, fleches saphirs).

@@ -3,12 +3,12 @@ function(map,fondPoints,types=NULL,couleurs=NULL,tailles=NULL,epaisseurs=NULL)
   {
     msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6 <- NULL
     
-    if(any(!any(class(map) %in% "leaflet"),!any(class(map) %in% "htmlwidget"))) msg_error1 <- "La carte doit etre un objet leaflet / "
+    if (any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
     if(any(!any(class(fondPoints) %in% "sf"),!any(class(fondPoints) %in% "data.frame"))) msg_error2 <- "Le fond de points doit etre un objet sf / "
-    if(!is.null(types)) if(any(class(types)!="numeric")) msg_error4 <- "Le type des symboles doit etre un vecteur de valeurs numeriques (de 0 a 25 - voir aide) / "
-    if(!is.null(couleurs)) if(any(class(couleurs)!="character")) msg_error5 <- "La couleur des symboles doit etre un vecteur de chaines de caracteres (nommee ou hexadecimal) / "
-    if(!is.null(tailles)) if(any(class(tailles)!="numeric")) msg_error6 <- "La taille des symboles doit etre un vecteur de valeurs numeriques / "
-    if(!is.null(epaisseurs)) if(any(class(epaisseurs)!="numeric")) msg_error7 <- "L'epaisseur des symboles doit etre un vecteur de valeurs numeriques / "
+    if(!is.null(types)) if(any(class(types)!="numeric")) msg_error3 <- "Le type des symboles doit etre un vecteur de valeurs numeriques (de 0 a 25 - voir aide) / "
+    if(!is.null(couleurs)) if(any(class(couleurs)!="character")) msg_error4 <- "La couleur des symboles doit etre un vecteur de chaines de caracteres (nommee ou hexadecimal) / "
+    if(!is.null(tailles)) if(any(class(tailles)!="numeric")) msg_error5 <- "La taille des symboles doit etre un vecteur de valeurs numeriques / "
+    if(!is.null(epaisseurs)) if(any(class(epaisseurs)!="numeric")) msg_error6 <- "L'epaisseur des symboles doit etre un vecteur de valeurs numeriques / "
     
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),!is.null(msg_error5),!is.null(msg_error6)))
     {

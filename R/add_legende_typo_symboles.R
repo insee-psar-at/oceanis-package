@@ -1,18 +1,19 @@
 add_legende_typo_symboles <-
-function(map,titre=NULL,lng=NULL,lat=NULL,labels=NULL,zoom=8)
+function(map,titre=NULL,lng=NULL,lat=NULL,labels=NULL,zoom=8,map_leaflet=NULL)
   {
     # Verification des parametres
     
-    msg_error1<-msg_error2<-msg_error3<-msg_error4 <- NULL
+    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5 <- NULL
     
-    if(any(!any(class(map) %in% "leaflet"),!any(class(map) %in% "htmlwidget"))) msg_error1 <- "La carte doit etre un objet leaflet / "
+    if (any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
     if(!is.null(lng)) if(any(class(lng)!="numeric")) msg_error2 <- "La longitude doit etre de type numerique (en coordonnees WGS84) / "
     if(!is.null(lat)) if(any(class(lat)!="numeric")) msg_error3 <- "La latitude doit etre de type numerique (en coordonnees WGS84) / "
     if(!is.null(labels)) if(any(class(labels)!="character")) msg_error4 <- "Les labels doivent etre un vecteur de type caractere / "
+    if (!is.null(map_leaflet)) if (any(!any(class(map_leaflet) %in% "leaflet"), !any(class(map_leaflet) %in% "htmlwidget"))) msg_error5 <- "La carte doit etre un objet leaflet / "
     
-    if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4)))
+    if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),!is.null(msg_error5)))
     {
-      stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4)))
+      stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5)))
     }
     
     if(is.null(titre)) titre <- " "
@@ -20,6 +21,12 @@ function(map,titre=NULL,lng=NULL,lat=NULL,labels=NULL,zoom=8)
     if(!is.null(labels))
     {
       labels<-iconv(labels,"latin1","utf8")
+    }
+    
+    if(!is.null(map_leaflet))
+    {
+      map_proxy <- map
+      map <- map_leaflet
     }
     
     idx_carte <- NULL
@@ -36,11 +43,21 @@ function(map,titre=NULL,lng=NULL,lat=NULL,labels=NULL,zoom=8)
       }
     }
     
-    code_epsg <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[3]]$code_epsg
-    
     coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
     
-    nbSymbLeg <- length(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[5]]$types)
+    types <- NULL
+    couleurs <- NULL
+    tailles <- NULL
+    epaisseurs <- NULL
+    for(i in 1:length(idx_carte))
+    {
+      types <- c(types,map$x$calls[[idx_carte[i]]]$args[[5]]$types)
+      couleurs <- c(couleurs,map$x$calls[[idx_carte[i]]]$args[[5]]$couleurs)
+      tailles <- c(tailles,map$x$calls[[idx_carte[i]]]$args[[5]]$tailles)
+      epaisseurs <- c(epaisseurs,map$x$calls[[idx_carte[i]]]$args[[5]]$epaisseurs)
+    }
+    symbLeg <- unique(data.frame(types, couleurs, tailles, epaisseurs))
+    nbSymbLeg <- nrow(symbLeg)
     
     lng_init <- lng
     lat_init <- lat
@@ -122,11 +139,19 @@ function(map,titre=NULL,lng=NULL,lat=NULL,labels=NULL,zoom=8)
         files
       }
       
+      if(!is.null(map_leaflet)) map <- map_proxy
+      
       for(i in 1:nbSymbLeg)
       {
-        iconFiles <- pchIcons(pch = map$x$calls[[idx_marker[i]]]$args[[5]]$types[i], width = map$x$calls[[idx_marker[i]]]$args[[5]]$tailles[i], height = map$x$calls[[idx_marker[i]]]$args[[5]]$tailles[i], col = map$x$calls[[idx_marker[i]]]$args[[5]]$couleurs[i], lwd = map$x$calls[[idx_marker[i]]]$args[[5]]$epaisseurs[i])
+        iconFiles <- pchIcons(pch = symbLeg$types[i], 
+                              width = symbLeg$tailles[i], 
+                              height = symbLeg$tailles[i], 
+                              col = symbLeg$couleurs[i], 
+                              lwd = symbLeg$epaisseurs[i])
+        iconX <- symbLeg$tailles[i]/2
+        iconY <- symbLeg$tailles[i]/2
         
-        map <- addMarkers(map = map, lng = lng[i], lat = lat[i], icon = icons(iconUrl = iconFiles, iconAnchorX = map$x$calls[[idx_marker[i]]]$args[[5]]$tailles[i]/2, iconAnchorY = map$x$calls[[idx_marker[i]]]$args[[5]]$tailles[i]/2),
+        map <- addMarkers(map = map, lng = lng[i], lat = lat[i], icon = icons(iconUrl = iconFiles, iconAnchorX = iconX, iconAnchorY = iconY),
                           options = pathOptions(clickable = F),
                           group = list(nom_couche="legende_typo_symb"))
         
