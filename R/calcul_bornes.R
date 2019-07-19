@@ -118,7 +118,7 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
         }
       }else if(methode!="manuel")# Pour la methode des quantiles, on ne gere pas la borne zero pour ne pas fausser l'equi-distribution des effectifs dans les classes.
       {
-        print("La methode des quantiles ne permet pas de gerer la borne a 0. Vous pouvez passer en mode manuel pour modifier les bornes des classes.")
+        message(simpleMessage("La methode des quantiles ne permet pas de gerer la borne a 0. Vous pouvez passer en mode manuel pour modifier les bornes des classes."))
         
         # On doit tout de meme determiner la couleur de la classe autour de zero
         

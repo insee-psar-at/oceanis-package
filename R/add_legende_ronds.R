@@ -1,14 +1,14 @@
 add_legende_ronds <-
-function(map,titre=NULL,lng=NULL,lat=NULL,dom="0",precision=0,zoom=8)
+function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
   {
     # Verification des parametres
     
     msg_error1<-msg_error2<-msg_error3<-msg_error4 <- NULL
     
-    if(any(!any(class(map) %in% "leaflet"),!any(class(map) %in% "htmlwidget"))) msg_error1 <- "La carte doit etre un objet leaflet / "
+    if (any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
     if(!is.null(lng)) if(any(class(lng)!="numeric")) msg_error2 <- "La longitude doit etre de type numerique (en coordonnees WGS84) / "
     if(!is.null(lat)) if(any(class(lat)!="numeric")) msg_error3 <- "La latitude doit etre de type numerique (en coordonnees WGS84) / "
-    if(!dom %in% c("0","971","972","973","974","976")) msg_error4 <- "La variable dom doit etre '0', '971', '972', '973', '974' ou '976' / "
+    if (!is.null(map_leaflet)) if (any(!any(class(map_leaflet) %in% "leaflet"), !any(class(map_leaflet) %in% "htmlwidget"))) msg_error4 <- "La carte doit etre un objet leaflet / "
     
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4)))
     {
@@ -16,72 +16,139 @@ function(map,titre=NULL,lng=NULL,lat=NULL,dom="0",precision=0,zoom=8)
     }
     
     if(is.null(titre)) titre <- " "
-    titre<-iconv(titre,"latin1","utf8")
     
-    idx_carte <- NULL
-    idx_legende <- NULL
-    for(i in 1:length(map$x$calls))
-    {
-      if(map$x$calls[[i]]$method %in% "addPolygons")
-      {
-        if(any(map$x$calls[[i]]$args[3][[1]]$nom_couche %in% c("carte_ronds","carte_ronds_classes","carte_classes_ronds"))) idx_carte <- c(idx_carte,i)
-      }
-      if(map$x$calls[[i]]$method %in% "addCircles")
-      {
-        if(any(map$x$calls[[i]]$args[5][[1]]$nom_couche %in% c("carte_ronds","carte_ronds_classes","carte_classes_ronds"))) idx_carte <- c(idx_carte,i)
-      }
-      if(map$x$calls[[i]]$method %in% "addCircles")
-      {
-        if(map$x$calls[[i]]$args[5][[1]]$nom_couche=="legende_ronds") idx_legende <- c(idx_legende,i)
-      }
-      if(!is.null(idx_legende)) # la legende existe
-      {
-        if(map$x$calls[[i]]$method=="addPolylines")
-        {
-          if(map$x$calls[[i]]$args[3][[1]]$nom_couche=="legende_ronds") idx_legende <- c(idx_legende,i)
-        }
-        if(map$x$calls[[i]]$method %in% "addMarkers")
-        {
-          if(map$x$calls[[i]]$args[5][[1]]$nom_couche=="legende_ronds") idx_legende <- c(idx_legende,i)
-        }
-      }
-    }
+    coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
     
-    code_epsg <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[5]]$code_epsg
-    
-    lng_init <- lng
-    lat_init <- lat
-    if(!is.null(idx_legende) & (is.null(lng_init) | is.null(lat_init)))# l'utilisateur veut juste supprimer la legende existante
+    if(any(class(map) %in% "leaflet"))
     {
-      map$x$calls <- map$x$calls[-idx_legende]
-    }else
-    {
-      if(!is.null(idx_legende)) map$x$calls <- map$x$calls[-idx_legende] # Si la legende existe, on la supprime pour la recreer
+      idx_carte <- NULL
+      idx_legende <- NULL
       
-      j <- NULL
       for(i in 1:length(map$x$calls))
       {
+        if(map$x$calls[[i]]$method %in% "addPolygons")
+        {
+          if(any(map$x$calls[[i]]$args[[3]] %in% c("carte_ronds","carte_ronds_classes","carte_classes_ronds"))) idx_carte <- c(idx_carte,i)
+        }
         if(map$x$calls[[i]]$method %in% "addCircles")
         {
-          j <- i
+          if(any(map$x$calls[[i]]$args[[5]] %in% c("carte_ronds","carte_ronds_classes","carte_classes_ronds"))) idx_carte <- c(idx_carte,i)
+        }
+        if(map$x$calls[[i]]$method %in% "addCircles")
+        {
+          if(map$x$calls[[i]]$args[[5]]=="legende_ronds") idx_legende <- c(idx_legende,i)
+        }
+        if(!is.null(idx_legende)) # la legende existe
+        {
+          if(map$x$calls[[i]]$method=="addPolylines")
+          {
+            if(map$x$calls[[i]]$args[[3]]=="legende_ronds") idx_legende <- c(idx_legende,i)
+          }
+          if(map$x$calls[[i]]$method %in% "addMarkers")
+          {
+            if(map$x$calls[[i]]$args[[5]]=="legende_ronds") idx_legende <- c(idx_legende,i)
+          }
         }
       }
       
-      rayonRond <- max(map$x$calls[[j]]$args[[3]])
+      code_epsg <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[4]]$code_epsg
       
-      max_var <- map$x$calls[[j]]$args[[5]]$max_var
+      lng_init <- lng
+      lat_init <- lat
+      if(!is.null(idx_legende) & (is.null(lng_init) | is.null(lat_init)))# l'utilisateur veut juste supprimer la legende existante
+      {
+        map$x$calls <- map$x$calls[-idx_legende]
+      }else
+      {
+        if(!is.null(idx_legende)) map$x$calls <- map$x$calls[-idx_legende] # Si la legende existe, on la supprime pour la recreer
+        bb<<-map
+        j <- NULL
+        for(i in 1:length(map$x$calls))
+        {
+          if(map$x$calls[[i]]$method %in% "addCircles")
+          {
+            j <- i
+          }
+        }
+        
+        rayonRond <- max(map$x$calls[[j]]$args[[3]])
+        
+        max_var <- map$x$calls[[j]]$args[[4]]$max_var
+        max_var <- as.numeric(str_replace_all(max_var,",","."))
+        
+        lng_init <- lng
+        lat_init <- lat
+        if(is.null(lng_init) | is.null(lat_init))
+        {
+          lng <- map$x$fitBounds[[4]]
+          lat <- map$x$fitBounds[[3]]
+        }
+      }
+    }else if(any(class(map) %in% "leaflet_proxy"))
+    {
+      idx_carte <- NULL
+      idx_legende <- NULL
+      aa <<- map_leaflet
+
+      for(i in 1:length(map_leaflet$x$calls))
+      {
+        if(map_leaflet$x$calls[[i]]$method %in% "addPolygons")
+        {
+          if(any(map_leaflet$x$calls[[i]]$args[[3]] %in% c("carte_ronds","carte_ronds_classes","carte_classes_ronds"))) idx_carte <- c(idx_carte,i)
+        }
+        if(map_leaflet$x$calls[[i]]$method %in% "addCircles")
+        {
+          if(any(map_leaflet$x$calls[[i]]$args[[5]] %in% c("carte_ronds","carte_ronds_classes","carte_classes_ronds"))) idx_carte <- c(idx_carte,i)
+        }
+        if(map_leaflet$x$calls[[i]]$method %in% "addCircles")
+        {
+          if(map_leaflet$x$calls[[i]]$args[[5]] %in% c("toto","legende_ronds")) idx_legende <- c(idx_legende,i)
+        }
+        if(!is.null(idx_legende)) # la legende existe
+        {
+          if(map_leaflet$x$calls[[i]]$method=="addPolylines")
+          {
+            if(map_leaflet$x$calls[[i]]$args[[3]]=="legende_ronds") idx_legende <- c(idx_legende,i)
+          }
+          if(map_leaflet$x$calls[[i]]$method %in% "addMarkers")
+          {
+            if(map_leaflet$x$calls[[i]]$args[[5]]=="legende_ronds") idx_legende <- c(idx_legende,i)
+          }
+        }
+      }
+      
+      code_epsg <- map_leaflet$x$calls[[idx_carte[length(idx_carte)]]]$args[[4]]$code_epsg
+      
+      j <- NULL
+      for(i in 1:length(map_leaflet$x$calls))
+      {
+        if(map_leaflet$x$calls[[i]]$method %in% "addCircles")
+        {
+          if(any(map_leaflet$x$calls[[i]]$args[[5]] %in% c("carte_ronds","carte_ronds_classes","carte_classes_ronds"))) j <- i
+        }
+      }
+      
+      rayonRond <- max(map_leaflet$x$calls[[j]]$args[[3]])
+      
+      max_var <- map_leaflet$x$calls[[j]]$args[[4]]$max_var
       max_var <- as.numeric(str_replace_all(max_var,",","."))
-      
-      coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
       
       lng_init <- lng
       lat_init <- lat
       if(is.null(lng_init) | is.null(lat_init))
       {
-        lng <- map$x$fitBounds[[4]]
-        lat <- map$x$fitBounds[[3]]
+        lng <- map_leaflet$x$fitBounds[[4]]
+        lat <- map_leaflet$x$fitBounds[[3]]
       }
-      
+    }
+    
+    clearGroup(map, group = "legende_ronds")
+    
+    if(any(class(map) %in% "leaflet") & !is.null(idx_legende) & (is.null(lng_init) | is.null(lat_init)))# l'utilisateur veut juste supprimer la legende existante
+    {
+      map$x$calls <- map$x$calls[-idx_legende]
+    }else
+    {
       ronds_leg <- construction_ronds_legende(lng,lat,code_epsg,rayonRond)
       
       ronds_sf_leg <- ronds_leg[[1]]
@@ -118,7 +185,9 @@ function(map,titre=NULL,lng=NULL,lat=NULL,dom="0",precision=0,zoom=8)
                                          fill = T,
                                          fillColor = "white",
                                          fillOpacity = 1,
-                                         group = list(nom_couche="legende_ronds",code_epsg=code_epsg,nom_fond="fond_ronds_leg_carte"))
+                                         group = "legende_ronds",
+                                         layerId = list(nom_couche="legende_ronds",code_epsg=code_epsg,nom_fond="fond_ronds_leg_carte")
+                              )
       )
       
       # leaflet lignes
@@ -130,7 +199,8 @@ function(map,titre=NULL,lng=NULL,lat=NULL,dom="0",precision=0,zoom=8)
                           options = pathOptions(clickable = F),
                           fill = F,
                           fillOpacity = 1,
-                          group = list(nom_couche="legende_ronds",code_epsg=code_epsg,nom_fond="fond_lignes_leg")
+                          group = "legende_ronds",
+                          layerId = list(code_epsg=code_epsg,nom_fond="fond_lignes_leg")
       )
       
       # leaflet valeur ronds
@@ -142,7 +212,8 @@ function(map,titre=NULL,lng=NULL,lat=NULL,dom="0",precision=0,zoom=8)
                                                                "color" = "black",
                                                                "font-size" = "12px"
                                                              )),
-                                 group = list(nom_couche="legende_ronds",code_epsg=code_epsg)
+                                 group = "legende_ronds",
+                                 layerId = list(code_epsg=code_epsg)
       )
       
       map <- addLabelOnlyMarkers(map = map,
@@ -153,7 +224,8 @@ function(map,titre=NULL,lng=NULL,lat=NULL,dom="0",precision=0,zoom=8)
                                                                "color" = "black",
                                                                "font-size" = "12px"
                                                              )),
-                                 group = list(nom_couche="legende_ronds",code_epsg=code_epsg)
+                                 group = "legende_ronds",
+                                 layerId = list(code_epsg=code_epsg)
       )
       
       if(!is.null(titre))
@@ -170,7 +242,8 @@ function(map,titre=NULL,lng=NULL,lat=NULL,dom="0",precision=0,zoom=8)
                                                                  "color" = "black",
                                                                  "font-size" = "14px"
                                                                )),
-                                   group = list(nom_couche="legende_ronds",code_epsg=code_epsg)
+                                   group = "legende_ronds",
+                                   layerId = list(code_epsg=code_epsg)
         )
       }
     }

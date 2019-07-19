@@ -224,7 +224,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                          popup = as.data.frame(fond_pays[,"LIBGEO"])[,-ncol(as.data.frame(fond_pays[,"LIBGEO"]))],
                          options = pathOptions(clickable = F),
                          fill = T, fillColor = "#CCCCCC", fillOpacity = 1,
-                         group = list(nom_couche="carte_ronds",code_epsg=code_epsg,nom_fond="fond_pays")
+                         group = "carte_ronds",
+                         layerId = list(code_epsg=code_epsg,nom_fond="fond_pays")
                          
       )
     }
@@ -235,7 +236,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                        popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
                        options = pathOptions(clickable = F),
                        fill = T, fillColor = "white", fillOpacity = 1,
-                       group = list(nom_couche="carte_ronds",code_epsg=code_epsg,nom_fond="fond_france")
+                       group = "carte_ronds",
+                       layerId = list(code_epsg=code_epsg,nom_fond="fond_pays")
     )
     
     # AFFICHAGE DU FOND TERRITOIRE
@@ -248,7 +250,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                          options = pathOptions(clickable = T),
                          popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fond_territoire)[,"LIBELLE"], "</font> </b>"),
                          fill = F,
-                         group = list(nom_couche="carte_ronds",code_epsg=code_epsg,nom_fond="fond_territoire")
+                         group = "carte_ronds",
+                         layerId = list(code_epsg=code_epsg,nom_fond="fond_territoire")
       )
     }
     
@@ -260,7 +263,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                          options = pathOptions(clickable = T),
                          popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fondMailleElargi)[,"LIBELLE"], "</font> </b>"),
                          fill = T, fillColor = "white", fillOpacity = 0.001,
-                         group = list(nom_couche="carte_ronds",code_epsg=code_epsg,nom_fond="fond_maille_elargi")
+                         group = "carte_ronds",
+                         layerId = list(code_epsg=code_epsg,nom_fond="fond_maille_elargi")
       )
     }
     
@@ -271,7 +275,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                        options = pathOptions(clickable = T),
                        popup = paste0("<b> <font color=#2B3E50>",as.data.frame(maille_WGS84)[,"LIBELLE"], "</font> </b>"),
                        fill = T, fillColor = "white", fillOpacity = 0.001,
-                       group = list(nom_couche="carte_ronds",code_epsg=code_epsg,nom_fond="fond_maille")
+                       group = "carte_ronds",
+                       layerId = list(code_epsg=code_epsg,nom_fond="fond_maille")
     )
     
     if(!is.null(fondMailleElargi))
@@ -290,9 +295,10 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                         fill = T,
                         fillColor = sapply(analyse$donnees_elargi$save, function(x) if(x>0){"#CD853F"}else{"#6495ED"}),
                         fillOpacity = 0.6,
-                        group = list(nom_couche="carte_ronds",code_epsg=code_epsg,dom=dom,nom_fond=c(if(max(analyse$donnees_elargi$save)>0){"fond_ronds_pos_elargi_carte"}else{" "},
-                                                                                                     if(min(analyse$donnees_elargi$save)<0){"fond_ronds_neg_elargi_carte"}else{" "}),
-                                     max_var=max_var,var_volume=varVolume)
+                        group = "carte_ronds",
+                        layerId = list(code_epsg=code_epsg,dom=dom,nom_fond=c(if(max(analyse$donnees_elargi$save)>0){"fond_ronds_pos_elargi_carte"}else{" "},
+                                                                                                      if(min(analyse$donnees_elargi$save)<0){"fond_ronds_neg_elargi_carte"}else{" "}),
+                                      max_var=max_var,var_volume=varVolume)
       )
     }
     
@@ -310,7 +316,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                       fill = T,
                       fillColor = sapply(analyse$donnees$save, function(x) if(x>0){"#CD853F"}else{"#6495ED"}),
                       fillOpacity = 1,
-                      group = list(nom_couche="carte_ronds",code_epsg=code_epsg,dom=dom,nom_fond=c(if(max(analyse$donnees$save)>0){"fond_ronds_pos_carte"}else{" "},
+                      group = "carte_ronds",
+                      layerId = list(code_epsg=code_epsg,dom=dom,nom_fond=c(if(max(analyse$donnees$save)>0){"fond_ronds_pos_carte"}else{" "},
                                                                                                    if(min(analyse$donnees$save)<0){"fond_ronds_neg_carte"}else{" "}),
                                    max_var=max_var,var_volume=varVolume)
     )
