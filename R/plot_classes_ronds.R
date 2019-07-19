@@ -363,7 +363,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     if(is.null(ylim)) ylim <- c(st_bbox(fondMaille)$ymin,st_bbox(fondMaille)$ymax+y_marge*3)
     
     par(mai=c(0,0,0,0))
-    plot(st_geometry(fondMaille),xlim=xlim,ylim=ylim,border=colBorderMaille)
+    plot(st_geometry(fondMaille),xlim=xlim,ylim=ylim,border=colBorder)
     
     if(!is.null(fondSousAnalyse))
     {
