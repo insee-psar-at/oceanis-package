@@ -18,21 +18,22 @@
 leaflet_fonds_simples(listFonds)
 
 leaflet_ronds(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL, idData,
-varVolume, rayonRond = NULL, rapportRond = NULL, dom = "0", fondChx = NULL)
+varVolume, rayonRond = NULL, rapportRond = NULL, dom = "0", fondChx = NULL,
+map = NULL)
 
 leaflet_classes(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL, idData,
 varRatio, methode = "kmeans", nbClasses = 3, bornes = NULL,
-precision = 1, dom = "0")
+precision = 1, dom = "0", map = NULL)
 
 leaflet_ronds_classes(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL,
 idData, varVolume, varRatio, rayonRond = NULL,
 rapportRond = NULL, methode = "kmeans", nbClasses = 3,
-bornes = NULL, precision = 1,  dom = "0", fondChx = NULL)
+bornes = NULL, precision = 1,  dom = "0", fondChx = NULL, map = NULL)
 
 leaflet_classes_ronds(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL,
 idData, varVolume, varRatio, rayonRond = NULL,
 rapportRond = NULL, methode = "kmeans", nbClasses = 3,
-bornes = NULL, precision = 1, dom = "0", fondChx = NULL)
+bornes = NULL, precision = 1, dom = "0", fondChx = NULL, map = NULL)
 
 leaflet_typo(data, fondMaille, fondSuppl = NULL, idData, varTypo, dom = "0")
 
@@ -134,6 +135,9 @@ filtreVol = 0, dom = "0")
 }
   \item{fondChx}{
 	objet sf. Fond des chefs-lieux. Pour les ronds proportionnels avec une maille communale, choix entre la position du centre des ronds sur les centroides des communes (NULL par defaut) ou sur les chefs-lieux (chx) des communes.
+}
+  \item{map}{
+	objet leaflet ou leaflet_proxy. Pour l'integration des fonctions leaflet dans les applications shiny (cf vignette). Par defaut a NULL.
 }
 }
 \details{

@@ -1,24 +1,31 @@
 add_legende_classes <-
-function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
+function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
   {
     # Verification des parametres
     
-    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5 <- NULL
+    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6 <- NULL
     
-    if(any(!any(class(map) %in% "leaflet"),!any(class(map) %in% "htmlwidget"))) msg_error1 <- "La carte doit etre un objet leaflet / "
+    if (any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
     if(!is.null(lng)) if(any(class(lng)!="numeric")) msg_error2 <- "La longitude doit etre de type numerique (en coordonnees WGS84) / "
     if(!is.null(lat)) if(any(class(lat)!="numeric")) msg_error3 <- "La latitude doit etre de type numerique (en coordonnees WGS84) / "
     if(any(class(typeLegende)!="numeric")) msg_error4 <- "Le type de legende doit etre de type numerique (1:litterale ou 2:en echelle) / "
     if(!typeLegende %in% c(1,2)) msg_error5 <- "La variable typeLegende doit etre 1 ou 2 / "
+    if (!is.null(map_leaflet)) if (any(!any(class(map_leaflet) %in% "leaflet"), !any(class(map_leaflet) %in% "htmlwidget"))) msg_error6 <- "La carte doit etre un objet leaflet / "
     
-    if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),!is.null(msg_error5)))
+    if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),!is.null(msg_error5),!is.null(msg_error6)))
     {
-      stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5)))
+      stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6)))
     }
     
     if(is.null(titre)) titre <- " "
     titre<-iconv(titre,"latin1","utf8")
     
+    if(!is.null(map_leaflet))
+    {
+      map_proxy <- map
+      map <- map_leaflet
+    }
+
     idx_carte <- NULL
     idx_legende <- NULL
     ronds <- F
@@ -26,11 +33,11 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
     {
       if(map$x$calls[[i]]$method %in% "addPolygons")
       {
-        if(any(map$x$calls[[i]]$args[[3]]$nom_couche %in% c("carte_classes","carte_ronds_classes","carte_classes_ronds"))) idx_carte <- c(idx_carte,i)
+        if(any(map$x$calls[[i]]$args[[3]] %in% c("carte_classes","carte_ronds_classes","carte_classes_ronds"))) idx_carte <- c(idx_carte,i)
       }
       if(map$x$calls[[i]]$method %in% "addCircles")
       {
-        if(map$x$calls[[i]]$args[[5]]$nom_couche %in% "carte_ronds_classes")
+        if(map$x$calls[[i]]$args[[6]] %in% "carte_ronds_classes")
         {
           idx_carte <- c(idx_carte,i)
           ronds <- T
@@ -38,22 +45,22 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
       }
       if(map$x$calls[[i]]$method %in% "addRectangles")
       {
-        if(map$x$calls[[i]]$args[[6]]$nom_couche=="legende_classes") idx_legende <- c(idx_legende,i)
+        if(map$x$calls[[i]]$args[[6]]=="legende_classes") idx_legende <- c(idx_legende,i)
       }
       if(!is.null(idx_legende)) # la legende existe
       {
         if(map$x$calls[[i]]$method %in% "addPolygons")
         {
-          if(map$x$calls[[i]]$args[[3]]$nom_couche=="legende_classes") idx_legende <- c(idx_legende,i)
+          if(map$x$calls[[i]]$args[[3]]=="legende_classes") idx_legende <- c(idx_legende,i)
         }
         if(map$x$calls[[i]]$method %in% "addMarkers")
         {
-          if(map$x$calls[[i]]$args[[5]]$nom_couche=="legende_classes") idx_legende <- c(idx_legende,i)
+          if(map$x$calls[[i]]$args[[5]]=="legende_classes") idx_legende <- c(idx_legende,i)
         }
       }
     }
-    
-    if(ronds) arg <- 5 else arg <- 3
+
+    if(ronds) arg <- 4 else arg <- 2
     code_epsg <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$code_epsg
     
     coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
@@ -74,7 +81,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
     
     if(is.null(idx_legende) | !is.null(idx_legende) & !(is.null(lng_init) | is.null(lat_init))) # Si la legende doit etre creee ou recreee
     {
-      # on calcule idx_carte au cas oC9 la legende ait ete supprimee, c'est le nombre de polygons dans le leaflet
+      # on calcule idx_carte au cas ou la legende ait ete supprimee, c'est le nombre de polygons dans le leaflet
       idx_carte <- NULL
       for(i in 1:length(map$x$calls))
       {
@@ -84,7 +91,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
         }
         if(map$x$calls[[i]]$method %in% "addCircles")
         {
-          if(map$x$calls[[i]]$args[[5]]$nom_couche %in% "carte_ronds_classes")
+          if(map$x$calls[[i]]$args[[5]] %in% "carte_ronds_classes")
           {
             idx_carte <- c(idx_carte,i)
           }
@@ -123,8 +130,15 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
         assign(paste0("rectangle_",i),list(matrix(c(x_coord_rectangle,y_coord_rectangle,x_coord_rectangle+coeff*1,y_coord_rectangle,x_coord_rectangle+coeff*1,y_coord_rectangle+coeff*0.5,x_coord_rectangle,y_coord_rectangle+coeff*0.5,x_coord_rectangle,y_coord_rectangle),ncol=2, byrow=TRUE)))
       }
       
-      if(ronds) arg <- 5 else arg <- 3
+      if(ronds) arg <- 4 else arg <- 2
       precision <- as.numeric(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$precision)
+      
+      if(!is.null(map_leaflet))
+      {
+        map_leaflet <- map
+        map <- map_proxy
+        clearGroup(map, group = "legende_classes")
+      }
       
       if(typeLegende==1) # Litterale
       {
@@ -147,11 +161,17 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
                              fill = T,
                              fillColor = "white",
                              fillOpacity = 0.5,
-                             group=list(nom_couche="legende_classes")
+                             group = "legende_classes"
                              )
         
         # leaflet rectangles et valeurs classes
         label_rectangle <- NULL
+        
+        if(!is.null(map_leaflet))
+        {
+          map_proxy <- map
+          map <- map_leaflet
+        }
         
         for(i in 1:nb_classes)
         {
@@ -167,6 +187,12 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
           }
         }
         
+        if(!is.null(map_leaflet))
+        {
+          map_leaflet <- map
+          map <- map_proxy
+        }
+        
         for(i in 1:nb_classes)
         {
           map <- addLabelOnlyMarkers(map = map,
@@ -177,7 +203,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
                                                                    "color" = "black",
                                                                    "font-size" = "12px"
                                                                  )),
-                                     group=list(nom_couche="legende_classes")
+                                     group = "legende_classes"
           )
         }
         
@@ -190,7 +216,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
                              fill = T,
                              fillColor = pal_classes[i],
                              fillOpacity = 1,
-                             group=list(nom_couche="legende_classes")
+                             group = "legende_classes"
           )
         }
         
@@ -206,7 +232,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
                                                                  "color" = "black",
                                                                  "font-size" = "14px"
                                                                )),
-                                   group=list(nom_couche="legende_classes")
+                                   group = "legende_classes"
         )
       }
       
@@ -231,11 +257,18 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
                              fill = T,
                              fillColor = "white",
                              fillOpacity = 0.5,
-                             group=list(nom_couche="legende_classes")
+                             group = "legende_classes"
                              )
         
-        if(ronds) arg <- 5 else arg <- 3
-        bornes <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes
+        if(ronds) arg <- 4 else arg <- 2
+        
+        if(!is.null(map_leaflet))
+        {
+          bornes <- map_leaflet$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes
+        }else
+        {
+          bornes <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes
+        }
         
         for(i in 1:nb_classes)
         {
@@ -253,7 +286,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
                                 options = pathOptions(clickable = F),
                                 fill = F,
                                 fillOpacity = 1,
-                                group=list(nom_couche="legende_classes")
+                                group = "legende_classes"
             )
             
             map <- addLabelOnlyMarkers(map = map,
@@ -264,7 +297,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
                                                                      "color" = "black",
                                                                      "font-size" = "12px"
                                                                    )),
-                                       group=list(nom_couche="legende_classes")
+                                       group = "legende_classes"
             )
           }
         }
@@ -278,7 +311,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
                              fill = T,
                              fillColor = pal_classes[i],
                              fillOpacity = 1,
-                             group=list(nom_couche="legende_classes")
+                             group = "legende_classes"
           )
         }
         
@@ -294,7 +327,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8)
                                                                  "color" = "black",
                                                                  "font-size" = "14px"
                                                                )),
-                                   group=list(nom_couche="legende_classes")
+                                   group = "legende_classes"
         )
       }
     }

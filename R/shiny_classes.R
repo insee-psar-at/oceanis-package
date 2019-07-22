@@ -884,7 +884,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         if(length(unique(bornes)) != length(bornes))
         {
           removeModal()
-          showModal(modalDialog(HTML(paste0("<font size=+1>Les bornes calculees avec la methode '",input$methode_ac_id,"' ne sont pas uniques. La methode kmeans a donc ete retenue.</font>")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
+          showModal(modalDialog(HTML(paste0("<font size=+1>Les bornes calcul\u00e9es avec la methode '",input$methode_ac_id,"' ne sont pas uniques. La methode kmeans a donc \u00e9t\u00e9 retenue.</font>")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
           Sys.sleep(7)
           suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse_ac()$donnees[,varRatio]),max_classes$a,style="kmeans",rtimes=10,intervalClosure="left"))
           carac_bornes <- calcul_bornes(analyse_ac()$donnees,bornes_analyse,varRatio,max_classes$a,"kmeans")

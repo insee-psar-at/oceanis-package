@@ -1,11 +1,11 @@
 leaflet_oursins <-
-function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtreVol=0,filtreDist=100,filtreMajeurs=10,decalageAllerRetour=0,decalageCentroid=0,dom="0")
+function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtreVol=0,filtreDist=100,filtreMajeurs=10,decalageAllerRetour=0,decalageCentroid=0,dom="0",map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
     # Verification des parametres
     
-    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19 <- NULL
+    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20 <- NULL
     
     if(any(class(data)!="data.frame")) msg_error1 <- "Les donnees doivent etre dans un data.frame / "
     if(any(!any(class(fondMaille) %in% "sf"),!any(class(fondMaille) %in% "data.frame"))) msg_error2 <- "Le fond de maille doit etre un objet sf / "
@@ -29,14 +29,16 @@ function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtr
     if(!any(names(data) %in% varFlux))  msg_error18 <- "La variable a representer n'existe pas dans la table des donnees / "
     if(!dom %in% c("0","971","972","973","974","976")) msg_error19 <- "La variable dom doit etre '0', '971', '972', '973', '974' ou '976' / "
     
+    if (!is.null(map_proxy)) if(!any(class(map_proxy) %in% "leaflet_proxy")) msg_error20 <- "La carte doit etre un objet leaflet_proxy / "
+    
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
            !is.null(msg_error9),!is.null(msg_error10),!is.null(msg_error11),!is.null(msg_error12),
            !is.null(msg_error13),!is.null(msg_error14),!is.null(msg_error15),!is.null(msg_error16),
-           !is.null(msg_error17),!is.null(msg_error18),!is.null(msg_error19)))
+           !is.null(msg_error17),!is.null(msg_error18),!is.null(msg_error19),!is.null(msg_error20)))
     {
       stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6,msg_error7,msg_error8,
-                              msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,msg_error16,msg_error17,msg_error18,msg_error19)))
+                              msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,msg_error16,msg_error17,msg_error18,msg_error19,msg_error20)))
     }
     
     names(data)[names(data)==idDataDepart] <- "CODE1"
@@ -51,6 +53,12 @@ function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtr
     }
     
     fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","utf8")
+    
+    if(!is.null(map_proxy))
+    {
+      map <- map_proxy
+      clearGroup(map, group = "carte_oursins")
+    }
     
     code_epsg <- switch(dom, #DOM
                         "0"="2154",# Lambert 93
@@ -149,49 +157,52 @@ function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtr
     
     # Construction de la map par defaut
     
-    map <- leaflet(padding = 0,
-                   options = leafletOptions(
-                     preferCanvas = TRUE,
-                     transition = 2
-                   )) %>%
-      
-      setMapWidgetStyle(list(background = "#AFC9E0")) %>%
-      
-      addTiles_insee(attribution = paste0("<a href=\"http://www.insee.fr\">OCEANIS - \u00A9 IGN - INSEE ",format(Sys.time(), format = "%Y"),"</a>")) %>%
-      
-      fitBounds(lng1 = min(list_bbox[[1]]),
-                lat1 = min(list_bbox[[2]]),
-                lng2 = max(list_bbox[[1]]),
-                lat2 = max(list_bbox[[2]])
-      ) %>%
-      
-      # On ajoute une barre d'echelle
-      addScaleBar(position = 'bottomright',
-                  options = scaleBarOptions(metric = TRUE, imperial = FALSE)
-      )
-    
-    # AFFICHAGE DES FONDS D'HABILLAGE
-    if(dom %in% c("0","973"))
+    if(is.null(map_proxy))
     {
-      map <- addPolygons(map = map, data = fond_pays[,"LIBGEO"], opacity = 1, # fond_pays sauf la France
-                         stroke = TRUE, color = "white",
-                         weight = 1,
-                         popup = as.data.frame(fond_pays[,"LIBGEO"])[,-ncol(as.data.frame(fond_pays[,"LIBGEO"]))],
+      map <- leaflet(padding = 0,
+                     options = leafletOptions(
+                       preferCanvas = TRUE,
+                       transition = 2
+                     )) %>%
+        
+        setMapWidgetStyle(list(background = "#AFC9E0")) %>%
+        
+        addTiles_insee(attribution = paste0("<a href=\"http://www.insee.fr\">OCEANIS - \u00A9 IGN - INSEE ",format(Sys.time(), format = "%Y"),"</a>")) %>%
+        
+        fitBounds(lng1 = min(list_bbox[[1]]),
+                  lat1 = min(list_bbox[[2]]),
+                  lng2 = max(list_bbox[[1]]),
+                  lat2 = max(list_bbox[[2]])
+        ) %>%
+        
+        # On ajoute une barre d'echelle
+        addScaleBar(position = 'bottomright',
+                    options = scaleBarOptions(metric = TRUE, imperial = FALSE)
+        )
+      
+      # AFFICHAGE DES FONDS D'HABILLAGE
+      if(dom %in% c("0","973"))
+      {
+        map <- addPolygons(map = map, data = fond_pays[,"LIBGEO"], opacity = 1, # fond_pays sauf la France
+                           stroke = TRUE, color = "white",
+                           weight = 1,
+                           popup = as.data.frame(fond_pays[,"LIBGEO"])[,-ncol(as.data.frame(fond_pays[,"LIBGEO"]))],
+                           options = pathOptions(clickable = F),
+                           fill = T, fillColor = "#CCCCCC", fillOpacity = 1,
+                           group = list(nom_couche="carte_oursins_init",code_epsg=code_epsg,nom_fond="fond_pays")
+                           
+        )
+      }
+      
+      map <- addPolygons(map = map, data = fond_france[,"LIBGEO"], opacity = 1, # fond_france
+                         stroke = TRUE, color = "black",
+                         weight = 1.5,
+                         popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
                          options = pathOptions(clickable = F),
-                         fill = T, fillColor = "#CCCCCC", fillOpacity = 1,
-                         group = list(nom_couche="carte_oursins",code_epsg=code_epsg,nom_fond="fond_pays")
-                         
+                         fill = T, fillColor = "white", fillOpacity = 1,
+                         group = list(nom_couche="carte_oursins_init",code_epsg=code_epsg,nom_fond="fond_france")
       )
     }
-    
-    map <- addPolygons(map = map, data = fond_france[,"LIBGEO"], opacity = 1, # fond_france
-                       stroke = TRUE, color = "black",
-                       weight = 1.5,
-                       popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
-                       options = pathOptions(clickable = F),
-                       fill = T, fillColor = "white", fillOpacity = 1,
-                       group = list(nom_couche="carte_oursins",code_epsg=code_epsg,nom_fond="fond_france")
-    )
     
     # AFFICHAGE DU FOND TERRITOIRE
     

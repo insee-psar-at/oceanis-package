@@ -1,11 +1,11 @@
 leaflet_classes <-
-function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,methode="kmeans",nbClasses=3,bornes=NULL,precision=1,dom="0")
+function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,methode="kmeans",nbClasses=3,bornes=NULL,precision=1,dom="0",map=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
     # Verification des parametres
     
-    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19 <- NULL
+    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20 <- NULL
     
     if(any(class(data)!="data.frame")) msg_error1 <- "Les donnees doivent etre dans un data.frame / "
     if(any(!any(class(fondMaille) %in% "sf"),!any(class(fondMaille) %in% "data.frame"))) msg_error2 <- "Le fond de maille doit etre un objet sf / "
@@ -29,14 +29,17 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
     if(!methode %in% c("kmeans","fisher","jenks","quantile")) msg_error18 <- "Le nom de la methode doit etre 'kmeans', 'fisher', 'jenks' ou 'quantile' / "
     if(!dom %in% c("0","971","972","973","974","976")) msg_error19 <- "La variable dom doit etre '0', '971', '972', '973', '974' ou '976' / "
     
+    if (!is.null(map)) if (any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
+    
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
            !is.null(msg_error9),!is.null(msg_error10),!is.null(msg_error11),!is.null(msg_error12),
            !is.null(msg_error13),!is.null(msg_error14),!is.null(msg_error15),!is.null(msg_error16),
-           !is.null(msg_error17),!is.null(msg_error18),!is.null(msg_error19)))
+           !is.null(msg_error17),!is.null(msg_error18),!is.null(msg_error19),!is.null(msg_error20)))
     {
       stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6,msg_error7,msg_error8,
-                              msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,msg_error16,msg_error17,msg_error18,msg_error19)))
+                              msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,
+                              msg_error16,msg_error17,msg_error18,msg_error19,msg_error20)))
     }
     
     names(data)[names(data)==idData] <- "CODE"
@@ -56,6 +59,14 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
     }
     
     fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","utf8")
+    
+    if(!is.null(map))
+    {
+      if(any(class(map) %in% "leaflet_proxy"))
+      {
+        clearGroup(map, group = "carte_classes")
+      }
+    }
     
     if(is.null(fondMailleElargi))
     {
@@ -104,9 +115,39 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
     
     if(is.null(bornes))
     {
-      suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse$donnees[,varRatio]),nbClasses,style=methode,rtimes=10,intervalClosure="left"))
+      suppressWarnings(test_bornes_analyse <- try(classIntervals(as.numeric(analyse$donnees[,varRatio]),nbClasses,style=methode,rtimes=10,intervalClosure="left"),silent=TRUE))
       
-      carac_bornes <- calcul_bornes(analyse$donnees,bornes_analyse,varRatio,nbClasses,methode)
+      if(!class(test_bornes_analyse) %in% "try-error")
+      {
+        suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse$donnees[,varRatio]),nbClasses,style=methode,rtimes=10,intervalClosure="left"))
+      }else
+      {
+        if(!is.null(map))
+        {
+          showModal(modalDialog(HTML("<font size=+1>Le nombre de classes n'est pas adapt\u00e9 \u00e0 l'analyse.</font>"), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
+          return(map)
+        }else
+        {
+          stop(simpleError("Le nombre de classes n'est pas adapte a l'analyse."))
+        }
+      }
+      
+      suppressWarnings(test_calcul_bornes <- try(calcul_bornes(analyse$donnees,bornes_analyse,varRatio,nbClasses,methode),silent=TRUE))
+      
+      if(!class(test_calcul_bornes) %in% "try-error")
+      {
+        carac_bornes <- calcul_bornes(analyse$donnees,bornes_analyse,varRatio,nbClasses,methode)
+      }else
+      {
+        if(!is.null(map))
+        {
+          showModal(modalDialog(HTML(paste0("<font size=+1>La maille ne correspond pas au niveau g\u00e9ographique du fichier de donn","\u00e9","es.<br><br>Veuillez svp choisir une maille adapt","\u00e9","e ou modifier le fichier de donn","\u00e9","es.</font>")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
+          return(map)
+        }else
+        {
+          stop(simpleError("La maille ne correspond pas au niveau geographique du fichier de donnees. Veuillez svp choisir une maille adaptee ou modifier le fichier de donnees"))
+        }
+      }
       
       bornes <- carac_bornes[[1]]
       bornes[1] <- max(as.numeric(analyse$donnees[,varRatio]))
@@ -210,49 +251,54 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
     
     # Construction de la map par defaut
     
-    map <- leaflet(padding = 0,
-                   options = leafletOptions(
-                     preferCanvas = TRUE,
-                     transition = 2
-                   )) %>%
-      
-      setMapWidgetStyle(list(background = "#AFC9E0")) %>%
-      
-      addTiles_insee(attribution = paste0("<a href=\"http://www.insee.fr\">OCEANIS - \u00A9 IGN - INSEE ",format(Sys.time(), format = "%Y"),"</a>")) %>%
-      
-      fitBounds(lng1 = min(list_bbox[[1]]),
-                lat1 = min(list_bbox[[2]]),
-                lng2 = max(list_bbox[[1]]),
-                lat2 = max(list_bbox[[2]])
-      ) %>%
-      
-      # On ajoute une barre d'echelle
-      addScaleBar(position = 'bottomright',
-                  options = scaleBarOptions(metric = TRUE, imperial = FALSE)
-      )
-    
-    # AFFICHAGE DES FONDS D'HABILLAGE
-    if(dom %in% c("0","973"))
+    if(is.null(map) | (!is.null(map) & any(class(map) %in% "leaflet")))
     {
-      map <- addPolygons(map = map, data = fond_pays[,"LIBGEO"], opacity = 1, # fond_pays sauf la France
-                         stroke = TRUE, color = "white",
-                         weight = 1,
-                         popup = as.data.frame(fond_pays[,"LIBGEO"])[,-ncol(as.data.frame(fond_pays[,"LIBGEO"]))],
+      map <- leaflet(padding = 0,
+                     options = leafletOptions(
+                       preferCanvas = TRUE,
+                       transition = 2
+                     )) %>%
+        
+        setMapWidgetStyle(list(background = "#AFC9E0")) %>%
+        
+        addTiles_insee(attribution = paste0("<a href=\"http://www.insee.fr\">OCEANIS - \u00A9 IGN - INSEE ",format(Sys.time(), format = "%Y"),"</a>")) %>%
+        
+        fitBounds(lng1 = min(list_bbox[[1]]),
+                  lat1 = min(list_bbox[[2]]),
+                  lng2 = max(list_bbox[[1]]),
+                  lat2 = max(list_bbox[[2]])
+        ) %>%
+        
+        # On ajoute une barre d'echelle
+        addScaleBar(position = 'bottomright',
+                    options = scaleBarOptions(metric = TRUE, imperial = FALSE)
+        )
+      
+      # AFFICHAGE DES FONDS D'HABILLAGE
+      if(dom %in% c("0","973"))
+      {
+        map <- addPolygons(map = map, data = fond_pays[,"LIBGEO"], opacity = 1, # fond_pays sauf la France
+                           stroke = TRUE, color = "white",
+                           weight = 1,
+                           popup = as.data.frame(fond_pays[,"LIBGEO"])[,-ncol(as.data.frame(fond_pays[,"LIBGEO"]))],
+                           options = pathOptions(clickable = F),
+                           fill = T, fillColor = "#CCCCCC", fillOpacity = 1,
+                           group = "carte_classes_init",
+                           layerId = list(code_epsg=code_epsg,nom_fond="fond_pays")
+                           
+        )
+      }
+      
+      map <- addPolygons(map = map, data = fond_france[,"LIBGEO"], opacity = 1, # fond_france
+                         stroke = TRUE, color = "black",
+                         weight = 1.5,
+                         popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
                          options = pathOptions(clickable = F),
-                         fill = T, fillColor = "#CCCCCC", fillOpacity = 1,
-                         group = list(nom_couche="carte_classes",code_epsg=code_epsg,nom_fond="fond_pays")
-                         
+                         fill = T, fillColor = "white", fillOpacity = 1,
+                         group = "carte_classes_init",
+                         layerId = list(code_epsg=code_epsg,nom_fond="fond_france")
       )
     }
-    
-    map <- addPolygons(map = map, data = fond_france[,"LIBGEO"], opacity = 1, # fond_france
-                       stroke = TRUE, color = "black",
-                       weight = 1.5,
-                       popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
-                       options = pathOptions(clickable = F),
-                       fill = T, fillColor = "white", fillOpacity = 1,
-                       group = list(nom_couche="carte_classes",code_epsg=code_epsg,nom_fond="fond_france")
-    )
     
     # AFFICHAGE DU FOND TERRITOIRE
     
@@ -264,7 +310,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
                          options = pathOptions(clickable = T),
                          popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fond_territoire)[,"LIBELLE"], "</font> </b>"),
                          fill = T, fillColor = "white", fillOpacity = 0.001,
-                         group = list(nom_couche="carte_classes",code_epsg=code_epsg,nom_fond="fond_territoire")
+                         group = "carte_classes",
+                         layerId = list(code_epsg=code_epsg,nom_fond="fond_territoire")
       )
     }
     
@@ -285,7 +332,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
                          fill = T,
                          fillColor = palette(analyse_maille_classe),
                          fillOpacity = 0.6,
-                         group = list(nom_couche="carte_classes",code_epsg=code_epsg,dom=dom,nom_fond="fond_maille_elargi_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style="defaut")
+                         group = "carte_classes",
+                         layerId = list(code_epsg=code_epsg,dom=dom,nom_fond="fond_maille_elargi_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style="defaut")
       )
     }
     
@@ -304,7 +352,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
                        fill = T,
                        fillColor = palette(analyse_maille_classe),
                        fillOpacity = 1,
-                       group = list(nom_couche="carte_classes",code_epsg=code_epsg,dom=dom,nom_fond="fond_maille_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style="defaut")
+                       group = "carte_classes",
+                       layerId = list(code_epsg=code_epsg,dom=dom,nom_fond="fond_maille_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style="defaut")
     )
     
     return(map)

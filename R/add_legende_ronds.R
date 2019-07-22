@@ -61,7 +61,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
       }else
       {
         if(!is.null(idx_legende)) map$x$calls <- map$x$calls[-idx_legende] # Si la legende existe, on la supprime pour la recreer
-        bb<<-map
+        
         j <- NULL
         for(i in 1:length(map$x$calls))
         {
@@ -88,8 +88,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
     {
       idx_carte <- NULL
       idx_legende <- NULL
-      aa <<- map_leaflet
-
+      
       for(i in 1:length(map_leaflet$x$calls))
       {
         if(map_leaflet$x$calls[[i]]$method %in% "addPolygons")
@@ -140,10 +139,10 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
         lng <- map_leaflet$x$fitBounds[[4]]
         lat <- map_leaflet$x$fitBounds[[3]]
       }
+      
+      clearGroup(map, group = "legende_ronds")
     }
-    
-    clearGroup(map, group = "legende_ronds")
-    
+
     if(any(class(map) %in% "leaflet") & !is.null(idx_legende) & (is.null(lng_init) | is.null(lat_init)))# l'utilisateur veut juste supprimer la legende existante
     {
       map$x$calls <- map$x$calls[-idx_legende]
@@ -186,7 +185,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
                                          fillColor = "white",
                                          fillOpacity = 1,
                                          group = "legende_ronds",
-                                         layerId = list(nom_couche="legende_ronds",code_epsg=code_epsg,nom_fond="fond_ronds_leg_carte")
+                                         layerId = list(code_epsg=code_epsg,nom_fond="fond_ronds_leg_carte")
                               )
       )
       

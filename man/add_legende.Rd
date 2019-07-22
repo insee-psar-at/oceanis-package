@@ -14,16 +14,16 @@
 }
 \usage{
 add_legende_ronds(map, titre = NULL, lng = NULL, lat = NULL, dom = "0", precision = 0,
-					zoom = 8)
+					zoom = 8, map_leaflet = NULL)
 
 add_legende_classes(map, titre = NULL, lng = NULL, lat = NULL, typeLegende = 1,
-					zoom = 8)
+					zoom = 8, map_leaflet = NULL)
 
 add_legende_typo(map, titre = NULL, lng = NULL, lat = NULL, labels = NULL,
 					zoom = 8)
 					
 add_legende_typo_symboles(map, titre = NULL, lng = NULL, lat = NULL, labels = NULL,
-					zoom = 8)
+					zoom = 8, map_leaflet = NULL)
 
 add_legende_joignantes(map, titre = NULL, lng = NULL, lat = NULL, dom = "0",
 						precision = 0, zoom = 8)
@@ -59,6 +59,9 @@ add_legende_saphirs(map, titre = NULL, lng = NULL, lat = NULL, dom = "0", precis
 }
   \item{zoom}{
 	valeur numerique (numeric). Valeur entre 6 et 10 (8 par defaut). Definit le niveau de zoom de la carte pour un affichage optimal.
+}
+  \item{map_leaflet}{
+	objet leaflet. Pour l'integration des fonctions leaflet dans les applications shiny (cf vignette). Par defaut a NULL.
 }
 }
 \details{
