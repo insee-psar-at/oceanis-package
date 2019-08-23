@@ -401,7 +401,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         
         output$type_legende_ac_rp <- renderUI({
           radioButtons("type_legende_ac_rp_id", label = h5("Type de l\u00e9gende"),
-                       choices = list("Litt\u00e9rale" = 1, "En echelle" = 2),
+                       choices = list("Litterale" = 1, "En echelle" = 2),
                        selected = 1, inline = TRUE)
         })
         
