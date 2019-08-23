@@ -25,7 +25,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
       map_proxy <- map
       map <- map_leaflet
     }
-
+    
     idx_carte <- NULL
     idx_legende <- NULL
     ronds <- F
@@ -33,11 +33,11 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
     {
       if(map$x$calls[[i]]$method %in% "addPolygons")
       {
-        if(any(map$x$calls[[i]]$args[[3]] %in% c("carte_classes","carte_ronds_classes","carte_classes_ronds"))) idx_carte <- c(idx_carte,i)
+        if(any(map$x$calls[[i]]$args[[3]] %in% "carte_classes")) idx_carte <- c(idx_carte,i)
       }
       if(map$x$calls[[i]]$method %in% "addCircles")
       {
-        if(map$x$calls[[i]]$args[[6]] %in% "carte_ronds_classes")
+        if(map$x$calls[[i]]$args[[4]]$nom_fond %in% c("fond_ronds_classes_carte","fond_ronds_classes_elargi_carte"))
         {
           idx_carte <- c(idx_carte,i)
           ronds <- T
@@ -91,7 +91,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
         }
         if(map$x$calls[[i]]$method %in% "addCircles")
         {
-          if(map$x$calls[[i]]$args[[5]] %in% "carte_ronds_classes")
+          if(map$x$calls[[i]]$args[[4]]$nom_fond %in% c("fond_ronds_classes_carte","fond_ronds_classes_elargi_carte"))
           {
             idx_carte <- c(idx_carte,i)
           }
@@ -157,7 +157,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
                                             border-bottom:2px solid #2B3E50;
                                             border-radius: 5%"),
                              weight = 1,
-                             options = pathOptions(clickable = F),
+                             options = pathOptions(pane = "fond_legende", clickable = F),
                              fill = T,
                              fillColor = "white",
                              fillOpacity = 0.5,
@@ -208,15 +208,17 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
         }
         
         # On cree les polygons ensemble a la fin de l'objet leaflet juste avant le titre
+        
         for(i in 1:nb_classes)
         {
           map <- addPolygons(map = map, data = st_polygon(get(paste0("rectangle_",i))),
                              stroke = FALSE,
-                             options = pathOptions(clickable = F),
+                             options = pathOptions(pane = "fond_legende", clickable = F),
                              fill = T,
                              fillColor = pal_classes[i],
                              fillOpacity = 1,
-                             group = "legende_classes"
+                             group = "legende_classes",
+                             layerId = list(typeLegende=typeLegende, zoom=zoom)
           )
         }
         
@@ -253,7 +255,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
                                             border-bottom:2px solid #2B3E50;
                                             border-radius: 5%"),
                              weight = 1,
-                             options = pathOptions(clickable = F),
+                             options = pathOptions(pane = "fond_legende", clickable = F),
                              fill = T,
                              fillColor = "white",
                              fillOpacity = 0.5,
@@ -283,7 +285,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
             map <- addPolylines(map = map, data = ligne,
                                 color = "black",
                                 weight = 1,
-                                options = pathOptions(clickable = F),
+                                options = pathOptions(pane = "fond_legende", clickable = F),
                                 fill = F,
                                 fillOpacity = 1,
                                 group = "legende_classes"
@@ -307,11 +309,12 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
         {
           map <- addPolygons(map = map, data = st_polygon(get(paste0("rectangle_",i))),
                              stroke = FALSE,
-                             options = pathOptions(clickable = F),
+                             options = pathOptions(pane = "fond_legende", clickable = F),
                              fill = T,
                              fillColor = pal_classes[i],
                              fillOpacity = 1,
-                             group = "legende_classes"
+                             group = "legende_classes",
+                             layerId = list(typeLegende=typeLegende, zoom=zoom)
           )
         }
         
@@ -332,6 +335,10 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
       }
     }
     
-    message(simpleMessage(paste0("[INFO] Les coordonn","\u00e9","es de la l\u00e9gende des classes sont : longitude (x) = ",lng," degr\u00e9 ; latitude (y) = ",lat," degr\u00e9")))
+    if(!is.null(map_leaflet))
+    {
+      message(simpleMessage(paste0("[INFO] Les coordonn","\u00e9","es de la l\u00e9gende des classes sont : longitude (x) = ",lng," degr\u00e9 ; latitude (y) = ",lat," degr\u00e9")))
+    }
+    
     return(map)
   }

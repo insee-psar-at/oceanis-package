@@ -17,8 +17,8 @@ function(map,cheminDossier,nomFichier,titre1="",titre2="",source="")
     annee <- format(Sys.time(), format = "%Y")
     
     l <- c()
-    if(any(list_fonds[[2]] %in% "fond_ronds_carte")) l <- c(l,"fond_ronds_carte")
-    if(any(list_fonds[[2]] %in% "fond_ronds_elargi_carte")) l <- c(l,"fond_ronds_elargi_carte")
+    if(any(list_fonds[[2]] %in% "fond_classes_ronds_carte")) l <- c(l,"fond_classes_ronds_carte")
+    if(any(list_fonds[[2]] %in% "fond_classes_ronds_elargi_carte")) l <- c(l,"fond_classes_ronds_elargi_carte")
     
     if(any(list_fonds[[2]] %in% "fond_lignes_leg")) l <- c(l,"fond_lignes_leg")
     if(any(list_fonds[[2]] %in% "fond_ronds_leg_carte")) l <- c(l,"fond_ronds_leg_carte")

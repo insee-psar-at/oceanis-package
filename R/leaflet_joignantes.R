@@ -1,50 +1,10 @@
 leaflet_joignantes <-
-function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,largeurFlecheMax=NULL,filtreVol=0,filtreDist=100,filtreMajeurs=10,decalageAllerRetour=0,decalageCentroid=0,dom="0",map_proxy=NULL)
+function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,largeurFlecheMax=NULL,filtreVol=0,filtreDist=100,filtreMajeurs=10,decalageAllerRetour=0,decalageCentroid=0,colFleche="#CD853F",colBorder="#303030",dom="0",map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
     # Verification des parametres
-    
-    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20<-msg_error21<-msg_error22<-msg_error23 <- NULL
-    
-    if(any(class(data)!="data.frame")) msg_error1 <- "Les donnees doivent etre dans un data.frame / "
-    if(any(!any(class(fondMaille) %in% "sf"),!any(class(fondMaille) %in% "data.frame"))) msg_error2 <- "Le fond de maille doit etre un objet sf / "
-    if(!is.null(fondSuppl)) if(any(!any(class(fondSuppl) %in% "sf"),!any(class(fondSuppl) %in% "data.frame"))) msg_error3 <- "Le fond supplementaire doit etre un objet sf / "
-    if(any(class(typeMaille)!="character")) msg_error4 <- "La valeur doit etre de type caractere ('REG', 'DEP', 'ZE', 'AU', 'BV', 'UU', 'EPCI' ou 'COM') / "
-    if(any(class(idDataDepart)!="character")) msg_error5 <- "Le nom de la variable doit etre de type caractere / "
-    if(any(class(idDataArrivee)!="character")) msg_error6 <- "Le nom de la variable doit etre de type caractere / "
-    if(any(class(varFlux)!="character")) msg_error7 <- "Le nom de la variable doit etre de type caractere / "
-    if(!is.null(largeurFlecheMax)) if(any(class(largeurFlecheMax)!="numeric")) msg_error8 <- "La largeur de la fleche max doit etre de type numerique (en km) / "
-    if(any(class(filtreVol)!="numeric")) msg_error9 <- "Le filtre doit etre de type numerique / "
-    if(any(class(filtreDist)!="numeric")) msg_error10 <- "Le filtre doit etre de type numerique / "
-    if(any(class(filtreMajeurs)!="numeric")) msg_error11 <- "Le filtre doit etre de type numerique / "
-    if(any(class(decalageAllerRetour)!="numeric")) msg_error12 <- "La variable decalageAllerRetour doit etre de type numerique / "
-    if(any(class(decalageCentroid)!="numeric")) msg_error13 <- "La variable decalageCentroid doit etre de type numerique / "
-    if(any(class(dom)!="character")) msg_error14 <- "La valeur doit etre de type caractere ('0', '971', '972', '973', '974' ou '976') / "
-    
-    if(length(names(data))<3) msg_error15 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable de depart, une variable d'arrivee et la variable a representer / "
-    if(length(names(fondMaille))<3) msg_error16 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
-    if(!is.null(fondSuppl)) if(length(names(fondSuppl))<3) msg_error17 <- "Le fond supplementaire n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
-    
-    if(!typeMaille %in% c("REG", "DEP", "ZE", "AU", "BV", "UU", "EPCI", "COM")) msg_error18 <- "La variable typeMaille doit etre 'REG', 'DEP', 'ZE', 'AU', 'BV', 'UU', 'EPCI' ou 'COM' / "
-    if(!any(names(data) %in% idDataDepart))  msg_error19 <- "La variable de depart n'existe pas dans la table des donnees / "
-    if(!any(names(data) %in% idDataArrivee))  msg_error20 <- "La variable d'arrivee n'existe pas dans la table des donnees / "
-    if(!any(names(data) %in% varFlux))  msg_error21 <- "La variable a representer n'existe pas dans la table des donnees / "
-    if(!dom %in% c("0","971","972","973","974","976")) msg_error22 <- "La variable dom doit etre '0', '971', '972', '973', '974' ou '976' / "
-    
-    if (!is.null(map_proxy)) if(!any(class(map_proxy) %in% "leaflet_proxy")) msg_error23 <- "La carte doit etre un objet leaflet_proxy / "
-    
-    if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
-           !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
-           !is.null(msg_error9),!is.null(msg_error10),!is.null(msg_error11),!is.null(msg_error12),
-           !is.null(msg_error13),!is.null(msg_error14),!is.null(msg_error15),!is.null(msg_error16),
-           !is.null(msg_error17),!is.null(msg_error18),!is.null(msg_error19),!is.null(msg_error20),
-           !is.null(msg_error21),!is.null(msg_error22),!is.null(msg_error23)))
-    {
-      stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6,msg_error7,msg_error8,
-                              msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,
-                              msg_error16,msg_error17,msg_error18,msg_error19,msg_error20,msg_error21,msg_error22,msg_error23)))
-    }
+    leafletVerifParamJoignantes(data,fondMaille,typeMaille,fondSuppl,idDataDepart,idDataArrivee,varFlux,largeurFlecheMax,filtreVol,filtreDist,filtreMajeurs,decalageAllerRetour,decalageCentroid,colFleche,colBorder,dom,map_proxy)
     
     names(data)[names(data)==idDataDepart] <- "CODE1"
     names(data)[names(data)==idDataArrivee] <- "CODE2"
@@ -61,8 +21,10 @@ function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,va
     
     if(!is.null(map_proxy))
     {
-      map <- map_proxy
-      clearGroup(map, group = "carte_joignantes")
+      if(any(class(map_proxy) %in% "leaflet_proxy"))
+      {
+        clearGroup(map_proxy, group = "carte_joignantes")
+      }
     }
     
     code_epsg <- switch(dom, #DOM
@@ -173,11 +135,11 @@ function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,va
     donnees <- donnees[rev(order(donnees[,varFlux])),]
     
     coord_fleche_max_pl <- st_coordinates(analyse[[1]][abs(data.frame(analyse[[1]])[,varFlux])==max(donnees[,varFlux]),])
-    large_pl <- max(st_distance(st_sfc(st_point(c(coord_fleche_max_pl[5,1],coord_fleche_max_pl[5,2])),st_point(c(coord_fleche_max_pl[6,1],coord_fleche_max_pl[6,2])))))
+    large_pl <- max(st_distance(st_sfc(st_point(c(coord_fleche_max_pl[2,1],coord_fleche_max_pl[2,2])),st_point(c(coord_fleche_max_pl[6,1],coord_fleche_max_pl[6,2])))))
     
     # Construction de la map par defaut
     
-    if(is.null(map_proxy))
+    if(is.null(map_proxy) | (!is.null(map_proxy) & class(map_proxy)=="character"))
     {
       map <- leaflet(padding = 0,
                      options = leafletOptions(
@@ -195,6 +157,14 @@ function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,va
                   lat2 = max(list_bbox[[2]])
         ) %>%
         
+        # Pour gerer l'ordre des calques
+        addMapPane(name = "fond_pays", zIndex = 401) %>%
+        addMapPane(name = "fond_france", zIndex = 402) %>%
+        addMapPane(name = "fond_territoire", zIndex = 403) %>%
+        addMapPane(name = "fond_maille", zIndex = 404) %>%
+        addMapPane(name = "fond_joignantes", zIndex = 405) %>%
+        addMapPane(name = "fond_legende", zIndex = 406) %>%
+        
         # On ajoute une barre d'echelle
         addScaleBar(position = 'bottomright',
                     options = scaleBarOptions(metric = TRUE, imperial = FALSE)
@@ -207,9 +177,10 @@ function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,va
                            stroke = TRUE, color = "white",
                            weight = 1,
                            popup = as.data.frame(fond_pays[,"LIBGEO"])[,-ncol(as.data.frame(fond_pays[,"LIBGEO"]))],
-                           options = pathOptions(clickable = F),
+                           options = pathOptions(pane = "fond_pays", clickable = F),
                            fill = T, fillColor = "#CCCCCC", fillOpacity = 1,
-                           group = list(nom_couche="carte_joignantes_init",code_epsg=code_epsg,nom_fond="fond_pays")
+                           group = "carte_joignantes_init",
+                           layerId = list(code_epsg=code_epsg,nom_fond="fond_pays")
                            
         )
       }
@@ -218,48 +189,55 @@ function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,va
                          stroke = TRUE, color = "black",
                          weight = 1.5,
                          popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
-                         options = pathOptions(clickable = F),
+                         options = pathOptions(pane = "fond_france", clickable = F),
                          fill = T, fillColor = "white", fillOpacity = 1,
-                         group = list(nom_couche="carte_joignantes_init",code_epsg=code_epsg,nom_fond="fond_france")
+                         group = "carte_joignantes_init",
+                         layerId = list(code_epsg=code_epsg,nom_fond="fond_france")
       )
-    }
-    
-    # AFFICHAGE DU FOND TERRITOIRE
-    
-    if(!is.null(fondSuppl))
-    {
-      map <- addPolygons(map = map, data = fond_territoire,
-                         stroke = TRUE, color = "#BFBFBF", opacity = 1,
+      
+      # AFFICHAGE DU FOND TERRITOIRE
+      
+      if(!is.null(fondSuppl))
+      {
+        map <- addPolygons(map = map, data = fond_territoire,
+                           stroke = TRUE, color = "#BFBFBF", opacity = 1,
+                           weight = 0.5,
+                           options = pathOptions(pane = "fond_territoire", clickable = T),
+                           popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fond_territoire)[,"LIBELLE"], "</font> </b>"),
+                           fill = T, fillColor = "white", fillOpacity = 0.001,
+                           group = "carte_joignantes_init",
+                           layerId = list(code_epsg=code_epsg,nom_fond="fond_territoire")
+        )
+      }
+      
+      # AFFICHAGE DE LA MAILLE
+      
+      map <- addPolygons(map = map, data = maille_WGS84, opacity = 1,
+                         stroke = TRUE, color = "grey",
                          weight = 0.5,
-                         options = pathOptions(clickable = T),
-                         popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fond_territoire)[,"LIBELLE"], "</font> </b>"),
+                         options = pathOptions(pane = "fond_maille", clickable = T),
+                         popup = paste0("<b> <font color=#2B3E50>",as.data.frame(maille_WGS84)[,"LIBELLE"], "</font> </b>"),
                          fill = T, fillColor = "white", fillOpacity = 0.001,
-                         group = list(nom_couche="carte_joignantes",code_epsg=code_epsg,nom_fond="fond_territoire")
+                         group = "carte_joignantes_init",
+                         layerId = list(code_epsg=code_epsg,nom_fond="fond_maille")
       )
+    }else # Contexte shiny/proxy
+    {
+      map <- map_proxy
     }
-    
-    # AFFICHAGE DE LA MAILLE
-    
-    map <- addPolygons(map = map, data = maille_WGS84, opacity = 1,
-                       stroke = TRUE, color = "grey",
-                       weight = 0.5,
-                       options = pathOptions(clickable = T),
-                       popup = paste0("<b> <font color=#2B3E50>",as.data.frame(maille_WGS84)[,"LIBELLE"], "</font> </b>"),
-                       fill = T, fillColor = "white", fillOpacity = 0.001,
-                       group = list(nom_couche="carte_joignantes",code_epsg=code_epsg,nom_fond="fond_maille")
-    )
     
     # AFFICHAGE DE L'ANALYSE
     
     map <- addPolygons(map = map,
                        data = analyse_WGS84,
-                       stroke = TRUE, color = "#303030",
+                       stroke = TRUE, color = colBorder,
                        opacity = 1,
                        weight = 1,
-                       options = pathOptions(clickable = T),
+                       options = pathOptions(pane = "fond_joignantes", clickable = T),
                        popup = paste0("<b><font color=#2B3E50>",donnees$CODE1," vers ",donnees$CODE2,"<br>",varFlux," : ",donnees[,varFlux],"</font></b>"),
-                       fill = T, fillColor = "#CD853F", fillOpacity = 1,
-                       group = list(nom_couche="carte_joignantes",code_epsg=code_epsg,dom=dom,nom_fond="fond_flux",var_flux=varFlux,max_var=max(donnees[,varFlux]),largeur=largeurFlecheMax,distance=large_pl)
+                       fill = T, fillColor = colFleche, fillOpacity = 1,
+                       group = "carte_joignantes",
+                       layerId = list(analyse_WGS84=analyse_WGS84,donnees=donnees,code_epsg=code_epsg,dom=dom,nom_fond="fond_flux",var_flux=varFlux,max_var=max(donnees[,varFlux]),largeur=largeurFlecheMax,distance=large_pl)
     )
     
     return(map)

@@ -11,11 +11,11 @@ function(map)
     {
       if(map$x$calls[[i]]$method %in% "addPolygons")
       {
-        if(map$x$calls[[i]]$args[[3]]$nom_couche == "carte_oursins") idx_carte <- c(idx_carte,i)
+        if(map$x$calls[[i]]$args[[3]] %in% c("carte_oursins_init","carte_oursins")) idx_carte <- c(idx_carte,i)
       }
       if(map$x$calls[[i]]$method %in% "addPolylines")
       {
-        if(map$x$calls[[i]]$args[[3]]$nom_couche == "carte_oursins") idx_fleche <- i
+        if(map$x$calls[[i]]$args[[3]] == "carte_oursins") idx_fleche <- i
       }
       if(map$x$calls[[i]]$method %in% "addControl")
       {
@@ -24,10 +24,10 @@ function(map)
       }
     }
     
-    var_flux <- map$x$calls[[idx_fleche]]$args[[3]]$var_flux
+    var_flux <- map$x$calls[[idx_fleche]]$args[[2]]$var_flux
     
-    code_epsg <- map$x$calls[[idx_fleche]]$args[[3]]$code_epsg
-    dom <- map$x$calls[[idx_fleche]]$args[[3]]$dom
+    code_epsg <- map$x$calls[[idx_fleche]]$args[[2]]$code_epsg
+    dom <- map$x$calls[[idx_fleche]]$args[[2]]$dom
     
     list_fonds <- list()
     nom_fonds <- c()
@@ -50,7 +50,7 @@ function(map)
       
       list_fonds[[l]] <- fond
       
-      nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte[i]]]$args[[3]]$nom_fond)
+      nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte[i]]]$args[[2]]$nom_fond)
       
       l <- l+1
     }
@@ -85,7 +85,7 @@ function(map)
       
       list_fonds[[l]] <- fond
       
-      nom_fonds <- c(nom_fonds,map$x$calls[[idx_fleche]]$args[[3]]$nom_fond)
+      nom_fonds <- c(nom_fonds,map$x$calls[[idx_fleche]]$args[[2]]$nom_fond)
       
       l <- l+1
     }

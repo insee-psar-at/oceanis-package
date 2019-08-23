@@ -17,7 +17,7 @@ function(map)
       if(map$x$calls[[i]]$method %in% "addCircles")
       {
         j <- c(j,i)
-        if(map$x$calls[[i]]$args[5][[1]]$nom_couche=="legende_ronds") idx_legende <- c(idx_legende,i)
+        if(map$x$calls[[i]]$args[5][[1]]=="legende_ronds") idx_legende <- c(idx_legende,i)
       }
     }
     

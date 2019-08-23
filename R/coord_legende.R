@@ -3,7 +3,7 @@ function(map)
   {
     msg_error1 <- NULL
     
-    if(any(!any(class(map) %in% "leaflet"),!any(class(map) %in% "htmlwidget"))) msg_error1 <- "La carte doit etre un objet leaflet / "
+    if (!is.null(map)) if (any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) msg_error1 <- "La carte doit etre un objet leaflet / "
     
     if(any(!is.null(msg_error1)))
     {
@@ -13,7 +13,8 @@ function(map)
     ronds <- FALSE
     lng_ronds <- NULL
     lat_ronds <- NULL
-    if(any(map$x$calls[[4]]$args[[3]]$nom_couche %in% c("carte_ronds","carte_ronds_classes","carte_classes_ronds")))
+    
+    if(any(map$x$calls[[12]]$args[[3]] %in% c("carte_ronds_init","carte_ronds_classes_init","carte_classes_ronds_init")))
     {
       ronds <- TRUE
     }
@@ -43,7 +44,7 @@ function(map)
     classes <- FALSE
     lng_classes <- NULL
     lat_classes <- NULL
-    if(any(map$x$calls[[4]]$args[[3]]$nom_couche %in% c("carte_classes","carte_ronds_classes","carte_classes_ronds","carte_typo")))
+    if(any(map$x$calls[[12]]$args[[3]] %in% c("carte_classes_init","carte_ronds_classes_init","carte_classes_ronds_init","carte_typo_init")))
     {
       classes <- TRUE
     }
@@ -73,7 +74,7 @@ function(map)
     fleches <- FALSE
     lng_fleches <- NULL
     lat_fleches <- NULL
-    if(any(map$x$calls[[4]]$args[[3]]$nom_couche %in% c("carte_joignantes","carte_saphirs")))
+    if(any(map$x$calls[[12]]$args[[3]] %in% c("carte_joignantes_init","carte_saphirs_init")))
     {
       fleches <- TRUE
     }

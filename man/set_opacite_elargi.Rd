@@ -7,7 +7,7 @@
 	Modify the opacity of the expanded representation of a 'leaflet' map for proportional circles and chroropleth.
 }
 \usage{
-set_opacite_elargi(map, opacite = 0.6)
+set_opacite_elargi(map, opacite = 0.6, map_leaflet = NULL)
 }
 \arguments{
   \item{map}{
@@ -15,6 +15,9 @@ set_opacite_elargi(map, opacite = 0.6)
 }
   \item{opacite}{
 	valeur numerique (numeric). Chiffre entre 0 (transparent) et 1 (opaque). Par defaut a 0.6 (60 pour cent d'opacite ou 40 pour cent de transparence).
+}
+  \item{map_leaflet}{
+	objet leaflet. Pour l'integration des fonctions leaflet dans les applications shiny (cf vignette). Par defaut a NULL.
 }
 }
 \details{

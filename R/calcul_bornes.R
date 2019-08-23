@@ -111,11 +111,12 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
           
           bornes <- unique(c(bornes_analyse_neg,0,bornes_analyse_pos))
           bornes <- sort(bornes, decreasing = TRUE)
-          
-          pal_classes_pos <- pal_classes_pos[(length(pal_classes_pos)-length(bornes[bornes>0])+1):length(pal_classes_pos)]
-          pal_classes_neg <- pal_classes_neg[1:length(bornes[bornes<0])]
-          pal_classes <- c(pal_classes_pos,pal_classes_neg)
         }
+        
+        pal_classes_pos <- pal_classes_pos[(length(pal_classes_pos)-length(bornes[bornes>0])+1):length(pal_classes_pos)]
+        pal_classes_neg <- pal_classes_neg[1:length(bornes[bornes<0])]
+        pal_classes <- c(pal_classes_pos,pal_classes_neg)
+        
       }else if(methode!="manuel")# Pour la methode des quantiles, on ne gere pas la borne zero pour ne pas fausser l'equi-distribution des effectifs dans les classes.
       {
         message(simpleMessage("La methode des quantiles ne permet pas de gerer la borne a 0. Vous pouvez passer en mode manuel pour modifier les bornes des classes."))

@@ -68,7 +68,7 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,colEntree,colSor
       typeanalyse="singleSymbol"
       couleurfond="255,255,255"
       
-      if (l[i] %in% c("fond_flux_entree","fond_flux_leg"))
+      if (l[i] %in% c("fond_flux_entree"))
       {
         couleurfond=colEntree
         remplissagefond="yes"

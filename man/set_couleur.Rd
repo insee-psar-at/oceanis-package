@@ -11,17 +11,19 @@
 	Modify the colors of 'leaflet' map's analysis.
 }
 \usage{
-set_couleur_ronds(map, colorPos = "#CD853F", colorNeg = "#6495ED", colBorder = "white")
+set_couleur_ronds(map, colorPos = "#CD853F", colorNeg = "#6495ED", colBorder = "white",
+map_leaflet = NULL)
 
 set_couleur_classes(map, stylePalette = "defaut", palettePos = NULL, paletteNeg = NULL,
-colBorder = "white")
+colBorder = "white", map_leaflet = NULL)
 
-set_couleur_typo(map, paletteTypo = NULL, colBorder = "white")
+set_couleur_typo(map, paletteTypo = NULL, colBorder = "white", map_leaflet = NULL)
 
-set_couleur_joignantes(map, colFleche = "#CD853F", colBorder = "black")
+set_couleur_joignantes(map, colFleche = "#CD853F", colBorder = "black",
+map_leaflet = NULL)
 
 set_couleur_saphirs(map, colEntree = "#CD853F", colSortie = "#6495ED",
-colBorder = "black")
+colBorder = "black", map_leaflet = NULL)
 }
 \arguments{
   \item{map}{
@@ -56,6 +58,9 @@ colBorder = "black")
 }
   \item{colSortie}{
 	chaine de caracteres (character). Couleur nommee ou hexadecimal. Par defaut "#6495ED".
+}
+  \item{map_leaflet}{
+	objet leaflet. Pour l'integration des fonctions leaflet dans les applications shiny (cf vignette). Par defaut a NULL.
 }
 }
 \details{

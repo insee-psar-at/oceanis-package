@@ -1,14 +1,23 @@
+﻿Changes in version 1.0.0
+
+FEATURES
+
+- Utilisation de leaflet_proxy pour l'integration des fonctions leaflet dans les app shiny (toutes les fonctions leaflet). Actualisation des couches de la carte a la volee evitant ainsi le recalcul de la carte entiere.
+
+- Nouvelle vignette concernant l'integration des fonctions leaflet dans les app shiny.
+
+
 Changes in version 0.9.0
 
 BUG FIXES and IMPROVEMENTS
 
-- Utilisation de leaflet_proxy pour l'integration des fonctions leaflet dans des app shiny (ok pour ronds, classes et typo_symboles)
-
-- Correction d'un bug pour les fonctions plot_classes et plot_typo sur la delimitation de la carte
+- Correction d'un bug pour les fonctions plot_classes et plot_typo sur la delimitation de la carte.
 
 - Pour les fonctions plot_, possibilite de definir la bbox de la carte en parametre, maniere de zoomer sur la carte.
 
 FEATURES
+
+- Utilisation de leaflet_proxy pour l'integration des fonctions leaflet dans des app shiny (pour ronds, classes et typo_symboles).
 
 - Ajout de la fonction leaflet_fonds_simples permettant de creer une carte leaflet sans analyse. Il est possible a partir de cette fonction d'afficher plusieurs fonds, a organiser dans une liste passee en parametre.
 

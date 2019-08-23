@@ -129,7 +129,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,labels=NULL,zoom=8,map_leaflet=NULL)
         # create a sequence of png images
         for (i in seq_len(n)) {
           f <- tempfile(fileext = ".png")
-          png(f, width = width, height = height, bg = "transparent")
+          suppressWarnings(png(f, width = width, height = height, bg = "transparent"))
           par(mar = c(0, 0, 0, 0))
           plot.new()
           points(0.5, 0.5, pch = pch[i], cex = min(width, height) / 8, ...)

@@ -17,7 +17,7 @@ function(map)
       if(map$x$calls[[i]]$method %in% "addCircles")
       {
         j <- c(j,i)
-        if(map$x$calls[[i]]$args[5][[1]]$nom_couche=="legende_ronds") idx_legende <- c(idx_legende,i)
+        if(map$x$calls[[i]]$args[5][[1]]=="legende_ronds") idx_legende <- c(idx_legende,i)
       }
     }
     
@@ -31,7 +31,7 @@ function(map)
         if(length(j)>1) idx <- 2 else idx <- 1
       }
       rayonRond <- max(map$x$calls[[j[idx]]]$args[[3]])
-      max_var <- map$x$calls[[j[idx]]]$args[[5]]$max_var
+      max_var <- map$x$calls[[j[idx]]]$args[[4]]$max_var
       rapport <- (pi*(rayonRond)^2)/max_var
     }else
     {

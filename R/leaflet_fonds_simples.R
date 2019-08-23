@@ -1,23 +1,20 @@
 leaflet_fonds_simples <-
-function(listFonds)
+function(listFonds,popup=NULL,init=TRUE,map=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
     # Verification des parametres
+    leafletVerifParamFondsSimples(listFonds,popup,init,map)
     
-    msg_error1<-msg_error2 <- NULL
+    if(is.null(popup)) popup <- c(1:length(listFonds))
     
-    if(any(class(listFonds)!="list")) msg_error1 <- "Le parametre listFOnds doit etre une liste / "
-    if(any(!any(class(listFonds[[1]]) %in% "sf"),!any(class(listFonds[[1]]) %in% "data.frame"))) msg_error2 <- "Le parametre listFonds doit etre un objet sf / "
-    
-    if(any(!is.null(msg_error1),!is.null(msg_error2)))
-    {
-      stop(simpleError(paste0(msg_error1,msg_error2)))
-    }
+    if(!init) groupe <- "carte_fonds" else groupe <- "carte_fonds_init"
     
     # CONSTRUCTION DE LA MAP EN LEAFLET
     
-    map <- leaflet(padding = 0,
+    if(is.null(map))
+    {
+      map <- leaflet(padding = 0,
                    options = leafletOptions(
                      preferCanvas = TRUE,
                      transition = 2
@@ -31,25 +28,73 @@ function(listFonds)
       addScaleBar(position = 'bottomright',
                   options = scaleBarOptions(metric = TRUE, imperial = FALSE)
       )
-    
-    for(i in 1:length(listFonds))
+      
+      for(i in 1:length(listFonds))
+      {
+        if(any(!is.na(listFonds[[i]])))
+        {
+          unFond <- listFonds[[i]]
+          
+          if(any(popup %in% i)) affiche_popup <- TRUE else affiche_popup <- FALSE
+          
+          if(affiche_popup)
+          {
+            names(unFond)[2] <- "LIBELLE"
+            unFond$LIBELLE<-iconv(unFond$LIBELLE,"latin1","utf8")
+            libelle <- as.data.frame(unFond)$LIBELLE
+            clic <- T
+          }else
+          {
+            libelle <- NULL
+            clic <- F
+          }
+          
+          unFond <- st_transform(unFond,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          
+          map <- addPolygons(map = map, data = unFond, opacity = i/length(listFonds),
+                             stroke = TRUE, color = "black",
+                             weight = 1.5,
+                             popup = libelle,
+                             options = pathOptions(clickable = clic),
+                             fill = T, fillColor = "white", fillOpacity = 1,
+                             group = groupe
+          )
+        }
+      }
+    }else
     {
-      unFond <- listFonds[[i]][,c(1,ncol(listFonds[[i]]))]
-      
-      names(unFond)[1] <- "LIBELLE"
-      
-      unFond$LIBELLE<-iconv(unFond$LIBELLE,"latin1","utf8")
-      
-      unFond <- st_transform(unFond,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-      
-      map <- addPolygons(map = map, data = unFond, opacity = i/length(listFonds),
-                         stroke = TRUE, color = "black",
-                         weight = 1.5,
-                         popup = as.data.frame(unFond)$LIBELLE,
-                         options = pathOptions(clickable = T),
-                         fill = T, fillColor = "white", fillOpacity = 1,
-                         group = list(nom_couche="carte_fonds")
-      )
+      for(i in 1:length(listFonds))
+      {
+        if(any(!is.na(listFonds[[i]])))
+        {
+          unFond <- listFonds[[i]]
+          
+          if(any(popup %in% i)) affiche_popup <- TRUE else affiche_popup <- FALSE
+          
+          if(affiche_popup)
+          {
+            names(unFond)[2] <- "LIBELLE"
+            unFond$LIBELLE<-iconv(unFond$LIBELLE,"latin1","utf8")
+            libelle <- as.data.frame(unFond)$LIBELLE
+            clic <- T
+          }else
+          {
+            libelle <- NULL
+            clic <- F
+          }
+          
+          unFond <- st_transform(unFond,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          
+          map <- addPolygons(map = map, data = unFond, opacity = i/length(listFonds),
+                             stroke = TRUE, color = "black",
+                             weight = 1.5,
+                             popup = libelle,
+                             options = pathOptions(clickable = clic),
+                             fill = T, fillColor = "white", fillOpacity = 1,
+                             group = groupe
+          )
+        }
+      }
     }
     
     return(map)

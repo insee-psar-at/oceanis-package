@@ -8,7 +8,7 @@
 }
 \usage{
 set_fonds_simples(map, colRemplissageFonds = NULL, colBordureFonds = NULL,
-transparenceFonds = NULL, epaisseurFonds = NULL)
+transparenceFonds = NULL, epaisseurFonds = NULL, map_leaflet = NULL)
 }
 \arguments{
   \item{map}{
@@ -25,6 +25,9 @@ transparenceFonds = NULL, epaisseurFonds = NULL)
 }
   \item{epaisseurFonds}{
 	valeur numerique (numeric). Le vecteur comporte les valeurs numeriques pour l'epaiseeur de la bordure des fonds. Par defaut a NULL.
+}
+  \item{map_leaflet}{
+	objet leaflet. Pour l'integration des fonctions leaflet dans les applications shiny (cf vignette). Par defaut a NULL.
 }
 }
 \value{

@@ -12,7 +12,7 @@ function(map)
     {
       if(map$x$calls[[i]]$method %in% "addPolygons")
       {
-        if(map$x$calls[[i]]$args[[3]]$nom_couche == "carte_ronds") idx_carte <- c(idx_carte,i)
+        if(map$x$calls[[i]]$args[[3]] %in% c("carte_ronds_init","carte_ronds","carte_ronds_elargi")) idx_carte <- c(idx_carte,i)
       }
       if(map$x$calls[[i]]$method %in% "addControl")
       {
@@ -21,24 +21,24 @@ function(map)
       }
       if(map$x$calls[[i]]$method %in% "addCircles")
       {
-        if(map$x$calls[[i]]$args[[5]]$nom_couche=="carte_ronds") idx_carte_ronds <- c(idx_carte_ronds,i)
+        if(map$x$calls[[i]]$args[[5]] %in% c("carte_ronds","carte_ronds_elargi")) idx_carte_ronds <- c(idx_carte_ronds,i)
       }
       
       if(map$x$calls[[i]]$method %in% "addCircles")
       {
-        if(map$x$calls[[i]]$args[[5]]$nom_couche=="legende_ronds") idx_legende_ronds <- c(idx_legende_ronds,i)
+        if(map$x$calls[[i]]$args[[5]]=="legende_ronds") idx_legende_ronds <- c(idx_legende_ronds,i)
       }
       
       if(!is.null(idx_legende_ronds)) # la legende existe
       {
         if(map$x$calls[[i]]$method %in% "addMarkers")
         {
-          if(map$x$calls[[i]]$args[[5]]$nom_couche=="legende_ronds") idx_legende_ronds <- c(idx_legende_ronds,i)
+          if(map$x$calls[[i]]$args[[5]]=="legende_ronds") idx_legende_ronds <- c(idx_legende_ronds,i)
         }
         
         if(map$x$calls[[i]]$method %in% "addPolylines")
         {
-          if(map$x$calls[[i]]$args[[3]]$nom_couche=="legende_ronds") idx_legende_ronds <- c(idx_legende_ronds,i)
+          if(map$x$calls[[i]]$args[[3]]=="legende_ronds") idx_legende_ronds <- c(idx_legende_ronds,i)
         }
       }
     }
@@ -72,23 +72,23 @@ function(map)
           fond <- cbind(LIBELLE=map$x$calls[[idx_carte[i]]]$args[[5]],bb)
         }
         
-        fond <- st_transform(fond,paste0("+init=epsg:",map$x$calls[[idx_carte[i]]]$args[[3]]$code_epsg))
+        fond <- st_transform(fond,paste0("+init=epsg:",map$x$calls[[idx_carte[i]]]$args[[2]]$code_epsg))
         
         list_fonds[[l]] <- fond
         
-        nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte[i]]]$args[[3]]$nom_fond)
+        nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte[i]]]$args[[2]]$nom_fond)
         
         l <- l+1
       }
       
       for(i in 1:length(idx_carte_ronds))
       {
-        dom <- map$x$calls[[idx_carte_ronds[i]]]$args[[5]]$dom
+        dom <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$dom
         
-        centres_ronds <- data_frame(lng=map$x$calls[[idx_carte_ronds[i]]]$args[[2]],lat=map$x$calls[[idx_carte_ronds[i]]]$args[[1]])
+        centres_ronds <- data.frame(lng=map$x$calls[[idx_carte_ronds[i]]]$args[[2]],lat=map$x$calls[[idx_carte_ronds[i]]]$args[[1]])
         aa <- apply(centres_ronds,1, function(x) st_sf(geometry=st_sfc(st_point(x),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84")))
         bb <- do.call("rbind",aa)
-        cc <- st_transform(bb,paste0("+init=epsg:",map$x$calls[[idx_carte_ronds[i]]]$args[[5]]$code_epsg))
+        cc <- st_transform(bb,paste0("+init=epsg:",map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$code_epsg))
         ronds_pl <- st_buffer(cc, map$x$calls[[idx_carte_ronds[i]]]$args[[3]])
         
         col_bor <- map$x$calls[[idx_carte_ronds[i]]]$args[[6]]$color
@@ -113,13 +113,13 @@ function(map)
         if(!is.null(fond_pos))
         {
           list_fonds[[l]] <- fond_pos
-          nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte_ronds[i]]]$args[[5]]$nom_fond[1])
+          nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$nom_fond[1])
           l <- l+1
         }
         if(!is.null(fond_neg))
         {
           list_fonds[[l]] <- fond_neg
-          nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte_ronds[i]]]$args[[5]]$nom_fond[2])
+          nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$nom_fond[2])
           l <- l+1
         }
       }
@@ -128,10 +128,10 @@ function(map)
       {
         if(map$x$calls[[idx_legende_ronds[i]]]$method %in% "addCircles")
         {
-          centres_ronds <- data_frame(lng=map$x$calls[[idx_legende_ronds[i]]]$args[[2]],lat=map$x$calls[[idx_legende_ronds[i]]]$args[[1]])
+          centres_ronds <- data.frame(lng=map$x$calls[[idx_legende_ronds[i]]]$args[[2]],lat=map$x$calls[[idx_legende_ronds[i]]]$args[[1]])
           aa <- apply(centres_ronds,1, function(x) st_sf(geometry=st_sfc(st_point(x),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84")))
           bb <- do.call("rbind",aa)
-          cc <- st_transform(bb,paste0("+init=epsg:",map$x$calls[[idx_legende_ronds[i]]]$args[[5]]$code_epsg))
+          cc <- st_transform(bb,paste0("+init=epsg:",map$x$calls[[idx_legende_ronds[i]]]$args[[4]]$code_epsg))
           ronds_pl <- st_buffer(cc, map$x$calls[[idx_legende_ronds[i]]]$args[[3]])
           
           ronds_pl_leg <- ronds_pl
@@ -139,7 +139,7 @@ function(map)
           ronds_pl_leg <- cbind(VAL=val,ronds_pl_leg)
           
           list_fonds[[l]] <- ronds_pl_leg
-          nom_fonds <- c(nom_fonds,map$x$calls[[idx_legende_ronds[i]]]$args[[5]]$nom_fond)
+          nom_fonds <- c(nom_fonds,map$x$calls[[idx_legende_ronds[i]]]$args[[4]]$nom_fond)
           l <- l+1
         }
         
@@ -163,10 +163,10 @@ function(map)
           ligne_petit_pl <- rbind(pts1_petit_pl,pts2_petit_pl)
           
           lignes_pl <- st_sf(st_geometry(st_multilinestring(list(ligne_grand_pl,ligne_petit_pl))))
-          lignes_pl <- st_set_crs(lignes_pl,paste0("+init=epsg:",map$x$calls[[idx_legende_ronds[i]]]$args[[3]]$code_epsg))
+          lignes_pl <- st_set_crs(lignes_pl,paste0("+init=epsg:",map$x$calls[[idx_legende_ronds[i]]]$args[[2]]$code_epsg))
           
           list_fonds[[l]] <- lignes_pl
-          nom_fonds <- c(nom_fonds,map$x$calls[[idx_legende_ronds[i]]]$args[[3]]$nom_fond)
+          nom_fonds <- c(nom_fonds,map$x$calls[[idx_legende_ronds[i]]]$args[[2]]$nom_fond)
           l <- l+1
         }
       }

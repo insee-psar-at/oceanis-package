@@ -1,0 +1,491 @@
+---
+title: "Intégration dans les applications shiny"
+author: "Sébastien Calvet"
+date: '`r Sys.Date()`'
+output: 
+ rmarkdown::html_vignette: 
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Intégration dans les applications shiny}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+Les fonctions leaflet_ peuvent être utilisées dans 2 contextes différents :
+
++ Appel direct d'une fonction leaflet_ dans l'environnement RStudio. Dans ce cas, la carte s'affiche dans la fenêtre Viewer (ctrl+9). Il s'agit là d'un contexte 'leaflet' classique.
+
++ Dans une application shiny, les fonctions leaflet_ peuvent être utilisées pour actualiser des cartes à chaque changement de paramètres grâce à leaflet_proxy.
+L'intérêt ici est de ne pas recharger toutes les couches de la carte mais uniquement celles qui doivent être actualisées. Le temps de rafraîchissement est alors réduit.
+C'est le contexte 'proxy'.
+
+Il est bien sûr possible d'appeler des fonctions leaflet_ dans une application shiny avec un contexte 'leaflet', mais dans ce cas toute la carte sera rechargée dès qu'un paramètre sera modifié.
+
+Ci-dessous, quelques exemples d'applications shiny intégrant les fonctions leaflet_ dans un contexte 'proxy'.
+
+## Ronds proportionnels
+
+```r
+  library(oceanis)
+  library(shiny)
+
+  shinyApp(
+
+    ui = fluidPage(
+        sidebarLayout(
+          sidebarPanel(
+            uiOutput("lngRonds_out"),
+            uiOutput("latRonds_out"),
+            uiOutput("rayon_rond_out"),
+            uiOutput("opaciteElargie_out"),
+            uiOutput("colPos_out"),
+            uiOutput("colBorderRonds_out")
+          ),
+          mainPanel(
+            leafletOutput("carte", height = 900)
+          )
+        )
+    ),
+
+    server = function(input, output){
+
+      # Declaration et envoi des widgets a l'ui
+      output$lngRonds_out <- renderUI({
+        numericInput("lngRonds", "Longitude de la legende des ronds", value = 9)
+      })
+      output$latRonds_out <- renderUI({
+        numericInput("latRonds", "Latitude de la legende des ronds", value = 49)
+      })
+      output$rayon_rond_out <- renderUI({
+        numericInput("rayon_rond", "Rayon du rond le plus grand", value = 30000)
+      })
+      output$opaciteElargie_out <- renderUI({
+        sliderInput("opaciteElargie", "Opacite de la representation elargie",
+                    min=0,max=100,value=60,step=10,ticks=FALSE)
+      })
+      output$colPos_out <- renderUI({
+        textInput("colPos", "Couleur de remplissage des ronds", value = c("#CD853F"))
+      })
+      output$colBorderRonds_out <- renderUI({
+        textInput("colBorderRonds", "Couleur de la bordure des ronds", value = c("#303030"))
+      })
+     
+      # Initialisation et envoi de la carte leaflet a l'ui
+      output$carte <- renderLeaflet({
+        map <- leaflet_ronds(data = donnees_monoloc,
+                            fondMaille = depm[depm$REG %in% c("84","93"),],
+                            fondMailleElargi = depm,
+                            idData = "COD_DEP",
+                            varVolume = "POP_2015",
+                            map_proxy = "shiny")
+      })
+
+      # Reactive pour actualiser la carte leaflet
+      react_carte <- reactive({
+        map <- leaflet_ronds(data = donnees_monoloc,
+                            fondMaille = depm[depm$REG %in% c("84","93"),],
+                            fondMailleElargi = depm,
+                            idData = "COD_DEP",
+                            varVolume = "POP_2015",
+                            rayonRond = as.numeric(input$rayon_rond),
+                            opacityElargi = as.numeric(input$opaciteElargie)/100,
+                            colPos = input$colPos,
+                            colBorder = input$colBorderRonds,
+                            map_proxy = "shiny")
+      })
+
+      # Deplacement de la legende des ronds
+      observeEvent(list(input$lngRonds,input$latRonds),{
+
+        proxy <- leafletProxy("carte")
+
+        # on passe la carte leaflet en parametre (map_leaflet = react_carte()).
+        # on met a jour la carte proxy pour la nouvelle position de la legende des ronds.
+        proxy <- add_legende_ronds(map = proxy, 
+                                  titre = "POP_2015",
+                                  lng = as.numeric(input$lngRonds),
+                                  lat = as.numeric(input$latRonds),
+                                  zoom = 6,
+                                  map_leaflet = react_carte())
+      }, ignoreInit = T)
+  
+      # Modification de la taille des ronds
+      observeEvent(input$rayon_rond,{
+
+        proxy <- leafletProxy("carte")
+
+        # on passe le proxy en parametre (map_proxy = proxy).
+        # on utilise isolate() autour des input qui ne changent pas d'etat dans cet observeEvent
+        # pour eviter le rafraichissement intempestif de la carte.
+        # on met a jour la carte proxy avec la nouvelle taille des ronds.
+        proxy <- leaflet_ronds(data = donnees_monoloc,
+                              fondMaille = depm[depm$REG %in% c("84","93"),],
+                              fondMailleElargi = depm,
+                              idData = "COD_DEP",
+                              varVolume = "POP_2015",
+                              rayonRond = as.numeric(input$rayon_rond),
+                              opacityElargi = as.numeric(isolate(input$opaciteElargie))/100,
+                              colPos = isolate(input$colPos),
+                              colBorder = isolate(input$colBorderRonds),
+                              map_proxy = proxy)
+
+        # on passe la carte leaflet en parametre (map_leaflet = react_carte()).
+        # on met a jour la carte proxy pour la nouvelle taille des ronds de la legende.
+        proxy <- add_legende_ronds(map = proxy,
+                                  titre = "POP_2015",
+                                  lng = as.numeric(isolate(input$lngRonds)),
+                                  lat = as.numeric(isolate(input$latRonds)),
+                                  zoom = 6,
+                                  map_leaflet = react_carte())
+      }, ignoreInit = T)
+    
+      # Modification de l'opacite de la representation elargie
+      observeEvent(input$opaciteElargie,{
+
+        proxy <- leafletProxy("carte")
+
+        # on passe la carte leaflet en parametre (map_leaflet = react_carte()).
+        # on met a jour la carte proxy avec la nouvelle opacite de la representation elargie.
+        proxy <- set_opacite_elargi(map = proxy,
+                                    opacite = as.numeric(input$opaciteElargie)/100,
+                                    map_leaflet = react_carte())
+      }, ignoreInit = T)
+    
+      # Modification de la couleur des ronds
+      observeEvent(list(input$colPos,input$colBorderRonds),{
+
+        proxy <- leafletProxy("carte")
+
+        # on passe la carte leaflet en parametre (map_leaflet = react_carte()).
+        # on met a jour la carte proxy pour les nouvelles couleurs des ronds et de leur bordure.
+        proxy <- set_couleur_ronds(map = proxy,
+                                  colorPos = input$colPos,
+                                  colBorder = input$colBorderRonds,
+                                  map_leaflet = react_carte())
+      
+        # ou bien en passant les parametres directement dans la fonction leaflet_ronds()
+        # avec map_proxy = proxy.
+        # selon les cas, cette solution peut etre plus longue.
+        # proxy <- leaflet_ronds(data = donnees_monoloc,
+        #                       fondMaille = depm[depm$REG %in% c("84","93"),],
+        #                       fondMailleElargi = depm,
+        #                       idData = "COD_DEP",
+        #                       varVolume = "POP_2015",
+        #                       rayonRond = as.numeric(isolate(input$rayon_rond)),
+        #                       colPos = input$colPos,
+        #                       colBorder = input$colBorderRonds,
+        #                       opacityElargi = as.numeric(isolate(input$opaciteElargie))/100,
+        #                       map_proxy = proxy)
+      }, ignoreInit = T)
+    }
+  )
+```
+
+## Analyse en classes
+
+```r
+  library(oceanis)
+  library(shiny)
+
+  shinyApp(
+
+    ui = fluidPage(
+        sidebarLayout(
+          sidebarPanel(
+            uiOutput("lngClasses_out"),
+            uiOutput("latClasses_out"),
+            uiOutput("nb_classes_out"),
+            uiOutput("opaciteElargie_out"),
+            uiOutput("stylePalette_out"),
+            uiOutput("colBorder_out")
+          ),
+          mainPanel(
+            leafletOutput("carte", height = 900)
+          )
+        )
+    ),
+
+    server = function(input, output){
+
+      # Declaration et envoi des widgets a l'ui
+      output$lngClasses_out <- renderUI({
+        numericInput("lngClasses", "Longitude de la legende des classes", value = 9)
+      })
+      output$latClasses_out <- renderUI({
+        numericInput("latClasses", "Latitude de la legende des classes", value = 49)
+      })
+      output$nb_classes_out <- renderUI({
+        numericInput("nb_classes", "Nombre de classes", value = 4)
+      })
+      output$opaciteElargie_out <- renderUI({
+        sliderInput("opaciteElargie", "Opacite de la representation elargie",
+                    min=0,max=100,value=60,step=10,ticks=FALSE)
+      })
+      output$stylePalette_out <- renderUI({
+        selectInput("stylePalette", "Style Insee de la palette",
+                    choices = c("defaut", "InseeFlash", "InseeAnalyse",
+                                "InseeDossier", "InseePremiere"),
+                    selected = "defaut")
+      })
+      output$colBorder_out <- renderUI({
+        textInput("colBorderClasses", "Couleur de la bordure des classes", value = c("white"))
+      })
+           
+      # Initialisation et envoi de la carte leaflet a l'ui
+      output$carte <- renderLeaflet({
+        map <- leaflet_classes(data = donnees_monoloc,
+                              fondMaille = depm[depm$REG %in% c("84","93"),],
+                              fondMailleElargi = depm,
+                              idData = "COD_DEP",
+                              varRatio = "VAR_AN_MOY",
+                              nbClasses = 4,
+                              map_proxy = "shiny")
+      })
+
+      # Reactive pour actualiser la carte leaflet
+      react_carte <- reactive({
+        map <- leaflet_classes(data = donnees_monoloc,
+                              fondMaille = depm[depm$REG %in% c("84","93"),],
+                              fondMailleElargi = depm,
+                              idData = "COD_DEP",
+                              varRatio = "VAR_AN_MOY",
+                              nbClasses = as.numeric(input$nb_classes),
+                              stylePalette = input$stylePalette,
+                              opacityElargi = as.numeric(input$opaciteElargie)/100,
+                              colBorder = input$colBorderClasses,
+                              map_proxy = "shiny")
+      })
+
+      # Reactive pour ajouter la legende de classes a la carte leaflet
+      react_legende_carte <- reactive({
+        map <- add_legende_classes(map = react_carte(), 
+                                  titre = "VAR_AN_MOY",
+                                  lng = as.numeric(input$lngClasses),
+                                  lat = as.numeric(input$latClasses),
+                                  zoom = 6)
+      })
+
+      # Deplacement de la legende des classes
+      observeEvent(list(input$lngClasses,input$latClasses),{
+
+        proxy <- leafletProxy("carte")
+
+        # on passe la carte leaflet en parametre (map_leaflet = react_carte()).
+        # on met a jour la carte proxy pour la nouvelle position de la legende des classes.
+        proxy <- add_legende_classes(map = proxy, 
+                                    titre = "VAR_AN_MOY",
+                                    lng = as.numeric(input$lngClasses),
+                                    lat = as.numeric(input$latClasses),
+                                    zoom = 6,
+                                    map_leaflet = react_carte())
+      }, ignoreInit = T)
+  
+      # Modification du nombre de classes
+      observeEvent(input$nb_classes,{
+
+        proxy <- leafletProxy("carte")
+
+        # on passe le proxy en parametre (map_proxy = proxy).
+        # on utilise isolate() autour des input qui ne changent pas d'etat dans cet observeEvent
+        # pour eviter le rafraichissement intempestif de la carte.
+        # on met a jour la carte proxy avec le nouveau nombre de classes.
+        proxy <- leaflet_classes(data = donnees_monoloc,
+                                fondMaille = depm[depm$REG %in% c("84","93"),],
+                                fondMailleElargi = depm,
+                                idData = "COD_DEP",
+                                varRatio = "VAR_AN_MOY",
+                                nbClasses = as.numeric(input$nb_classes),
+                                stylePalette = isolate(input$stylePalette),
+                                opacityElargi = as.numeric(isolate(input$opaciteElargie))/100,
+                                colBorder = isolate(input$colBorderClasses),
+                                map_proxy = proxy)
+
+        # on passe la carte leaflet en parametre (map_leaflet = react_carte()).
+        # on met a jour la carte proxy pour le nouveau nombre de classes dans la legende.
+        proxy <- add_legende_classes(map = proxy,
+                                    titre = "VAR_AN_MOY",
+                                    lng = as.numeric(isolate(input$lngClasses)),
+                                    lat = as.numeric(isolate(input$latClasses)),
+                                    zoom = 6,
+                                    map_leaflet = react_carte())
+      }, ignoreInit = T)
+    
+      # Modification de l'opacite de la representation elargie
+      observeEvent(input$opaciteElargie,{
+
+        proxy <- leafletProxy("carte")
+
+        # on passe la carte leaflet en parametre (map_leaflet = react_carte()).
+        # on met a jour la carte proxy avec la nouvelle opacite de la representation elargie.
+        proxy <- set_opacite_elargi(map = proxy,
+                                    opacite = as.numeric(input$opaciteElargie)/100,
+                                    map_leaflet = react_carte())
+      }, ignoreInit = T)
+    
+      # Modification du style de palette et de la bordure des classes
+      observeEvent(list(input$stylePalette,input$colBorderClasses),{
+
+        proxy <- leafletProxy("carte")
+
+        # on passe la carte leaflet avec la legende en parametre
+        # (map_leaflet = react_legende_carte()).
+        # on met a jour la carte proxy pour la nouvelle palette et la bordure des classes.
+        proxy <- set_couleur_classes(map = proxy,
+                                    stylePalette = input$stylePalette,
+                                    colBorder = input$colBorderClasses,
+                                    map_leaflet = react_legende_carte())
+      }, ignoreInit = T)
+    }
+  )
+```
+
+## Flèches joignantes
+
+```r
+  library(oceanis)
+  library(shiny)
+
+  shinyApp(
+
+    ui = fluidPage(
+        sidebarLayout(
+          sidebarPanel(
+            uiOutput("lngFleches_out"),
+            uiOutput("latFleches_out"),
+            uiOutput("largeurFleche_out"),
+            uiOutput("colFleches_out"),
+            uiOutput("colBorderFleches_out")
+          ),
+          mainPanel(
+            leafletOutput("carte", height = 900)
+          )
+        )
+    ),
+
+    server = function(input, output){
+
+      # Declaration et envoi des widgets a l'ui
+      output$lngFleches_out <- renderUI({
+        numericInput("lngFleches", "Longitude de la legende des fleches", value = 9)
+      })
+      output$latFleches_out <- renderUI({
+        numericInput("latFleches", "Latitude de la legende des fleches", value = 49)
+      })
+      output$largeurFleche_out <- renderUI({
+        numericInput("largeurFleche", "Largeur de la plus grande fleche", value = 50)
+      })
+      output$colFleches_out <- renderUI({
+        textInput("colFleches", "Couleur de remplissage des fleches", value = c("#CD853F"))
+      })
+      output$colBorderFleches_out <- renderUI({
+        textInput("colBorderFleches", "Couleur de la bordure des fleches", value = c("#303030"))
+      })
+           
+      # Initialisation et envoi de la carte leaflet a l'ui
+      output$carte <- renderLeaflet({
+        map <- leaflet_joignantes(data = donnees_biloc,
+                                  fondMaille = regm,
+                                  typeMaille = "REG",
+                                  idDataDepart = "REG_DEPART",
+                                  idDataArrivee = "REG_ARRIVEE",
+                                  varFlux = "MIGR",
+                                  filtreDist = 300,
+                                  decalageAllerRetour = 20,
+                                  decalageCentroid = 20,
+                                  map_proxy = "shiny")
+      })
+
+      # Reactive pour actualiser la carte leaflet
+      react_carte <- reactive({
+        map <- leaflet_joignantes(data = donnees_biloc,
+                                  fondMaille = regm,
+                                  typeMaille = "REG",
+                                  idDataDepart = "REG_DEPART",
+                                  idDataArrivee = "REG_ARRIVEE",
+                                  varFlux = "MIGR",
+                                  filtreDist = 300,
+                                  decalageAllerRetour = 20,
+                                  decalageCentroid = 20,
+                                  largeurFlecheMax = as.numeric(input$largeurFleche),
+                                  colFleche = input$colFleches,
+                                  colBorder = input$colBorderFleches,
+                                  map_proxy = "shiny")
+      })
+
+      # Reactive pour ajouter la legende des fleches a la carte leaflet
+      react_legende_carte <- reactive({
+        map <- add_legende_joignantes(map = react_carte(), 
+                                    titre = "MIGR",
+                                    lng = as.numeric(input$lngFleches),
+                                    lat = as.numeric(input$latFleches),
+                                    zoom = 6)
+      })
+
+      # Deplacement de la legende des fleches
+      observeEvent(list(input$lngFleches,input$latFleches),{
+
+        proxy <- leafletProxy("carte")
+
+        # on passe la carte leaflet en parametre (map_leaflet = react_carte()).
+        # on met a jour la carte proxy pour la nouvelle position de la legende des fleches.
+        proxy <- add_legende_joignantes(map = proxy, 
+                                        titre = "MIGR",
+                                        lng = as.numeric(input$lngFleches),
+                                        lat = as.numeric(input$latFleches),
+                                        zoom = 6,
+                                        map_leaflet = react_carte())
+      }, ignoreInit = T)
+  
+      # Modification de la largeur des fleches
+      observeEvent(input$largeurFleche,{
+
+        proxy <- leafletProxy("carte")
+
+        # on passe le proxy en parametre (map_proxy = proxy).
+        # on utilise isolate() autour des input qui ne changent pas d'etat dans cet observeEvent
+        # pour eviter le rafraichissement intempestif de la carte.
+        # on met a jour la carte proxy avec la nouvelle largeur de fleches.
+        proxy <- leaflet_joignantes(data = donnees_biloc,
+                                    fondMaille = regm,
+                                    typeMaille = "REG",
+                                    idDataDepart = "REG_DEPART",
+                                    idDataArrivee = "REG_ARRIVEE",
+                                    varFlux = "MIGR",
+                                    filtreDist = 300,
+                                    decalageAllerRetour = 20,
+                                    decalageCentroid = 20,
+                                    largeurFlecheMax = as.numeric(input$largeurFleche),
+                                    colFleche = isolate(input$colFleches),
+                                    colBorder = isolate(input$colBorderFleches),
+                                    map_proxy = proxy)
+
+        # on passe la carte leaflet en parametre (map_leaflet = react_carte()).
+        # on met a jour la carte proxy pour la nouvelle largeur de fleches dans la legende.
+        proxy <- add_legende_joignantes(map = proxy,
+                                        titre = "MIGR",
+                                        lng = as.numeric(isolate(input$lngFleches)),
+                                        lat = as.numeric(isolate(input$latFleches)),
+                                        zoom = 6,
+                                        map_leaflet = react_carte())
+      }, ignoreInit = T)
+    
+      # Modification de la couleur des fleches et de leur bordure
+      observeEvent(list(input$colFleches,input$colBorderFleches),{
+
+        proxy <- leafletProxy("carte")
+        
+        # on passe la carte leaflet avec la legende en parametre
+        # (map_leaflet = react_legende_carte()).
+        # on met a jour la carte proxy pour la nouvelle couleur des fleches et des bordures.
+        proxy <- set_couleur_joignantes(map = proxy,
+                                        colFleche = input$colFleches,
+                                        colBorder = input$colBorderFleches,
+                                        map_leaflet = react_legende_carte())
+      }, ignoreInit = T)
+    }
+  )
+```

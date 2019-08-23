@@ -1,8 +1,8 @@
 Package: oceanis
 Type: Package
 Title: Cartography for Statistical Analysis
-Version: 0.9.0
-Date: 2019-07-15
+Version: 1.0.0
+Date: 2019-08-23
 Description: Creating maps for statistical analysis such as proportional circles, chroropleth, typology and flows. Some functions use 'shiny' or 'leaflet' technologies for dynamism and interactivity.
 	The great features are :
 	- Create maps in a web environment where the parameters are modifiable on the fly ('shiny' and 'leaflet' technology).

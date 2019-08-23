@@ -245,10 +245,8 @@ recup_palette(stylePalette = "defaut")
 # affichage de la palette InseePremiere
 recup_palette(stylePalette = "InseePremiere")
 
-# modification de la couleur de bordure des ronds
-map <- set_couleur_ronds(map = map, colBorder = "grey")
-# modification du style de la palette
-map <- set_couleur_classes(map = map, stylePalette = "InseePremiere")
+# modification du style de la palette et de la bordure des ronds
+map <- set_couleur_classes(map = map, stylePalette = "InseePremiere", colBorder = "grey")
 
 # modification de l'opacite de la representation elargie
 map <- set_opacite_elargi(map, opacite = 0.3)

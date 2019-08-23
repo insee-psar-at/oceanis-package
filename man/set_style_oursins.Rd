@@ -7,7 +7,7 @@
 	Modify the style of 'leaflet' map's urchins.
 }
 \usage{
-set_style_oursins(map, epaisseur = 2, colTrait = "black")
+set_style_oursins(map, epaisseur = 2, colTrait = "black", map_leaflet = NULL)
 }
 \arguments{
   \item{map}{
@@ -18,6 +18,9 @@ set_style_oursins(map, epaisseur = 2, colTrait = "black")
 }
   \item{colTrait}{
 	chaine de caracteres (character). Couleur nommee (par exemple "black") ou hexadecimal (par exemple "#000000"). Par defaut "black".
+}
+  \item{map_leaflet}{
+	objet leaflet. Pour l'integration des fonctions leaflet dans les applications shiny (cf vignette). Par defaut a NULL.
 }
 }
 \value{

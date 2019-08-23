@@ -93,8 +93,8 @@ function(fondPoints,listFonds,dom="0",types=NULL,couleurs=NULL,tailles=NULL,epai
       tableEtiquettes <- table_etiquettes(listFonds[[1]],etiquettes)
     }
     
-    if(is.null(xlim)) xlim <- c(st_bbox(fondMaille)$xmin,st_bbox(fondMaille)$xmax+x_marge*3)
-    if(is.null(ylim)) ylim <- c(st_bbox(fondMaille)$ymin,st_bbox(fondMaille)$ymax+y_marge*3)
+    if(is.null(xlim)) xlim <- c(st_bbox(listFonds[[1]])$xmin,st_bbox(listFonds[[1]])$xmax+x_marge*3)
+    if(is.null(ylim)) ylim <- c(st_bbox(listFonds[[1]])$ymin,st_bbox(listFonds[[1]])$ymax+y_marge*3)
     
     par(mai=c(0,0,0,0))
     

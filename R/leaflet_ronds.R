@@ -1,43 +1,10 @@
 leaflet_ronds <-
-function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,rayonRond=NULL,rapportRond=NULL,dom="0",fondChx=NULL,map=NULL)
+function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,rayonRond=NULL,rapportRond=NULL,dom="0",fondChx=NULL,colPos="#CD853F",colNeg="#6495ED",colBorder="white",opacityElargi=0.6,map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
     # Verification des parametres
-    
-    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18 <- NULL
-    
-    if(any(class(data)!="data.frame")) msg_error1 <- "Les donnees doivent etre dans un data.frame / "
-    if(any(!any(class(fondMaille) %in% "sf"),!any(class(fondMaille) %in% "data.frame"))) msg_error2 <- "Le fond de maille doit etre un objet sf / "
-    if(!is.null(fondMailleElargi)) if(any(!any(class(fondMailleElargi) %in% "sf"),!any(class(fondMailleElargi) %in% "data.frame"))) msg_error3 <- "Le fond de maille elargie doit etre un objet sf / "
-    if(!is.null(fondSuppl)) if(any(!any(class(fondSuppl) %in% "sf"),!any(class(fondSuppl) %in% "data.frame"))) msg_error4 <- "Le fond supplementaire doit etre un objet sf / "
-    if(any(class(idData)!="character")) msg_error5 <- "Le nom de la variable doit etre de type caractere / "
-    if(any(class(varVolume)!="character")) msg_error6 <- "Le nom de la variable doit etre de type caractere / "
-    if(!is.null(rayonRond)) if(any(class(rayonRond)!="numeric")) msg_error7 <- "La variable doit etre de type numerique / "
-    if(!is.null(rapportRond)) if(any(class(rapportRond)!="numeric")) msg_error8 <- "La variable doit etre de type numerique / "
-    if(any(class(dom)!="character")) msg_error9 <- "La valeur doit etre de type caractere ('0', '971', '972', '973', '974' ou '976') / "
-    if(!is.null(fondChx)) if(any(!any(class(fondChx) %in% "sf"),!any(class(fondChx) %in% "data.frame"))) msg_error10 <- "Le fond des chx doit etre un objet sf / "
-    
-    if(length(names(data))<2) msg_error11 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et la variable a representer / "
-    if(length(names(fondMaille))<3) msg_error12 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
-    if(!is.null(fondMailleElargi)) if(length(names(fondMailleElargi))<3) msg_error13 <- "Le fond de maille elargie n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
-    if(!is.null(fondSuppl)) if(length(names(fondSuppl))<3) msg_error14 <- "Le fond supplementaire n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
-    
-    if(!any(names(data) %in% idData))  msg_error15 <- "La variable identifiant les donnees n'existe pas dans la table des donnees / "
-    if(!any(names(data) %in% varVolume))  msg_error16 <- "La variable a representer n'existe pas dans la table des donnees / "
-    if(!dom %in% c("0","971","972","973","974","976")) msg_error17 <- "La variable dom doit etre '0', '971', '972', '973', '974' ou '976' / "
-    
-    if (!is.null(map)) if (any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
-    
-    if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
-           !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
-           !is.null(msg_error9),!is.null(msg_error10),!is.null(msg_error11),!is.null(msg_error12),
-           !is.null(msg_error13),!is.null(msg_error14),!is.null(msg_error15),!is.null(msg_error16),
-           !is.null(msg_error17),!is.null(msg_error18)))
-    {
-      stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6,msg_error7,msg_error8,
-                              msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,msg_error16,msg_error17,msg_error18)))
-    }
+    leafletVerifParamRonds(data,fondMaille,fondMailleElargi,fondSuppl,idData,varVolume,rayonRond,rapportRond,dom,fondChx,colPos,colNeg,colBorder,opacityElargi,map_proxy)
     
     if(!is.null(fondChx))
     {
@@ -69,11 +36,12 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
     
     fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","utf8")
     
-    if(!is.null(map))
+    if(!is.null(map_proxy))
     {
-      if(any(class(map) %in% "leaflet_proxy"))
+      if(any(class(map_proxy) %in% "leaflet_proxy")) # Contexte shiny/proxy
       {
-        clearGroup(map, group = "carte_ronds")
+        clearGroup(map_proxy, group = "carte_ronds")
+        clearGroup(map_proxy, group = "carte_ronds_elargi")
       }
     }
     
@@ -110,18 +78,29 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
     max_surface_rond <- (aire_territoire/(7*somme_quotient))
     #calcul du rayon max du rond le plus grand
     max_rayon_metres <- sqrt(max_surface_rond/pi)
-    
     if(!is.null(rayonRond))
     {
-      if(rayonRond>max_rayon_metres)
+      if(length(rayonRond)!=0)
       {
-        if(!is.null(map))
+        if(!is.na(rayonRond))
         {
-          showModal(modalDialog(HTML(paste0("Le rayon du rond le plus grand est trop \u00e9lev\u00e9 et ne permet pas de respecter la r\u00e8gle s\u00e9miologique des 1/7\u00e8me. Le rayon max est ",round(max_rayon_metres,2)," m\u00e8tres.")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
+          if(rayonRond>max_rayon_metres)
+          {
+            if(!is.null(map_proxy))
+            {
+              showModal(modalDialog(HTML(paste0("Le rayon du rond le plus grand est trop \u00e9lev\u00e9 et ne permet pas de respecter la r\u00e8gle s\u00e9miologique des 1/7\u00e8me. Le rayon max est ",round(max_rayon_metres,2)," m\u00e8tres.")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
+            }else
+            {
+              stop(simpleError(paste0("Le rayon du rond le plus grand est trop eleve et ne permet pas de respecter la regle semiologique des 1/7eme. Le rayon max est ",round(max_rayon_metres,2)," metres.")))
+            }
+          }
         }else
         {
-          stop(simpleError(paste0("Le rayon du rond le plus grand est trop eleve et ne permet pas de respecter la regle semiologique des 1/7eme. Le rayon max est ",round(max_rayon_metres,2)," metres.")))
+          rayonRond <- max_rayon_metres
         }
+      }else
+      {
+        rayonRond <- max_rayon_metres
       }
     }
     
@@ -141,7 +120,14 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
     
     if(is.null(analyse))
     {
-      stop(simpleError("La maille ne correspond pas au niveau geographique du fichier de donnees. Veuillez svp choisir une maille adaptee ou modifier le fichier de donnees."))
+      if(!is.null(map_proxy))
+      {
+        showModal(modalDialog(HTML(paste0("<font size=+1>La maille ne correspond pas au niveau g\u00e9ographique du fichier de donn","\u00e9","es.<br><br>Veuillez svp choisir une maille adapt","\u00e9","e ou modifier le fichier de donn","\u00e9","es.</font>")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
+        return(map_proxy)
+      }else
+      {
+        stop(simpleError("La maille ne correspond pas au niveau geographique du fichier de donnees. Veuillez svp choisir une maille adaptee ou modifier le fichier de donnees"))
+      }
     }
     
     analyse$donnees[,"TXT1"] <- paste0("<b> <font color=#2B3E50>",format(analyse$donnees$save, big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
@@ -211,7 +197,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
     
     # CONSTRUCTION DE LA MAP EN LEAFLET
     
-    if(is.null(map) | (!is.null(map) & any(class(map) %in% "leaflet")))
+    if(is.null(map_proxy) | (!is.null(map_proxy) & class(map_proxy)=="character"))
     {
       map <- leaflet(padding = 0,
                      options = leafletOptions(
@@ -229,6 +215,16 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                   lat2 = max(list_bbox[[2]])
         ) %>%
         
+        # Pour gerer l'ordre des calques
+        addMapPane(name = "fond_pays", zIndex = 401) %>%
+        addMapPane(name = "fond_france", zIndex = 402) %>%
+        addMapPane(name = "fond_territoire", zIndex = 403) %>%
+        addMapPane(name = "fond_maille_elargi", zIndex = 404) %>%
+        addMapPane(name = "fond_maille", zIndex = 405) %>%
+        addMapPane(name = "fond_ronds_elargi", zIndex = 406) %>%
+        addMapPane(name = "fond_ronds", zIndex = 407) %>%
+        addMapPane(name = "fond_legende", zIndex = 408) %>%
+        
         # On ajoute une barre d'echelle
         addScaleBar(position = 'bottomright',
                     options = scaleBarOptions(metric = TRUE, imperial = FALSE)
@@ -241,7 +237,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                            stroke = TRUE, color = "white",
                            weight = 1,
                            popup = as.data.frame(fond_pays[,"LIBGEO"])[,-ncol(as.data.frame(fond_pays[,"LIBGEO"]))],
-                           options = pathOptions(clickable = F),
+                           options = pathOptions(pane = "fond_pays", clickable = F),
                            fill = T, fillColor = "#CCCCCC", fillOpacity = 1,
                            group = "carte_ronds_init",
                            layerId = list(code_epsg=code_epsg,nom_fond="fond_pays")
@@ -253,51 +249,55 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                          stroke = TRUE, color = "black",
                          weight = 1.5,
                          popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
-                         options = pathOptions(clickable = F),
+                         options = pathOptions(pane = "fond_france", clickable = F),
                          fill = T, fillColor = "white", fillOpacity = 1,
                          group = "carte_ronds_init",
-                         layerId = list(code_epsg=code_epsg,nom_fond="fond_pays")
+                         layerId = list(code_epsg=code_epsg,nom_fond="fond_france")
       )
-    }
-    
-    # AFFICHAGE DU FOND TERRITOIRE
-    
-    if(!is.null(fondSuppl))
+      
+      # AFFICHAGE DU FOND TERRITOIRE
+      
+      if(!is.null(fondSuppl))
+      {
+        map <- addPolygons(map = map, data = fond_territoire,
+                           stroke = TRUE, color = "#BFBFBF", opacity = 1,
+                           weight = 0.5,
+                           options = pathOptions(pane = "fond_territoire", clickable = T),
+                           popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fond_territoire)[,"LIBELLE"], "</font> </b>"),
+                           fill = F,
+                           group = "carte_ronds_init",
+                           layerId = list(code_epsg=code_epsg,nom_fond="fond_territoire")
+        )
+      }
+      
+      # AFFICHAGE DE LA MAILLE
+      
+      map <- addPolygons(map = map, data = maille_WGS84, opacity = 1, #maille_WGS84
+                         stroke = TRUE, color = "grey", weight = 1,
+                         options = pathOptions(pane = "fond_maille", clickable = T),
+                         popup = paste0("<b> <font color=#2B3E50>",as.data.frame(maille_WGS84)[,"LIBELLE"], "</font> </b>"),
+                         fill = T, fillColor = "white", fillOpacity = 0.001,
+                         group = "carte_ronds_init",
+                         layerId = list(maille_WGS84=maille_WGS84,code_epsg=code_epsg,nom_fond="fond_maille")
+      )
+      
+    }else # Contexte shiny/proxy
     {
-      map <- addPolygons(map = map, data = fond_territoire,
-                         stroke = TRUE, color = "#BFBFBF", opacity = 1,
-                         weight = 0.5,
-                         options = pathOptions(clickable = T),
-                         popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fond_territoire)[,"LIBELLE"], "</font> </b>"),
-                         fill = F,
-                         group = "carte_ronds",
-                         layerId = list(code_epsg=code_epsg,nom_fond="fond_territoire")
-      )
+      map <- map_proxy
     }
 
     if(!is.null(fondMailleElargi))
     {
       map <- addPolygons(map = map, data = maille_WGS84_elargi,
-                         stroke = TRUE, color = "grey", opacity = 1,
+                         stroke = TRUE, color = "grey", opacity = opacityElargi,
                          weight = 0.5,
-                         options = pathOptions(clickable = T),
+                         options = pathOptions(pane = "fond_maille_elargi", clickable = T),
                          popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fondMailleElargi)[,"LIBELLE"], "</font> </b>"),
                          fill = T, fillColor = "white", fillOpacity = 0.001,
-                         group = "carte_ronds",
-                         layerId = list(code_epsg=code_epsg,nom_fond="fond_maille_elargi")
+                         group = "carte_ronds_elargi",
+                         layerId = list(maille_WGS84_elargi=maille_WGS84_elargi,code_epsg=code_epsg,nom_fond="fond_maille_elargi")
       )
     }
-    
-    # AFFICHAGE DE LA MAILLE
-    
-    map <- addPolygons(map = map, data = maille_WGS84, opacity = 1, #maille_WGS84
-                       stroke = TRUE, color = "grey", weight = 1,
-                       options = pathOptions(clickable = T),
-                       popup = paste0("<b> <font color=#2B3E50>",as.data.frame(maille_WGS84)[,"LIBELLE"], "</font> </b>"),
-                       fill = T, fillColor = "white", fillOpacity = 0.001,
-                       group = "carte_ronds",
-                       layerId = list(code_epsg=code_epsg,nom_fond="fond_maille")
-    )
     
     if(!is.null(fondMailleElargi))
     {
@@ -306,19 +306,20 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
       map <- addCircles(map = map,
                         lng = st_coordinates(analyse_WGS84_elargi)[,1],
                         lat = st_coordinates(analyse_WGS84_elargi)[,2],
-                        stroke = TRUE, color = "white",
-                        opacity = 0.6,
+                        stroke = TRUE, color = colBorder,
+                        opacity = opacityElargi,
                         weight = 1,
                         radius = rayonRond*sqrt(analyse$donnees_elargi[,varVolume]/max_var),
-                        options = pathOptions(clickable = T),
+                        options = pathOptions(pane = "fond_ronds_elargi", clickable = T),
                         popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse$donnees_elargi$TXT1),
                         fill = T,
-                        fillColor = sapply(analyse$donnees_elargi$save, function(x) if(x>0){"#CD853F"}else{"#6495ED"}),
-                        fillOpacity = 0.6,
-                        group = "carte_ronds",
-                        layerId = list(code_epsg=code_epsg,dom=dom,nom_fond=c(if(max(analyse$donnees_elargi$save)>0){"fond_ronds_pos_elargi_carte"}else{" "},
-                                                                                                      if(min(analyse$donnees_elargi$save)<0){"fond_ronds_neg_elargi_carte"}else{" "}),
-                                      max_var=max_var,var_volume=varVolume)
+                        fillColor = sapply(analyse$donnees_elargi$save, function(x) if(x>0){colPos}else{colNeg}),
+                        fillOpacity = opacityElargi,
+                        group = "carte_ronds_elargi",
+                        layerId = list(analyse=analyse,analyse_WGS84_elargi=analyse_WGS84_elargi,rayonRond=rayonRond,code_epsg=code_epsg,dom=dom,
+                                       nom_fond=c(if(max(analyse$donnees_elargi$save)>0){"fond_ronds_pos_elargi_carte"}else{" "},
+                                                  if(min(analyse$donnees_elargi$save)<0){"fond_ronds_neg_elargi_carte"}else{" "}),
+                                      max_var=max_var,var_volume=varVolume,colPos=colPos,colNeg=colNeg,colBorder=colBorder)
       )
     }
     
@@ -327,19 +328,20 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
     map <- addCircles(map = map,
                       lng = st_coordinates(analyse_WGS84)[,1],
                       lat = st_coordinates(analyse_WGS84)[,2],
-                      stroke = TRUE, color = "white",
+                      stroke = TRUE, color = colBorder,
                       opacity = 1,
                       weight = 1,
                       radius = rayonRond*sqrt(analyse$donnees[,varVolume]/max_var),
-                      options = pathOptions(clickable = T),
+                      options = pathOptions(pane = "fond_ronds", clickable = T),
                       popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse$donnees$TXT1),
                       fill = T,
-                      fillColor = sapply(analyse$donnees$save, function(x) if(x>0){"#CD853F"}else{"#6495ED"}),
+                      fillColor = sapply(analyse$donnees$save, function(x) if(x>0){colPos}else{colNeg}),
                       fillOpacity = 1,
                       group = "carte_ronds",
-                      layerId = list(code_epsg=code_epsg,dom=dom,nom_fond=c(if(max(analyse$donnees$save)>0){"fond_ronds_pos_carte"}else{" "},
-                                                                                                   if(min(analyse$donnees$save)<0){"fond_ronds_neg_carte"}else{" "}),
-                                   max_var=max_var,var_volume=varVolume)
+                      layerId = list(analyse=analyse,analyse_WGS84=analyse_WGS84,rayonRond=rayonRond,code_epsg=code_epsg,dom=dom,
+                                     nom_fond=c(if(max(analyse$donnees$save)>0){"fond_ronds_pos_carte"}else{" "},
+                                                if(min(analyse$donnees$save)<0){"fond_ronds_neg_carte"}else{" "}),
+                                   max_var=max_var,var_volume=varVolume,colPos=colPos,colNeg=colNeg,colBorder=colBorder)
     )
     
     return(map)

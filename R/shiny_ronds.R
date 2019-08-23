@@ -916,7 +916,6 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                              weight = 1,
                              options = pathOptions(pane = "fond_pays", clickable = F),
                              fill = T, fillColor = "#CCCCCC", fillOpacity = 1
-                             
             )
           }
           

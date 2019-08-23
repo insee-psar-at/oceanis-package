@@ -18,7 +18,7 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,var_depart_k,var_
     base <- merge(merge(donnees_k,coord,by.x=var_depart_k,by.y="CODGEO"),coord,by.x=var_arrivee_k,by.y="CODGEO",suffixes = c(".Z",".T"))
     base <- base[order(abs(base[,var_flux_k]),decreasing=T),]
     
-    if (type=="Sor")
+    if(type=="Sor")
     {
       unix <- (base$X.Z-base$X.T)/((base$X.Z-base$X.T)^2+(base$Y.Z-base$Y.T)^2)^0.5
       uniy <- (base$Y.Z-base$Y.T)/((base$X.Z-base$X.T)^2+(base$Y.Z-base$Y.T)^2)^0.5
@@ -30,7 +30,7 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,var_depart_k,var_
       
       base <- base[,c(var_depart_k,var_arrivee_k,var_flux_k,"X.R","Y.R","X.T","Y.T","typeFlux")]
     }
-    if (type=="Ent")
+    if(type=="Ent")
     {
       base$X.R <- base$X.Z
       base$Y.R <- base$Y.Z
@@ -46,7 +46,7 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,var_depart_k,var_
       base <- base[,c(var_depart_k,var_arrivee_k,var_flux_k,"X.R","Y.R","X.T","Y.T","typeFlux")]
     }
     
-    if (type=="Sol")
+    if(type=="Sol")
     {
       temp1 <- base[base[,var_flux_k]>0,]
       

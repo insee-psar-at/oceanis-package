@@ -15,13 +15,13 @@ function(map)
     {
       if(map$x$calls[[i]]$method %in% "addPolygons")
       {
-        if(map$x$calls[[i]]$args[[3]]$nom_fond=="fond_flux") idx_fleche <- i
+        if(map$x$calls[[i]]$args[[2]]$nom_fond=="fond_flux") idx_fleche <- i
       }
     }
     
     if(!is.null(idx_fleche))
     {
-      largeur <- map$x$calls[[idx_fleche]]$args[[3]]$largeur
+      largeur <- map$x$calls[[idx_fleche]]$args[[2]]$largeur
     }else
     {
       stop(simpleError("Il n'y a pas d'analyse en fleches joignantes ou saphirs dans la map"))

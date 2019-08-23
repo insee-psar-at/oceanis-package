@@ -72,6 +72,8 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
         }
         
         rayonRond <- max(map$x$calls[[j]]$args[[3]])
+        if(is.null(rayonRond)) rayonRond <- 1
+        if(rayonRond==0) rayonRond <- 1
         
         max_var <- map$x$calls[[j]]$args[[4]]$max_var
         max_var <- as.numeric(str_replace_all(max_var,",","."))
@@ -93,15 +95,15 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
       {
         if(map_leaflet$x$calls[[i]]$method %in% "addPolygons")
         {
-          if(any(map_leaflet$x$calls[[i]]$args[[3]] %in% c("carte_ronds","carte_ronds_classes","carte_classes_ronds"))) idx_carte <- c(idx_carte,i)
+          if(any(map_leaflet$x$calls[[i]]$args[[3]] %in% "carte_classes")) idx_carte <- c(idx_carte,i)
         }
         if(map_leaflet$x$calls[[i]]$method %in% "addCircles")
         {
-          if(any(map_leaflet$x$calls[[i]]$args[[5]] %in% c("carte_ronds","carte_ronds_classes","carte_classes_ronds"))) idx_carte <- c(idx_carte,i)
+          if(any(map_leaflet$x$calls[[i]]$args[[5]] %in% "carte_ronds")) idx_carte <- c(idx_carte,i)
         }
         if(map_leaflet$x$calls[[i]]$method %in% "addCircles")
         {
-          if(map_leaflet$x$calls[[i]]$args[[5]] %in% c("toto","legende_ronds")) idx_legende <- c(idx_legende,i)
+          if(map_leaflet$x$calls[[i]]$args[[5]] %in% "legende_ronds") idx_legende <- c(idx_legende,i)
         }
         if(!is.null(idx_legende)) # la legende existe
         {
@@ -123,11 +125,13 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
       {
         if(map_leaflet$x$calls[[i]]$method %in% "addCircles")
         {
-          if(any(map_leaflet$x$calls[[i]]$args[[5]] %in% c("carte_ronds","carte_ronds_classes","carte_classes_ronds"))) j <- i
+          if(any(map_leaflet$x$calls[[i]]$args[[5]] %in% "carte_ronds")) j <- i
         }
       }
       
       rayonRond <- max(map_leaflet$x$calls[[j]]$args[[3]])
+      if(is.null(rayonRond)) rayonRond <- 1
+      if(rayonRond==0) rayonRond <- 1
       
       max_var <- map_leaflet$x$calls[[j]]$args[[4]]$max_var
       max_var <- as.numeric(str_replace_all(max_var,",","."))
@@ -179,7 +183,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
                                          color = "#2B3E50",
                                          weight = 2,
                                          radius = c(rayonRond,rayonRond/sqrt(3)),
-                                         options = pathOptions(clickable = F),
+                                         options = pathOptions(pane = "fond_legende", clickable = F),
                                          popup = c(max_var,round(max_var/3,0)),
                                          fill = T,
                                          fillColor = "white",
@@ -195,7 +199,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
                           opacity = 1,
                           color = "#2B3E50",
                           weight = 2,
-                          options = pathOptions(clickable = F),
+                          options = pathOptions(pane = "fond_legende", clickable = F),
                           fill = F,
                           fillOpacity = 1,
                           group = "legende_ronds",
@@ -247,6 +251,10 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
       }
     }
     
-    message(simpleMessage(paste0("[INFO] Les coordonn","\u00e9","es de la l\u00e9gende des ronds sont : longitude (x) = ",lng," degr\u00e9 ; latitude (y) = ",lat," degr\u00e9")))
+    if(!is.null(map_leaflet))
+    {
+      message(simpleMessage(paste0("[INFO] Les coordonn","\u00e9","es de la l\u00e9gende des ronds sont : longitude (x) = ",lng," degr\u00e9 ; latitude (y) = ",lat," degr\u00e9")))
+    }
+    
     return(map)
   }

@@ -22,7 +22,7 @@ function(map)
       }
       map$x$calls <- map$x$calls[-j[c(1,2)]]
       
-      map$x$calls[[4]]$args[[4]]$weight <- 2
+      # map$x$calls[[12]]$args[[4]]$weight <- 2
       
       map <- addTiles(map,
                       urlTemplate = "//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",

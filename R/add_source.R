@@ -4,7 +4,7 @@ function(map, source)
     msg_error1<-msg_error2 <- NULL
     
     if (any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
-    if(!is.null(source)) if(any(class(titre)!="character")) msg_error2 <- "La source doit etre de type caractere / "
+    if(!is.null(source)) if(any(class(source)!="character")) msg_error2 <- "La source doit etre de type caractere / "
     
     if(any(!is.null(msg_error1),!is.null(msg_error2)))
     {

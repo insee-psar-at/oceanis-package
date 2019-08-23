@@ -11,7 +11,7 @@ function(map)
     {
       if(map$x$calls[[i]]$method %in% "addPolygons")
       {
-        if(any(map$x$calls[[i]]$args[3][[1]]$nom_couche %in% c("carte_joignantes"))) idx_carte <- c(idx_carte,i)
+        if(any(map$x$calls[[i]]$args[3][[1]] %in% c("carte_joignantes_init","carte_joignantes"))) idx_carte <- c(idx_carte,i)
       }
       
       if(map$x$calls[[i]]$method %in% "addControl")
@@ -22,13 +22,13 @@ function(map)
       
       if(map$x$calls[[i]]$method %in% "addPolygons")
       {
-        if(any(map$x$calls[[i]]$args[3][[1]]$nom_couche %in% c("legende_joignantes"))) idx_legende <- c(idx_legende,i)
+        if(any(map$x$calls[[i]]$args[3][[1]] %in% c("legende_joignantes"))) idx_legende <- c(idx_legende,i)
       }
       if(!is.null(idx_legende)) # la legende existe
       {
         if(map$x$calls[[i]]$method %in% "addMarkers")
         {
-          if(any(map$x$calls[[i]]$args[5][[1]]$nom_couche %in% c("legende_joignantes"))) idx_legende <- c(idx_legende,i)
+          if(any(map$x$calls[[i]]$args[5][[1]] %in% c("legende_joignantes"))) idx_legende <- c(idx_legende,i)
         }
       }
     }
@@ -41,10 +41,10 @@ function(map)
       idx_fleche <- idx_carte[length(idx_carte)]
       idx_carte <- idx_carte[-length(idx_carte)]
       
-      var_flux <- map$x$calls[[idx_fleche]]$args[[3]]$var_flux
+      var_flux <- map$x$calls[[idx_fleche]]$args[[2]]$var_flux
       
-      code_epsg <- map$x$calls[[idx_fleche]]$args[[3]]$code_epsg
-      dom <- map$x$calls[[idx_fleche]]$args[[3]]$dom
+      code_epsg <- map$x$calls[[idx_fleche]]$args[[2]]$code_epsg
+      dom <- map$x$calls[[idx_fleche]]$args[[2]]$dom
       
       list_fonds <- list()
       nom_fonds <- c()
@@ -68,7 +68,7 @@ function(map)
         
         list_fonds[[l]] <- fond
         
-        nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte[i]]]$args[[3]]$nom_fond)
+        nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte[i]]]$args[[2]]$nom_fond)
         
         l <- l+1
       }
@@ -103,7 +103,7 @@ function(map)
         
         list_fonds[[l]] <- fond
         
-        nom_fonds <- c(nom_fonds,map$x$calls[[idx_fleche]]$args[[3]]$nom_fond)
+        nom_fonds <- c(nom_fonds,map$x$calls[[idx_fleche]]$args[[2]]$nom_fond)
         
         l <- l+1
       }
@@ -126,7 +126,7 @@ function(map)
       
       if(!is.null(idx_legende))
       {
-        large <- map$x$calls[[idx_fleche[1]]]$args[[3]]$distance
+        large <- map$x$calls[[idx_fleche[1]]]$args[[2]]$distance
         long <- large*2
         
         gf <- st_sf(geometry=st_sfc(st_polygon(list(as.matrix(map$x$calls[[idx_legende[1]]]$args[[1]][[1]][[1]][[1]]))),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84"))
@@ -134,13 +134,13 @@ function(map)
         y <- st_bbox(gf)$ymin
         flux_leg_pl <- flux_legende_joignantes_pl(x,y,long,large,code_epsg)
         
-        max_var <- map$x$calls[[idx_fleche]]$args[[3]]$max_var
+        max_var <- map$x$calls[[idx_fleche]]$args[[2]]$max_var
         flux_leg_pl <- cbind(VAR=c(max_var,max_var/3),flux_leg_pl)
         names(flux_leg_pl) <- c(var_flux,"geometry")
         
         list_fonds[[l]] <- flux_leg_pl
         
-        nom_fonds <- c(nom_fonds,map$x$calls[[idx_legende[[1]]]]$args[[3]]$nom_fond)
+        nom_fonds <- c(nom_fonds,map$x$calls[[idx_legende[[1]]]]$args[[2]]$nom_fond)
         
         l <- l+1
       }

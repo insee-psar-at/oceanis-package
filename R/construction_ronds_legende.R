@@ -1,7 +1,7 @@
 construction_ronds_legende <-
 function(lon,lat,code_epsg,taille_rond_m)
   {
-    centres_leg <- t(data_frame(c(lon,lat)))
+    centres_leg <- t(data.frame(c(lon,lat)))
     
     #On cree les points en WGS84
     ronds_sf_leg <- st_sf(geometry=st_sfc(st_point(centres_leg),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84"))
