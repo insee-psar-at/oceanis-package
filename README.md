@@ -32,6 +32,16 @@ L'aide du package et la vignette proposent des exemples de réalisation de carte
 
 La vignette propose notamment un exemple de scénario de réalisation de cartes depuis le chargement des données et des fonds jusqu'à son exportation en fichier image ou en projet Qgis.
 
+Pour installer le package _oceanis_ depuis GitHub et le charger dans R :
+```r
+devtools::install_github("insee-psar-at/oceanis-package")
+library(oceanis)
+```
+ou à partir du CRAN :
+```r
+install.packages("oceanis")
+library(oceanis)
+```
 
 Ci-dessous quelques exemples de cartes réalisées avec le package _oceanis_ :
 
