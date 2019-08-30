@@ -12,9 +12,9 @@
 
 <meta name="author" content="Sébastien Calvet" />
 
-<meta name="date" content="2019-08-23" />
+<meta name="date" content="2019-08-28" />
 
-<title>Intégration dans les applications shiny</title>
+<title>Integration dans les applications shiny</title>
 
 
 
@@ -93,26 +93,26 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<h1 class="title toc-ignore">Intégration dans les applications shiny</h1>
+<h1 class="title toc-ignore">Integration dans les applications shiny</h1>
 <h4 class="author">Sébastien Calvet</h4>
-<h4 class="date">2019-08-23</h4>
+<h4 class="date">2019-08-28</h4>
 
 
 <div id="TOC">
 <ul>
 <li><a href="#ronds-proportionnels">Ronds proportionnels</a></li>
 <li><a href="#analyse-en-classes">Analyse en classes</a></li>
-<li><a href="#fleches-joignantes">Flèches joignantes</a></li>
+<li><a href="#fleches-joignantes">Fleches joignantes</a></li>
 </ul>
 </div>
 
-<p>Les fonctions leaflet_ peuvent être utilisées dans 2 contextes différents :</p>
+<p>Les fonctions leaflet_ peuvent etre utilisees dans 2 contextes differents :</p>
 <ul>
-<li><p>Appel direct d’une fonction leaflet_ dans l’environnement RStudio. Dans ce cas, la carte s’affiche dans la fenêtre Viewer (ctrl+9). Il s’agit là d’un contexte ‘leaflet’ classique.</p></li>
-<li><p>Dans une application shiny, les fonctions leaflet_ peuvent être utilisées pour actualiser des cartes à chaque changement de paramètres grâce à leaflet_proxy. L’intérêt ici est de ne pas recharger toutes les couches de la carte mais uniquement celles qui doivent être actualisées. Le temps de rafraîchissement est alors réduit. C’est le contexte ‘proxy’.</p></li>
+<li><p>Appel direct d’une fonction leaflet_ dans l’environnement RStudio. Dans ce cas, la carte s’affiche dans la fenetre Viewer (ctrl+9). Il s’agit la d’un contexte ‘leaflet’ classique.</p></li>
+<li><p>Dans une application shiny, les fonctions leaflet_ peuvent etre utilisees pour actualiser des cartes a chaque changement de parametres grace a leaflet_proxy. L’interet ici est de ne pas recharger toutes les couches de la carte mais uniquement celles qui doivent etre actualisees. Le temps de rafraichissement est alors reduit. C’est le contexte ‘proxy’.</p></li>
 </ul>
-<p>Il est bien sûr possible d’appeler des fonctions leaflet_ dans une application shiny avec un contexte ‘leaflet’, mais dans ce cas toute la carte sera rechargée dès qu’un paramètre sera modifié.</p>
-<p>Ci-dessous, quelques exemples d’applications shiny intégrant les fonctions leaflet_ dans un contexte ‘proxy’.</p>
+<p>Il est bien sur possible d’appeler des fonctions leaflet_ dans une application shiny avec un contexte ‘leaflet’, mais dans ce cas toute la carte sera rechargee des qu’un parametre sera modifie.</p>
+<p>Ci-dessous, quelques exemples d’applications shiny integrant les fonctions leaflet_ dans un contexte ‘proxy’.</p>
 <div id="ronds-proportionnels" class="section level2">
 <h2>Ronds proportionnels</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">  <span class="kw">library</span>(oceanis)
@@ -131,7 +131,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <span class="kw">uiOutput</span>(<span class="st">&quot;colBorderRonds_out&quot;</span>)
           ),
           <span class="kw">mainPanel</span>(
-            <span class="kw">leafletOutput</span>(<span class="st">&quot;carte&quot;</span>, <span class="dt">height =</span> <span class="dv">900</span>)
+            <span class="kw">leafletOutput</span>(<span class="st">&quot;carte&quot;</span>,
+                          <span class="dt">height =</span> <span class="dv">900</span>)
           )
         )
     ),
@@ -140,23 +141,38 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
       <span class="co"># Declaration et envoi des widgets a l'ui</span>
       output<span class="op">$</span>lngRonds_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">numericInput</span>(<span class="st">&quot;lngRonds&quot;</span>, <span class="st">&quot;Longitude de la legende des ronds&quot;</span>, <span class="dt">value =</span> <span class="dv">9</span>)
+        <span class="kw">numericInput</span>(<span class="st">&quot;lngRonds&quot;</span>,
+                     <span class="st">&quot;Longitude de la legende des ronds&quot;</span>,
+                     <span class="dt">value =</span> <span class="dv">9</span>)
       })
       output<span class="op">$</span>latRonds_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">numericInput</span>(<span class="st">&quot;latRonds&quot;</span>, <span class="st">&quot;Latitude de la legende des ronds&quot;</span>, <span class="dt">value =</span> <span class="dv">49</span>)
+        <span class="kw">numericInput</span>(<span class="st">&quot;latRonds&quot;</span>, 
+                     <span class="st">&quot;Latitude de la legende des ronds&quot;</span>,
+                     <span class="dt">value =</span> <span class="dv">49</span>)
       })
       output<span class="op">$</span>rayon_rond_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">numericInput</span>(<span class="st">&quot;rayon_rond&quot;</span>, <span class="st">&quot;Rayon du rond le plus grand&quot;</span>, <span class="dt">value =</span> <span class="dv">30000</span>)
+        <span class="kw">numericInput</span>(<span class="st">&quot;rayon_rond&quot;</span>,
+                     <span class="st">&quot;Rayon du rond le plus grand&quot;</span>,
+                     <span class="dt">value =</span> <span class="dv">30000</span>)
       })
       output<span class="op">$</span>opaciteElargie_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">sliderInput</span>(<span class="st">&quot;opaciteElargie&quot;</span>, <span class="st">&quot;Opacite de la representation elargie&quot;</span>,
-                    <span class="dt">min=</span><span class="dv">0</span>,<span class="dt">max=</span><span class="dv">100</span>,<span class="dt">value=</span><span class="dv">60</span>,<span class="dt">step=</span><span class="dv">10</span>,<span class="dt">ticks=</span><span class="ot">FALSE</span>)
+        <span class="kw">sliderInput</span>(<span class="st">&quot;opaciteElargie&quot;</span>,
+                    <span class="st">&quot;Opacite de la representation elargie&quot;</span>,
+                    <span class="dt">min=</span><span class="dv">0</span>,
+                    <span class="dt">max=</span><span class="dv">100</span>,
+                    <span class="dt">value=</span><span class="dv">60</span>,
+                    <span class="dt">step=</span><span class="dv">10</span>,
+                    <span class="dt">ticks=</span><span class="ot">FALSE</span>)
       })
       output<span class="op">$</span>colPos_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">textInput</span>(<span class="st">&quot;colPos&quot;</span>, <span class="st">&quot;Couleur de remplissage des ronds&quot;</span>, <span class="dt">value =</span> <span class="kw">c</span>(<span class="st">&quot;#CD853F&quot;</span>))
+        <span class="kw">textInput</span>(<span class="st">&quot;colPos&quot;</span>,
+                  <span class="st">&quot;Couleur de remplissage des ronds&quot;</span>,
+                  <span class="dt">value =</span> <span class="st">&quot;#CD853F&quot;</span>)
       })
       output<span class="op">$</span>colBorderRonds_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">textInput</span>(<span class="st">&quot;colBorderRonds&quot;</span>, <span class="st">&quot;Couleur de la bordure des ronds&quot;</span>, <span class="dt">value =</span> <span class="kw">c</span>(<span class="st">&quot;#303030&quot;</span>))
+        <span class="kw">textInput</span>(<span class="st">&quot;colBorderRonds&quot;</span>,
+                  <span class="st">&quot;Couleur de la bordure des ronds&quot;</span>,
+                  <span class="dt">value =</span> <span class="st">&quot;#303030&quot;</span>)
       })
      
       <span class="co"># Initialisation et envoi de la carte leaflet a l'ui</span>
@@ -287,7 +303,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <span class="kw">uiOutput</span>(<span class="st">&quot;colBorder_out&quot;</span>)
           ),
           <span class="kw">mainPanel</span>(
-            <span class="kw">leafletOutput</span>(<span class="st">&quot;carte&quot;</span>, <span class="dt">height =</span> <span class="dv">900</span>)
+            <span class="kw">leafletOutput</span>(<span class="st">&quot;carte&quot;</span>,
+                          <span class="dt">height =</span> <span class="dv">900</span>)
           )
         )
     ),
@@ -296,17 +313,28 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
       <span class="co"># Declaration et envoi des widgets a l'ui</span>
       output<span class="op">$</span>lngClasses_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">numericInput</span>(<span class="st">&quot;lngClasses&quot;</span>, <span class="st">&quot;Longitude de la legende des classes&quot;</span>, <span class="dt">value =</span> <span class="dv">9</span>)
+        <span class="kw">numericInput</span>(<span class="st">&quot;lngClasses&quot;</span>,
+                     <span class="st">&quot;Longitude de la legende des classes&quot;</span>,
+                     <span class="dt">value =</span> <span class="dv">9</span>)
       })
       output<span class="op">$</span>latClasses_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">numericInput</span>(<span class="st">&quot;latClasses&quot;</span>, <span class="st">&quot;Latitude de la legende des classes&quot;</span>, <span class="dt">value =</span> <span class="dv">49</span>)
+        <span class="kw">numericInput</span>(<span class="st">&quot;latClasses&quot;</span>,
+                     <span class="st">&quot;Latitude de la legende des classes&quot;</span>,
+                     <span class="dt">value =</span> <span class="dv">49</span>)
       })
       output<span class="op">$</span>nb_classes_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">numericInput</span>(<span class="st">&quot;nb_classes&quot;</span>, <span class="st">&quot;Nombre de classes&quot;</span>, <span class="dt">value =</span> <span class="dv">4</span>)
+        <span class="kw">numericInput</span>(<span class="st">&quot;nb_classes&quot;</span>,
+                     <span class="st">&quot;Nombre de classes&quot;</span>,
+                     <span class="dt">value =</span> <span class="dv">4</span>)
       })
       output<span class="op">$</span>opaciteElargie_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">sliderInput</span>(<span class="st">&quot;opaciteElargie&quot;</span>, <span class="st">&quot;Opacite de la representation elargie&quot;</span>,
-                    <span class="dt">min=</span><span class="dv">0</span>,<span class="dt">max=</span><span class="dv">100</span>,<span class="dt">value=</span><span class="dv">60</span>,<span class="dt">step=</span><span class="dv">10</span>,<span class="dt">ticks=</span><span class="ot">FALSE</span>)
+        <span class="kw">sliderInput</span>(<span class="st">&quot;opaciteElargie&quot;</span>,
+                    <span class="st">&quot;Opacite de la representation elargie&quot;</span>,
+                    <span class="dt">min=</span><span class="dv">0</span>,
+                    <span class="dt">max=</span><span class="dv">100</span>,
+                    <span class="dt">value=</span><span class="dv">60</span>,
+                    <span class="dt">step=</span><span class="dv">10</span>,
+                    <span class="dt">ticks=</span><span class="ot">FALSE</span>)
       })
       output<span class="op">$</span>stylePalette_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
         <span class="kw">selectInput</span>(<span class="st">&quot;stylePalette&quot;</span>, <span class="st">&quot;Style Insee de la palette&quot;</span>,
@@ -315,7 +343,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
                     <span class="dt">selected =</span> <span class="st">&quot;defaut&quot;</span>)
       })
       output<span class="op">$</span>colBorder_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">textInput</span>(<span class="st">&quot;colBorderClasses&quot;</span>, <span class="st">&quot;Couleur de la bordure des classes&quot;</span>, <span class="dt">value =</span> <span class="kw">c</span>(<span class="st">&quot;white&quot;</span>))
+        <span class="kw">textInput</span>(<span class="st">&quot;colBorderClasses&quot;</span>,
+                  <span class="st">&quot;Couleur de la bordure des classes&quot;</span>,
+                  <span class="dt">value =</span> <span class="st">&quot;white&quot;</span>)
       })
            
       <span class="co"># Initialisation et envoi de la carte leaflet a l'ui</span>
@@ -426,7 +456,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
   )</code></pre></div>
 </div>
 <div id="fleches-joignantes" class="section level2">
-<h2>Flèches joignantes</h2>
+<h2>Fleches joignantes</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">  <span class="kw">library</span>(oceanis)
   <span class="kw">library</span>(shiny)
 
@@ -442,7 +472,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <span class="kw">uiOutput</span>(<span class="st">&quot;colBorderFleches_out&quot;</span>)
           ),
           <span class="kw">mainPanel</span>(
-            <span class="kw">leafletOutput</span>(<span class="st">&quot;carte&quot;</span>, <span class="dt">height =</span> <span class="dv">900</span>)
+            <span class="kw">leafletOutput</span>(<span class="st">&quot;carte&quot;</span>,
+                          <span class="dt">height =</span> <span class="dv">900</span>)
           )
         )
     ),
@@ -451,19 +482,29 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
       <span class="co"># Declaration et envoi des widgets a l'ui</span>
       output<span class="op">$</span>lngFleches_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">numericInput</span>(<span class="st">&quot;lngFleches&quot;</span>, <span class="st">&quot;Longitude de la legende des fleches&quot;</span>, <span class="dt">value =</span> <span class="dv">9</span>)
+        <span class="kw">numericInput</span>(<span class="st">&quot;lngFleches&quot;</span>,
+                     <span class="st">&quot;Longitude de la legende des fleches&quot;</span>,
+                     <span class="dt">value =</span> <span class="dv">9</span>)
       })
       output<span class="op">$</span>latFleches_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">numericInput</span>(<span class="st">&quot;latFleches&quot;</span>, <span class="st">&quot;Latitude de la legende des fleches&quot;</span>, <span class="dt">value =</span> <span class="dv">49</span>)
+        <span class="kw">numericInput</span>(<span class="st">&quot;latFleches&quot;</span>,
+                     <span class="st">&quot;Latitude de la legende des fleches&quot;</span>,
+                     <span class="dt">value =</span> <span class="dv">49</span>)
       })
       output<span class="op">$</span>largeurFleche_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">numericInput</span>(<span class="st">&quot;largeurFleche&quot;</span>, <span class="st">&quot;Largeur de la plus grande fleche&quot;</span>, <span class="dt">value =</span> <span class="dv">50</span>)
+        <span class="kw">numericInput</span>(<span class="st">&quot;largeurFleche&quot;</span>,
+                     <span class="st">&quot;Largeur de la plus grande fleche&quot;</span>,
+                     <span class="dt">value =</span> <span class="dv">50</span>)
       })
       output<span class="op">$</span>colFleches_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">textInput</span>(<span class="st">&quot;colFleches&quot;</span>, <span class="st">&quot;Couleur de remplissage des fleches&quot;</span>, <span class="dt">value =</span> <span class="kw">c</span>(<span class="st">&quot;#CD853F&quot;</span>))
+        <span class="kw">textInput</span>(<span class="st">&quot;colFleches&quot;</span>,
+                  <span class="st">&quot;Couleur de remplissage des fleches&quot;</span>,
+                  <span class="dt">value =</span> <span class="st">&quot;#CD853F&quot;</span>)
       })
       output<span class="op">$</span>colBorderFleches_out &lt;-<span class="st"> </span><span class="kw">renderUI</span>({
-        <span class="kw">textInput</span>(<span class="st">&quot;colBorderFleches&quot;</span>, <span class="st">&quot;Couleur de la bordure des fleches&quot;</span>, <span class="dt">value =</span> <span class="kw">c</span>(<span class="st">&quot;#303030&quot;</span>))
+        <span class="kw">textInput</span>(<span class="st">&quot;colBorderFleches&quot;</span>,
+                  <span class="st">&quot;Couleur de la bordure des fleches&quot;</span>,
+                  <span class="dt">value =</span> <span class="st">&quot;#303030&quot;</span>)
       })
            
       <span class="co"># Initialisation et envoi de la carte leaflet a l'ui</span>

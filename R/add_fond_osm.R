@@ -1,11 +1,11 @@
 add_fond_osm <-
-function(map,opacityAnalyse=1,colTrait="white",epaisseurBordure=1)
+function(map,opacityAnalyse=1,colBordure="white",epaisseurBordure=1)
   {
     msg_error1 <- msg_error2 <- msg_error3 <- msg_error4 <- NULL
     
     if (any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
     if(any(class(opacityAnalyse)!="numeric")) msg_error2 <- "La variable doit etre de type numerique / "
-    if(any(class(colTrait)!="character")) msg_error3 <- "Le style de couleur doit etre de type caractere / "
+    if(any(class(colBordure)!="character")) msg_error3 <- "Le style de couleur doit etre de type caractere / "
     if(any(class(epaisseurBordure)!="numeric")) msg_error4 <- "L'epaisseur de bordure doit etre de type numerique / "
     
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4)))
@@ -34,7 +34,7 @@ function(map,opacityAnalyse=1,colTrait="white",epaisseurBordure=1)
       }
       map$x$calls[[j[length(j)]]]$args[[4]]$opacity <- opacityAnalyse
       map$x$calls[[j[length(j)]]]$args[[4]]$fillOpacity <- opacityAnalyse
-      map$x$calls[[j[length(j)]]]$args[[4]]$color <- colTrait
+      map$x$calls[[j[length(j)]]]$args[[4]]$color <- colBordure
       map$x$calls[[j[length(j)]]]$args[[4]]$weight <- epaisseurBordure
       
       map <- addTiles(map,

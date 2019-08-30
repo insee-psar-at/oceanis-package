@@ -1,31 +1,31 @@
 ---
-title: "Intégration dans les applications shiny"
+title: "Integration dans les applications shiny"
 author: "Sébastien Calvet"
 date: '`r Sys.Date()`'
 output: 
  rmarkdown::html_vignette: 
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Intégration dans les applications shiny}
+  %\VignetteIndexEntry{Integration dans les applications shiny}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF8}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r echo=FALSE}
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-Les fonctions leaflet_ peuvent être utilisées dans 2 contextes différents :
+Les fonctions leaflet_ peuvent etre utilisees dans 2 contextes differents :
 
-+ Appel direct d'une fonction leaflet_ dans l'environnement RStudio. Dans ce cas, la carte s'affiche dans la fenêtre Viewer (ctrl+9). Il s'agit là d'un contexte 'leaflet' classique.
++ Appel direct d'une fonction leaflet_ dans l'environnement RStudio. Dans ce cas, la carte s'affiche dans la fenetre Viewer (ctrl+9). Il s'agit la d'un contexte 'leaflet' classique.
 
-+ Dans une application shiny, les fonctions leaflet_ peuvent être utilisées pour actualiser des cartes à chaque changement de paramètres grâce à leaflet_proxy.
-L'intérêt ici est de ne pas recharger toutes les couches de la carte mais uniquement celles qui doivent être actualisées. Le temps de rafraîchissement est alors réduit.
++ Dans une application shiny, les fonctions leaflet_ peuvent etre utilisees pour actualiser des cartes a chaque changement de parametres grace a leaflet_proxy.
+L'interet ici est de ne pas recharger toutes les couches de la carte mais uniquement celles qui doivent etre actualisees. Le temps de rafraichissement est alors reduit.
 C'est le contexte 'proxy'.
 
-Il est bien sûr possible d'appeler des fonctions leaflet_ dans une application shiny avec un contexte 'leaflet', mais dans ce cas toute la carte sera rechargée dès qu'un paramètre sera modifié.
+Il est bien sur possible d'appeler des fonctions leaflet_ dans une application shiny avec un contexte 'leaflet', mais dans ce cas toute la carte sera rechargee des qu'un parametre sera modifie.
 
-Ci-dessous, quelques exemples d'applications shiny intégrant les fonctions leaflet_ dans un contexte 'proxy'.
+Ci-dessous, quelques exemples d'applications shiny integrant les fonctions leaflet_ dans un contexte 'proxy'.
 
 ## Ronds proportionnels
 
@@ -46,7 +46,8 @@ Ci-dessous, quelques exemples d'applications shiny intégrant les fonctions leaf
             uiOutput("colBorderRonds_out")
           ),
           mainPanel(
-            leafletOutput("carte", height = 900)
+            leafletOutput("carte",
+                          height = 900)
           )
         )
     ),
@@ -55,23 +56,38 @@ Ci-dessous, quelques exemples d'applications shiny intégrant les fonctions leaf
 
       # Declaration et envoi des widgets a l'ui
       output$lngRonds_out <- renderUI({
-        numericInput("lngRonds", "Longitude de la legende des ronds", value = 9)
+        numericInput("lngRonds",
+                     "Longitude de la legende des ronds",
+                     value = 9)
       })
       output$latRonds_out <- renderUI({
-        numericInput("latRonds", "Latitude de la legende des ronds", value = 49)
+        numericInput("latRonds", 
+                     "Latitude de la legende des ronds",
+                     value = 49)
       })
       output$rayon_rond_out <- renderUI({
-        numericInput("rayon_rond", "Rayon du rond le plus grand", value = 30000)
+        numericInput("rayon_rond",
+                     "Rayon du rond le plus grand",
+                     value = 30000)
       })
       output$opaciteElargie_out <- renderUI({
-        sliderInput("opaciteElargie", "Opacite de la representation elargie",
-                    min=0,max=100,value=60,step=10,ticks=FALSE)
+        sliderInput("opaciteElargie",
+                    "Opacite de la representation elargie",
+                    min=0,
+                    max=100,
+                    value=60,
+                    step=10,
+                    ticks=FALSE)
       })
       output$colPos_out <- renderUI({
-        textInput("colPos", "Couleur de remplissage des ronds", value = c("#CD853F"))
+        textInput("colPos",
+                  "Couleur de remplissage des ronds",
+                  value = "#CD853F")
       })
       output$colBorderRonds_out <- renderUI({
-        textInput("colBorderRonds", "Couleur de la bordure des ronds", value = c("#303030"))
+        textInput("colBorderRonds",
+                  "Couleur de la bordure des ronds",
+                  value = "#303030")
       })
      
       # Initialisation et envoi de la carte leaflet a l'ui
@@ -204,7 +220,8 @@ Ci-dessous, quelques exemples d'applications shiny intégrant les fonctions leaf
             uiOutput("colBorder_out")
           ),
           mainPanel(
-            leafletOutput("carte", height = 900)
+            leafletOutput("carte",
+                          height = 900)
           )
         )
     ),
@@ -213,17 +230,28 @@ Ci-dessous, quelques exemples d'applications shiny intégrant les fonctions leaf
 
       # Declaration et envoi des widgets a l'ui
       output$lngClasses_out <- renderUI({
-        numericInput("lngClasses", "Longitude de la legende des classes", value = 9)
+        numericInput("lngClasses",
+                     "Longitude de la legende des classes",
+                     value = 9)
       })
       output$latClasses_out <- renderUI({
-        numericInput("latClasses", "Latitude de la legende des classes", value = 49)
+        numericInput("latClasses",
+                     "Latitude de la legende des classes",
+                     value = 49)
       })
       output$nb_classes_out <- renderUI({
-        numericInput("nb_classes", "Nombre de classes", value = 4)
+        numericInput("nb_classes",
+                     "Nombre de classes",
+                     value = 4)
       })
       output$opaciteElargie_out <- renderUI({
-        sliderInput("opaciteElargie", "Opacite de la representation elargie",
-                    min=0,max=100,value=60,step=10,ticks=FALSE)
+        sliderInput("opaciteElargie",
+                    "Opacite de la representation elargie",
+                    min=0,
+                    max=100,
+                    value=60,
+                    step=10,
+                    ticks=FALSE)
       })
       output$stylePalette_out <- renderUI({
         selectInput("stylePalette", "Style Insee de la palette",
@@ -232,7 +260,9 @@ Ci-dessous, quelques exemples d'applications shiny intégrant les fonctions leaf
                     selected = "defaut")
       })
       output$colBorder_out <- renderUI({
-        textInput("colBorderClasses", "Couleur de la bordure des classes", value = c("white"))
+        textInput("colBorderClasses",
+                  "Couleur de la bordure des classes",
+                  value = "white")
       })
            
       # Initialisation et envoi de la carte leaflet a l'ui
@@ -343,7 +373,7 @@ Ci-dessous, quelques exemples d'applications shiny intégrant les fonctions leaf
   )
 ```
 
-## Flèches joignantes
+## Fleches joignantes
 
 ```r
   library(oceanis)
@@ -361,7 +391,8 @@ Ci-dessous, quelques exemples d'applications shiny intégrant les fonctions leaf
             uiOutput("colBorderFleches_out")
           ),
           mainPanel(
-            leafletOutput("carte", height = 900)
+            leafletOutput("carte",
+                          height = 900)
           )
         )
     ),
@@ -370,19 +401,29 @@ Ci-dessous, quelques exemples d'applications shiny intégrant les fonctions leaf
 
       # Declaration et envoi des widgets a l'ui
       output$lngFleches_out <- renderUI({
-        numericInput("lngFleches", "Longitude de la legende des fleches", value = 9)
+        numericInput("lngFleches",
+                     "Longitude de la legende des fleches",
+                     value = 9)
       })
       output$latFleches_out <- renderUI({
-        numericInput("latFleches", "Latitude de la legende des fleches", value = 49)
+        numericInput("latFleches",
+                     "Latitude de la legende des fleches",
+                     value = 49)
       })
       output$largeurFleche_out <- renderUI({
-        numericInput("largeurFleche", "Largeur de la plus grande fleche", value = 50)
+        numericInput("largeurFleche",
+                     "Largeur de la plus grande fleche",
+                     value = 50)
       })
       output$colFleches_out <- renderUI({
-        textInput("colFleches", "Couleur de remplissage des fleches", value = c("#CD853F"))
+        textInput("colFleches",
+                  "Couleur de remplissage des fleches",
+                  value = "#CD853F")
       })
       output$colBorderFleches_out <- renderUI({
-        textInput("colBorderFleches", "Couleur de la bordure des fleches", value = c("#303030"))
+        textInput("colBorderFleches",
+                  "Couleur de la bordure des fleches",
+                  value = "#303030")
       })
            
       # Initialisation et envoi de la carte leaflet a l'ui
