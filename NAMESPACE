@@ -4,7 +4,7 @@ export(
 "plot_ronds","plot_classes","plot_ronds_classes","plot_classes_ronds","plot_typo","plot_typo_symboles","plot_oursins","plot_joignantes","plot_saphirs",
 "zonage_a_facon",
 "add_typo_symboles",
-"add_legende_ronds","add_legende_classes","add_legende_typo","add_legende_typo_symboles","add_legende_joignantes","add_legende_saphirs","add_titre","add_source","add_fond_osm",
+"add_legende_fonds_simples","add_legende_ronds","add_legende_classes","add_legende_typo","add_legende_typo_symboles","add_legende_joignantes","add_legende_saphirs","add_titre","add_source","add_fond_osm",
 "set_fonds_simples","set_couleur_classes","set_opacite_elargi","set_couleur_ronds","set_couleur_typo","set_style_oursins","set_couleur_joignantes","set_couleur_saphirs",
 "rayon_ronds","rapport_ronds","largeur_fleche",
 "coord_legende",

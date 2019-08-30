@@ -19,7 +19,7 @@ function(data,fondMaille,fondMailleElargi,fondSuppl,idData,varVolume,varRatio,ra
   if(any(class(dom)!="character")) msg_error15 <- "La valeur doit etre de type caractere ('0', '971', '972', '973', '974' ou '976') / "
   if(any(class(colBorderClasses)!="character")) msg_error16 <- "Le style de couleur doit etre de type caractere / "
   if(any(class(colBorderRonds)!="character")) msg_error17 <- "Le style de couleur doit etre de type caractere / "
-  if(any(class(precision)!="numeric")) msg_error18 <- "Le style de couleur doit etre de type caractere / "
+  if(any(class(precision)!="numeric")) msg_error18 <- "La variable doit etre de type numerique / "
   if(!is.null(fondChx)) if(any(!any(class(fondChx) %in% "sf"),!any(class(fondChx) %in% "data.frame"))) msg_error19 <- "Le fond des chx doit etre un objet sf / "
   
   if(length(names(data))<2) msg_error20 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et la variable a representer / "
