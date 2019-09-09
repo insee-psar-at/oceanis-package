@@ -32,6 +32,10 @@ Ci-dessous, quelques exemples d'applications shiny integrant les fonctions leafl
 ```r
   library(oceanis)
   library(shiny)
+  library(leaflet)
+
+  data("depm")
+  data("donnees_monoloc")
 
   shinyApp(
 
@@ -206,6 +210,10 @@ Ci-dessous, quelques exemples d'applications shiny integrant les fonctions leafl
 ```r
   library(oceanis)
   library(shiny)
+  library(leaflet)
+
+  data("depm")
+  data("donnees_monoloc")
 
   shinyApp(
 
@@ -378,6 +386,10 @@ Ci-dessous, quelques exemples d'applications shiny integrant les fonctions leafl
 ```r
   library(oceanis)
   library(shiny)
+  library(leaflet)
+  
+  data("repm")
+  data("donnees_biloc")
 
   shinyApp(
 

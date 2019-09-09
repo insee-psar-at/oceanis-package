@@ -122,8 +122,8 @@ library(oceanis)
 donnees_a_facon <- rio::import(file = system.file("data/donnees_a_facon.rda",
                                                   package = "oceanis"))
 # fond communal des departements 13, 30, 83 et 84
-com_dep_13_30_83_84 <- rio::import(file = system.file("data/com_dep_13_30_83_84.rda",
-                                                      package = "oceanis"))
+com_dep_13_30_83_84 <- sf::st_as_sf(rio::import(file = system.file("data/com_dep_13_30_83_84.rda",
+                                                      package = "oceanis")))
 
 # chemin du fond de carte .shp
 path_to_shp <- system.file("extdata",

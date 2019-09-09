@@ -1,5 +1,5 @@
 leaflet_classes_ronds <-
-function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,stylePalette="defaut",opacityElargi=0.6,colBorderClasses="white",colBorderRonds="#303030",precision=1,dom="0",fondChx=NULL,map_proxy=NULL)
+function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,stylePalette="defaut",opacityElargi=0.6,colBorderClasses="white",colBorderRonds="#303030",precision=1,dom="0",fondChx=NULL,zoomMaille=NULL,map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
@@ -278,7 +278,20 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
       maille_WGS84_elargi <- st_transform(fondMailleElargi,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
     }
     
-    list_bbox <- list(c(st_bbox(maille_WGS84)[1],st_bbox(maille_WGS84)[3]),c(st_bbox(maille_WGS84)[2],st_bbox(maille_WGS84)[4]))
+    if(!is.null(zoomMaille))
+    {
+      zoom_maille_WGS84 <- maille_WGS84[maille_WGS84$CODE %in% zoomMaille,]
+      if(nrow(zoom_maille_WGS84)>0)
+      {
+        list_bbox <- list(c(st_bbox(zoom_maille_WGS84)[1],st_bbox(zoom_maille_WGS84)[3]),c(st_bbox(zoom_maille_WGS84)[2],st_bbox(zoom_maille_WGS84)[4]))
+      }else
+      {
+        list_bbox <- list(c(st_bbox(maille_WGS84)[1],st_bbox(maille_WGS84)[3]),c(st_bbox(maille_WGS84)[2],st_bbox(maille_WGS84)[4]))
+      }
+    }else
+    {
+      list_bbox <- list(c(st_bbox(maille_WGS84)[1],st_bbox(maille_WGS84)[3]),c(st_bbox(maille_WGS84)[2],st_bbox(maille_WGS84)[4]))
+    }
     
     if(!is.null(fondSuppl))
     {

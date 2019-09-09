@@ -13,9 +13,9 @@
 	
 	Type : Package
 	
-	Version : 0.8.6
+	Version : 1.0.3
 	
-	Date : 2019-07-05
+	Date : 2019-09-06
 	
 	License : GPL(>=2.0)
 	
@@ -23,11 +23,11 @@
 	
 	Le package \code{oceanis} repond a 3 types de besoins :
 	
-	- Creer des cartes fixes avec la possibilite d'ajouter des etiquettes. Ideal pour les impressions de documents (.pdf ou autres). Peut etre integre dans les applications.
+	- Creer des cartes fixes avec la possibilite d'ajouter des etiquettes. Ideal pour les impressions de documents (.pdf ou autres).
 	
-	- Creer des cartes interactives grace au zoom et aux pop-up (technologie leaflet). Utile pour l'integration dans une application ou dans une presentation en direct.
+	- Creer des cartes interactives grace au zoom et aux pop-up (technologie leaflet). Ideal pour l'integration dans une application (en shiny par exemple) ou dans une presentation en direct (en HTML).
 	
-	- Creer des cartes dans un environnement web ou les parametres sont modifiables a la volee (technologie R-Shiny + leaflet). Utile pour l'integration dans une application ou dans une presentation en direct. Ici, la carte est externalisee vers une nouvelle fenetre du navigateur.
+	- Creer des cartes dans un environnement web ou les parametres sont modifiables a la volee (technologie R-Shiny + leaflet). Ideal pour une visualisation rapide des donnees ou pour une presentation en direct. Ici, la carte est externalisee vers une nouvelle fenetre du navigateur.
 	
 	
 	Les fonctions de creation de cartes sont classees en 3 categories, correspondant aux 3 besoins precedents. Elles sont respectivement prefixees par \code{plot_}, \code{leaflet_} et \code{shiny_}.

@@ -1,4 +1,12 @@
-﻿
+﻿Changes in version 1.0.3
+
+FEATURES
+
+- Pour les fonctions leaflet_, possibilite de zoomer sur une ou plusieurs entites de la maille des la creation de la carte (nouveau parametre zoomMaille).
+
+- Pour la fonction add_fond_osm, possibilite de personnaliser l'analyse : transparence pour faire ressortir le fond osm, couleur et épaisseur de la bordure (nouveaux parametres opacityAnalyse, colBordure et epaisseurBordure)
+
+
 Changes in version 1.0.0
 
 FEATURES

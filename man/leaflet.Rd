@@ -20,42 +20,44 @@ leaflet_fonds_simples(listFonds, popup = NULL, init = TRUE, map = NULL)
 leaflet_ronds(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL, idData,
 varVolume, rayonRond = NULL, rapportRond = NULL, dom = "0", fondChx = NULL,
 colPos = "#CD853F", colNeg = "#6495ED", colBorder = "white", opacityElargi = 0.6,
-map_proxy = NULL)
+zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_classes(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL, idData,
 varRatio, methode = "kmeans", nbClasses = 3, bornes = NULL, stylePalette = "defaut",
-opacityElargi = 0.6, colBorder = "white", precision = 1, dom = "0", map_proxy = NULL)
+opacityElargi = 0.6, colBorder = "white", precision = 1, dom = "0", zoomMaille = NULL,
+map_proxy = NULL)
 
 leaflet_ronds_classes(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL,
 idData, varVolume, varRatio, rayonRond = NULL,
 rapportRond = NULL, methode = "kmeans", nbClasses = 3,
 bornes = NULL, stylePalette = "defaut", opacityElargi = 0.6, colBorder = "white",
-precision = 1, dom = "0", fondChx = NULL, map_proxy = NULL)
+precision = 1, dom = "0", fondChx = NULL, zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_classes_ronds(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL,
 idData, varVolume, varRatio, rayonRond = NULL,
 rapportRond = NULL, methode = "kmeans", nbClasses = 3,
 bornes = NULL, stylePalette = "defaut", opacityElargi = 0.6,
 colBorderClasses = "white", colBorderRonds = "#303030", precision = 1, dom = "0",
-fondChx = NULL, map_proxy = NULL)
+fondChx = NULL, zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_typo(data, fondMaille, fondSuppl = NULL, idData, varTypo, dom = "0",
-map_proxy = NULL)
+zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_oursins(data, fondMaille, fondSuppl = NULL, idDataDepart, idDataArrivee,
 varFlux, filtreVol = 0, filtreDist = 100, filtreMajeurs = 10,
-decalageAllerRetour = 0, decalageCentroid = 0, dom = "0", map_proxy = NULL)
+decalageAllerRetour = 0, decalageCentroid = 0, dom = "0", zoomMaille = NULL,
+map_proxy = NULL)
 
 leaflet_joignantes(data, fondMaille, typeMaille, fondSuppl = NULL, idDataDepart,
 idDataArrivee, varFlux, largeurFlecheMax = NULL, filtreVol = 0,
 filtreDist = 100, filtreMajeurs = 10, decalageAllerRetour = 0,
 decalageCentroid = 0, colFleche = "#CD853F", colBorder = "#303030", dom = "0",
-map_proxy = NULL)
+zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_saphirs(data, fondMaille, typeMaille, fondSuppl = NULL, idDataDepart,
 idDataArrivee, varFlux, largeurFlecheMax = NULL, direction = "Ent",
 filtreVol = 0, colEntree = "#CD853F", colSortie = "#6495ED",
-colBorder = "#303030", dom = "0", map_proxy = NULL)
+colBorder = "#303030", dom = "0", zoomMaille = NULL, map_proxy = NULL)
 }
 \arguments{
   \item{data}{
@@ -180,6 +182,9 @@ colBorder = "#303030", dom = "0", map_proxy = NULL)
 }
   \item{fondChx}{
 	objet sf. Fond des chefs-lieux. Pour les ronds proportionnels avec une maille communale, choix entre la position du centre des ronds sur les centroides des communes (NULL par defaut) ou sur les chefs-lieux (chx) des communes.
+}
+  \item{zoomMaille}{
+	vecteur de caracteres ou numeriques (character ou numeric). Identifiant(s) de la maille du parametre fondMaille. Permet de zoomer sur une ou plusieurs entites de la maille. Par defaut a NULL (zoom sur l'emprise de la maille).
 }
   \item{map_proxy}{
 	objet leaflet ou leaflet_proxy. Pour l'integration des fonctions leaflet dans les applications shiny (cf vignette). Par defaut a NULL.
