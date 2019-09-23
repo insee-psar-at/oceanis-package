@@ -1,4 +1,15 @@
-﻿Changes in version 1.0.3
+﻿Changes in version 1.0.4
+
+FEATURES
+
+- Pour les fonctions leaflet_, possibilite de zoomer sur un territoire particulier grace au nouveau parametre zoomMaille. Par defaut, le zoom se fait sur la maille entiere.
+
+BUG FIXES and IMPROVEMENTS
+
+- Ajout des colonnes d'identification dans les tables d'attributs du projet Qgis lors de l'export.
+
+
+Changes in version 1.0.3
 
 FEATURES
 

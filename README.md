@@ -1,5 +1,5 @@
 
-# oceanis-package (version 1.0.3) [![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](http://www.awesomeofficialstatistics.org)
+# oceanis-package (version 1.0.4) [![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](http://www.awesomeofficialstatistics.org)
 
 Le package _oceanis_ permet de réaliser des cartes d'analyses. Il propose plusieurs représentations cartographiques possibles :
 + ronds proportionnels
