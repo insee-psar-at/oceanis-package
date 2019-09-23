@@ -48,31 +48,17 @@ function(map)
       return(NULL)
     }else
     {
+      code_epsg <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[2]]$code_epsg
+      
       list_fonds <- list()
       nom_fonds <- c()
       l <- 1
       
       for(i in 1:length(idx_carte))
       {
-        aa <- lapply(1:length(map$x$calls[[idx_carte[i]]]$args[[1]]), function(x) lapply(c(1:length(map$x$calls[[idx_carte[i]]]$args[[1]][[x]])), function(y) st_polygon(list(as.matrix(map$x$calls[[idx_carte[i]]]$args[[1]][[x]][[y]][[1]])))))
+        fond <- map$x$calls[[idx_carte[i]]]$args[[2]][1][[1]]
         
-        bb <- st_sf(geometry=st_sfc(NULL),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        for(j in 1:length(aa))
-        {
-          bb <- rbind(bb,st_sf(geometry=st_sfc(st_multipolygon(lapply(1:length(aa[[j]]), function(x) aa[[j]][[x]]))),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84"))
-        }
-        bb <- bb[-1,]
-        
-        if(any(substring(map$x$calls[[idx_carte[i]]]$args[[5]],1,3) %in% "<b>"))
-        {
-          cc <- substring(map$x$calls[[idx_carte[i]]]$args[[5]],25,nchar(map$x$calls[[idx_carte[i]]]$args[[5]])-12)
-          fond <- cbind(LIBELLE=cc,bb)
-        }else
-        {
-          fond <- cbind(LIBELLE=map$x$calls[[idx_carte[i]]]$args[[5]],bb)
-        }
-        
-        fond <- st_transform(fond,paste0("+init=epsg:",map$x$calls[[idx_carte[i]]]$args[[2]]$code_epsg))
+        fond <- st_transform(fond,paste0("+init=epsg:",code_epsg))
         
         list_fonds[[l]] <- fond
         

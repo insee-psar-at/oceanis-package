@@ -253,7 +253,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                            options = pathOptions(pane = "fond_pays", clickable = F),
                            fill = T, fillColor = "#CCCCCC", fillOpacity = 1,
                            group = "carte_ronds_init",
-                           layerId = list(code_epsg=code_epsg,nom_fond="fond_pays")
+                           layerId = list(fond_pays=fond_pays,code_epsg=code_epsg,nom_fond="fond_pays")
                            
         )
       }
@@ -265,7 +265,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                          options = pathOptions(pane = "fond_france", clickable = F),
                          fill = T, fillColor = "white", fillOpacity = 1,
                          group = "carte_ronds_init",
-                         layerId = list(code_epsg=code_epsg,nom_fond="fond_france")
+                         layerId = list(fond_france=fond_france,code_epsg=code_epsg,nom_fond="fond_france")
       )
       
       # AFFICHAGE DU FOND TERRITOIRE
@@ -279,7 +279,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                            popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fond_territoire)[,"LIBELLE"], "</font> </b>"),
                            fill = F,
                            group = "carte_ronds_init",
-                           layerId = list(code_epsg=code_epsg,nom_fond="fond_territoire")
+                           layerId = list(fond_territoire=fond_territoire,code_epsg=code_epsg,nom_fond="fond_territoire")
         )
       }
       

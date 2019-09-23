@@ -69,25 +69,7 @@ function(map)
       
       for(i in 1:length(idx_carte))
       {
-        aa <- lapply(1:length(map$x$calls[[idx_carte[i]]]$args[[1]]), function(x) lapply(c(1:length(map$x$calls[[idx_carte[i]]]$args[[1]][[x]])), function(y) st_polygon(list(as.matrix(map$x$calls[[idx_carte[i]]]$args[[1]][[x]][[y]][[1]])))))
-        
-        bb <- st_sf(geometry=st_sfc(NULL),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        for(j in 1:length(aa))
-        {
-          bb <- rbind(bb,st_sf(geometry=st_sfc(st_multipolygon(lapply(1:length(aa[[j]]), function(x) aa[[j]][[x]]))),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84"))
-        }
-        bb <- bb[-1,]
-        
-        if(any(substring(map$x$calls[[idx_carte[i]]]$args[[5]],1,3) %in% "<b>"))
-        {
-          cc <- sapply(1:length(map$x$calls[[idx_carte[i]]]$args[[5]]), function(y) substring(map$x$calls[[idx_carte[i]]]$args[[5]][[y]],25,str_locate_all(map$x$calls[[idx_carte[i]]]$args[[5]][[y]],"<")[[1]][3]-1))
-          fond <- cbind(LIBELLE=cc,bb)
-          rm(cc)
-        }else
-        {
-          fond <- cbind(LIBELLE=map$x$calls[[idx_carte[i]]]$args[[5]],bb)
-        }
-        rm(aa,bb)
+        fond <- map$x$calls[[idx_carte[i]]]$args[[2]][1][[1]]
         
         fond <- st_transform(fond,paste0("+init=epsg:",code_epsg))
         
@@ -104,30 +86,34 @@ function(map)
         var_ronds <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$var_volume
         dom <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$dom
         
-        centres_ronds <- data.frame(lng=map$x$calls[[idx_carte_ronds[i]]]$args[[2]],lat=map$x$calls[[idx_carte_ronds[i]]]$args[[1]])
-        aa <- apply(centres_ronds,1, function(x) st_sf(geometry=st_sfc(st_point(x),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84")))
-        bb <- do.call("rbind",aa)
-        cc <- st_transform(bb,paste0("+init=epsg:",map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$code_epsg))
-        dd <- st_buffer(cc, map$x$calls[[idx_carte_ronds[i]]]$args[[3]])
+        if(length(map$x$calls[[idx_carte_ronds[1]]]$args[[4]][[2]])==4) # representation elargie
+        {
+          if(i==1) # couche elargie
+          {
+            arg_fond <- 3
+            arg_donnees <- 4
+          }else # couche analyse
+          {
+            arg_fond <- 1 
+            arg_donnees <- 2
+          }
+        }else # representation normale
+        {
+          arg_fond <- 1 
+          arg_donnees <- 2
+        }
         
-        ee <- sapply(1:length(map$x$calls[[idx_carte_ronds[i]]]$args[[7]]), function(y) substring(map$x$calls[[idx_carte_ronds[i]]]$args[[7]][[y]],25,str_locate_all(map$x$calls[[idx_carte_ronds[i]]]$args[[7]][[y]],"<")[[1]][3]-1))
-        fond <- cbind(LIBELLE=ee,dd)
-        ff <- sapply(1:length(map$x$calls[[idx_carte_ronds[i]]]$args[[7]]), function(y) substring(map$x$calls[[idx_carte_ronds[i]]]$args[[7]][[y]],str_locate_all(map$x$calls[[idx_carte_ronds[i]]]$args[[7]][[y]],">")[[1]][11]+1,str_locate_all(map$x$calls[[idx_carte_ronds[i]]]$args[[7]][[y]],"<")[[1]][12]-1))
-        ff <- as.numeric(str_replace_all(str_replace_all(ff,",",".")," ",""))
-        fond <- cbind(VAR_VOLUME=ff,fond)
-        rm(aa,bb,cc,dd,ee,ff)
+        centres_ronds <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]][[2]][[arg_fond]]
+        donnees <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]][[2]][[arg_donnees]][,c("CODE","LIBELLE",var_ronds,var_classes)]
+        
+        fond <- st_buffer(centres_ronds, map$x$calls[[idx_carte_ronds[i]]]$args[[3]])
+        fond <- cbind(donnees,fond)
         
         col_bor <- map$x$calls[[idx_carte_ronds[i]]]$args[[6]]$color
         fond <- cbind(COL_BOR=col_bor,fond)
         col <- map$x$calls[[idx_carte_ronds[i]]]$args[[6]]$fillColor
         fond <- cbind(classe=col,fond)
-        val <- str_replace_all(substring(map$x$calls[[idx_carte_ronds[i]]]$args[[7]],str_locate(map$x$calls[[idx_carte_ronds[i]]]$args[[7]],var_classes)[,2]+40,nchar(map$x$calls[[idx_carte_ronds[i]]]$args[[7]])-11)," ","")
-        val <- as.numeric(str_replace_all(val,",","."))
-        fond <- cbind(val=val,fond)
-        fond$var <- fond$val
-        ronds_pl <- fond[,c("LIBELLE","var","VAR_VOLUME","COL_BOR","val","classe","geometry")]
-        names(ronds_pl) <- c("LIBELLE",var_classes,var_ronds,"COL_BOR","val","classe","geometry")
-        rm(fond)
+        ronds_pl <- fond[,c("CODE","LIBELLE",var_ronds,var_classes,"COL_BOR","classe","geometry")]
         
         nb_classes <- length(unique(map$x$calls[[idx_carte_ronds[i]]]$args[[6]]$fillColor))
         pal_classes <- unique(map$x$calls[[idx_carte_ronds[i]]]$args[[6]]$fillColor)
