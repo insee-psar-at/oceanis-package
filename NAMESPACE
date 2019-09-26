@@ -16,7 +16,7 @@ export(
 "export_png","export_jpeg","export_pdf"
 )
 import(utils)
-import(shiny)
+import(shiny, except = runExample)
 import(shinyBS)
 import(shinyjs)
 import(shinythemes)
