@@ -1394,7 +1394,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
       
       # TABLEAUX DE DONNEES, MAILLE ET CONTOUR
       
-      output$mydonnees_fs <- DT::renderDataTable(datatable({
+      output$mydonnees_fs <- DT::renderDataTable(DT::datatable({
         if(direction!="Sol")
         {
           analyse_WGS84 <- analyse_fs()[[2]][as.data.frame(analyse_fs()[[2]])[,varFlux]>=flux_min_fs(),]
@@ -1407,13 +1407,13 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
       },  style = 'bootstrap'
       ))
       
-      output$mymaille_fs <- DT::renderDataTable(datatable({
+      output$mymaille_fs <- DT::renderDataTable(DT::datatable({
         data <- as.data.frame(fondMaille)
         tableau_maille <- data[,c(1:2)]
       },  style = 'bootstrap'
       ))
       
-      output$mycontour_fs <- DT::renderDataTable(datatable({
+      output$mycontour_fs <- DT::renderDataTable(DT::datatable({
         data <- as.data.frame(fondContour)
         tableau_contour <- data[,c(1:2)]
       },  style = 'bootstrap'

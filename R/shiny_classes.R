@@ -2009,7 +2009,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       
       # TABLEAUX DE DONNEES, MAILLE ET CONTOUR
       
-      output$mymaille_ac <- DT::renderDataTable(datatable({
+      output$mymaille_ac <- DT::renderDataTable(DT::datatable({
         if(elargi_ac())
           data <- analyse_ac()$donnees_elargi
         else
@@ -2019,7 +2019,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       },  style = 'bootstrap'
       ))
       
-      output$mycontour_ac <- DT::renderDataTable(datatable({
+      output$mycontour_ac <- DT::renderDataTable(DT::datatable({
         data <- as.data.frame(fondContour)
         tableau_contour <- data[order(data$CODE),c(1:2)]
       },  style = 'bootstrap'
