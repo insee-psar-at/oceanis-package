@@ -154,7 +154,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
     
     vmax <- max(abs(as.data.frame(fond_saphirs)[,varFlux]))
     
-    coord_fleche_max_pl <- st_coordinates(analyse[abs(data.frame(analyse)[,varFlux])==vmax,])
+    coord_fleche_max_pl <- st_coordinates(analyse[abs(as.data.frame(analyse)[,varFlux])==vmax,])
     large_pl <- max(st_distance(st_sfc(st_point(c(coord_fleche_max_pl[5,1],coord_fleche_max_pl[5,2])),st_point(c(coord_fleche_max_pl[6,1],coord_fleche_max_pl[6,2])))))
     
     long_pl <- large_pl
