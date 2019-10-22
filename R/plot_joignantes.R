@@ -177,7 +177,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
     
     vmax <- max(donnees[,varFlux])
     
-    coord_fleche_max_pl <- st_coordinates(fond_joignantes[abs(data.frame(fond_joignantes)[,varFlux])==vmax,])
+    coord_fleche_max_pl <- st_coordinates(fond_joignantes[abs(as.data.frame(fond_joignantes)[,varFlux])==vmax,])
     large_pl <- max(st_distance(st_sfc(st_point(c(coord_fleche_max_pl[2,1],coord_fleche_max_pl[2,2])),st_point(c(coord_fleche_max_pl[6,1],coord_fleche_max_pl[6,2])))))
     
     long_pl <- large_pl*2

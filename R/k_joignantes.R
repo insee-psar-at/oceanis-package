@@ -72,77 +72,80 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,var_depart_k,var_
     base_0 <- base[base$AR==0,] # sans aller-retour
     base_AR <- base[base$AR!=0,] # avec aller-retour
     
-    l <- list()
-    for(i in 1:(nrow(base_AR)/2))
+    if(nrow(base_AR)>0)
     {
-      doublon <- which(base_AR[,"AR"]==i)
-      
-      decalage1 <- base_AR[doublon[1],var_flux_k]*(largeur_k/2)/max(base[,var_flux_k]) + (decalage_aller_retour_k/2)*1000
-      decalage2 <- base_AR[doublon[2],var_flux_k]*(largeur_k/2)/max(base[,var_flux_k]) + (decalage_aller_retour_k/2)*1000
-      
-      # Coordonnees des points A et B
-      Ax <- base_AR[doublon[1],"X.R"]
-      Ay <- base_AR[doublon[1],"Y.R"]
-      Bx <- base_AR[doublon[1],"X.T"]
-      By <- base_AR[doublon[1],"Y.T"]
-      
-      if(Ax==Bx) # La ligne est verticale
+      l <- list()
+      for(i in 1:(nrow(base_AR)/2))
       {
-        A1x <- Ax
-        A1y <- Ay+decalage1
-        A2x <- Ax
-        A2y <- Ay-decalage1
-        B1x <- Bx
-        B1y <- By+decalage2
-        B2x <- Bx
-        B2y <- By-decalage2
-      }else if(Ay==By) # La ligne est horizontale
-      {
-        A1x <- Ax+decalage1
-        A1y <- Ay
-        A2x <- Ax+decalage1
-        A2y <- Ay
-        B1x <- Bx+decalage2
-        B1y <- By
-        B2x <- Bx+decalage2
-        B2y <- By
-      }else
-      {
-        # On applique le produit scalaire pour calculer les nouvelles coordonnees des points A1, B1 et A2, B2
+        doublon <- which(base_AR[,"AR"]==i)
         
-        # On fixe le vecteur S1 pour calculer un coeff multiplicateur M
-        S1 <- 1 # Sx-Ax
-        # S2 = Sy-Ay
+        decalage1 <- base_AR[doublon[1],var_flux_k]*(largeur_k/2)/max(base[,var_flux_k]) + (decalage_aller_retour_k/2)*1000
+        decalage2 <- base_AR[doublon[2],var_flux_k]*(largeur_k/2)/max(base[,var_flux_k]) + (decalage_aller_retour_k/2)*1000
         
-        #(Sx-Ax)*(Ax-Bx)+S2*(Ay-By)=0 : produit scalaire
-        #S1*(Ax-Bx)+S2*(Ay-By)=0
-        S2 <- -S1*(Ax-Bx)/(Ay-By)
-        N <- (1+S2^2)^(1/2)
-        M1 <- decalage1/N
-        M2 <- decalage2/N
-        # (M^2+(M*S2)^2)^(1/2) = decalage : verif
+        # Coordonnees des points A et B
+        Ax <- base_AR[doublon[1],"X.R"]
+        Ay <- base_AR[doublon[1],"Y.R"]
+        Bx <- base_AR[doublon[1],"X.T"]
+        By <- base_AR[doublon[1],"Y.T"]
         
-        A1x <- Ax+M1
-        A1y <- Ay+M1*S2
-        A2x <- Ax-M2
-        A2y <- Ay-M2*S2
-        B1x <- Bx+M1
-        B1y <- By+M1*S2
-        B2x <- Bx-M2
-        B2y <- By-M2*S2
+        if(Ax==Bx) # La ligne est verticale
+        {
+          A1x <- Ax
+          A1y <- Ay+decalage1
+          A2x <- Ax
+          A2y <- Ay-decalage1
+          B1x <- Bx
+          B1y <- By+decalage2
+          B2x <- Bx
+          B2y <- By-decalage2
+        }else if(Ay==By) # La ligne est horizontale
+        {
+          A1x <- Ax+decalage1
+          A1y <- Ay
+          A2x <- Ax+decalage1
+          A2y <- Ay
+          B1x <- Bx+decalage2
+          B1y <- By
+          B2x <- Bx+decalage2
+          B2y <- By
+        }else
+        {
+          # On applique le produit scalaire pour calculer les nouvelles coordonnees des points A1, B1 et A2, B2
+          
+          # On fixe le vecteur S1 pour calculer un coeff multiplicateur M
+          S1 <- 1 # Sx-Ax
+          # S2 = Sy-Ay
+          
+          #(Sx-Ax)*(Ax-Bx)+S2*(Ay-By)=0 : produit scalaire
+          #S1*(Ax-Bx)+S2*(Ay-By)=0
+          S2 <- -S1*(Ax-Bx)/(Ay-By)
+          N <- (1+S2^2)^(1/2)
+          M1 <- decalage1/N
+          M2 <- decalage2/N
+          # (M^2+(M*S2)^2)^(1/2) = decalage : verif
+          
+          A1x <- Ax+M1
+          A1y <- Ay+M1*S2
+          A2x <- Ax-M2
+          A2y <- Ay-M2*S2
+          B1x <- Bx+M1
+          B1y <- By+M1*S2
+          B2x <- Bx-M2
+          B2y <- By-M2*S2
+        }
+        
+        # Nouvelles coordonnees des points de A vers B puis de B vers A
+        
+        base_AR[doublon[1],"X.R"] <- A1x
+        base_AR[doublon[1],"Y.R"] <- A1y
+        base_AR[doublon[1],"X.T"] <- B1x
+        base_AR[doublon[1],"Y.T"] <- B1y
+        
+        base_AR[doublon[2],"X.R"] <- B2x
+        base_AR[doublon[2],"Y.R"] <- B2y
+        base_AR[doublon[2],"X.T"] <- A2x
+        base_AR[doublon[2],"Y.T"] <- A2y
       }
-      
-      # Nouvelles coordonnees des points de A vers B puis de B vers A
-      
-      base_AR[doublon[1],"X.R"] <- A1x
-      base_AR[doublon[1],"Y.R"] <- A1y
-      base_AR[doublon[1],"X.T"] <- B1x
-      base_AR[doublon[1],"Y.T"] <- B1y
-      
-      base_AR[doublon[2],"X.R"] <- B2x
-      base_AR[doublon[2],"Y.R"] <- B2y
-      base_AR[doublon[2],"X.T"] <- A2x
-      base_AR[doublon[2],"Y.T"] <- A2y
     }
     
     base <- rbind(base_0,base_AR)
