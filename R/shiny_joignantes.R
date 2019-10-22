@@ -1392,20 +1392,20 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
       
       # TABLEAUX DE DONNEES, MAILLE ET CONTOUR
       
-      output$mydonnees_fj <- DT::renderDataTable(datatable({
+      output$mydonnees_fj <- DT::renderDataTable(DT::datatable({
         analyse_WGS84 <- analyse_apres_filtre_fj()[[1]]
         data <- as.data.frame(analyse_WGS84)
         tableau_donnees <- data[,c("CODE1","CODE2",varFlux)]
       },  style = 'bootstrap'
       ))
       
-      output$mymaille_fj <- DT::renderDataTable(datatable({
+      output$mymaille_fj <- DT::renderDataTable(DT::datatable({
         data <- as.data.frame(fondMaille)
         tableau_maille <- data[,c(1:2)]
       },  style = 'bootstrap'
       ))
       
-      output$mycontour_fj <- DT::renderDataTable(datatable({
+      output$mycontour_fj <- DT::renderDataTable(DT::datatable({
         data <- as.data.frame(fondContour)
         tableau_contour <- data[,c(1:2)]
       },  style = 'bootstrap'

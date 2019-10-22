@@ -2551,7 +2551,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       
       # TABLEAUX DE DONNEES, MAILLE ET CONTOUR
       
-      output$mydonnees_ac_rp <- DT::renderDataTable(datatable({
+      output$mydonnees_ac_rp <- DT::renderDataTable(DT::datatable({
         if(elargi_ac_rp())
           data <- analyse_ac_rp()[[1]]$donnees_elargi
         else
@@ -2560,7 +2560,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       },  style = 'bootstrap'
       ))
       
-      output$mymaille_ac_rp <- DT::renderDataTable(datatable({
+      output$mymaille_ac_rp <- DT::renderDataTable(DT::datatable({
         if(elargi_ac_rp())
           data <- as.data.frame(fondMailleElargi)
         else
@@ -2569,7 +2569,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       },  style = 'bootstrap'
       ))
       
-      output$mycontour_ac_rp <- DT::renderDataTable(datatable({
+      output$mycontour_ac_rp <- DT::renderDataTable(DT::datatable({
         data <- as.data.frame(fondContour)
         tableau_contour <- data[,c(1:2)]
       },  style = 'bootstrap'

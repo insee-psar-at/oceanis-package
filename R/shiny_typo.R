@@ -1175,13 +1175,13 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,dom="0")
       
       # TABLEAUX DE DONNEES, MAILLE ET CONTOUR
       
-      output$mydonnees_ty <- DT::renderDataTable(datatable({
+      output$mydonnees_ty <- DT::renderDataTable(DT::datatable({
         data <- as.data.frame(analyse_ty()[[1]])
         tableau_donnees <- data[,c("CODE","LIBELLE",varTypo)]
       },  style = 'bootstrap'
       ))
       
-      output$mycontour_ty <- DT::renderDataTable(datatable({
+      output$mycontour_ty <- DT::renderDataTable(DT::datatable({
         data <- as.data.frame(fondContour)
         tableau_contour <- data[,c(1:2)]
       },  style = 'bootstrap'
