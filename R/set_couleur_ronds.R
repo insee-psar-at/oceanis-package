@@ -50,8 +50,7 @@ function(map,colorPos="#CD853F",colorNeg="#6495ED",map_leaflet=NULL)
       {
         if(!classes)
         {
-          varVolume <- map$x$calls[[idx_carte[i]]]$args[[4]]$var_volume
-          valeurs <- map$x$calls[[idx_carte[i]]]$args[[4]]$analyse$donnees[,varVolume]
+          valeurs <- map$x$calls[[idx_carte[i]]]$args[[4]]$analyse$donnees$save
           
           val_pos <- which(valeurs>=0)
           

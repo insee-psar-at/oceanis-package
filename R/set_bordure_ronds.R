@@ -61,21 +61,20 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
     {
       for(i in 1:length(idx_carte))
       {
-        varVolume <- map$x$calls[[idx_carte[i]]]$args[[4]]$var_volume
-        valeurs <- map$x$calls[[idx_carte[i]]]$args[[4]]$analyse$donnees[,varVolume]
+        valeurs <- map$x$calls[[idx_carte[i]]]$args[[4]]$analyse$donnees$save
         
         val_pos <- which(valeurs>=0)
         
         if(length(val_pos)>0)
         {
-          map$x$calls[[idx_carte[i]]]$args[[6]]$color <- colBorderPos
+          map$x$calls[[idx_carte[i]]]$args[[6]]$color[val_pos] <- colBorderPos
         }
         
         val_neg <- which(valeurs<0)
         
         if(length(val_neg)>0)
         {
-          map$x$calls[[idx_carte[i]]]$args[[6]]$color <- colBorderNeg
+          map$x$calls[[idx_carte[i]]]$args[[6]]$color[val_neg] <- colBorderNeg
         }
         
         map$x$calls[[idx_carte[i]]]$args[[6]]$weight <- epaisseurBorder
