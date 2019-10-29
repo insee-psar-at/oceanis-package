@@ -18,46 +18,50 @@
 leaflet_fonds_simples(listFonds, popup = NULL, init = TRUE, map = NULL)
 
 leaflet_ronds(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL, idData,
-varVolume, rayonRond = NULL, rapportRond = NULL, dom = "0", fondChx = NULL,
-colPos = "#CD853F", colNeg = "#6495ED", colBorder = "white", opacityElargi = 0.6,
-zoomMaille = NULL, map_proxy = NULL)
+varVolume, rayonRond = NULL, rapportRond = NULL, emprise = "FRM", fondEtranger = NULL,
+fondChx = NULL, colPos = "#CD853F", colNeg = "#6495ED", colBorderPos = "white",
+colBorderNeg = "white", epaisseurBorder = 1, opacityElargi = 0.6, zoomMaille = NULL,
+map_proxy = NULL)
 
 leaflet_classes(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL, idData,
 varRatio, methode = "kmeans", nbClasses = 3, bornes = NULL, stylePalette = "defaut",
-opacityElargi = 0.6, colBorder = "white", precision = 1, dom = "0", zoomMaille = NULL,
-map_proxy = NULL)
+opacityElargi = 0.6, colBorder = "white", precision = 1, emprise = "FRM",
+fondEtranger = NULL, zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_ronds_classes(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL,
 idData, varVolume, varRatio, rayonRond = NULL,
 rapportRond = NULL, methode = "kmeans", nbClasses = 3,
-bornes = NULL, stylePalette = "defaut", opacityElargi = 0.6, colBorder = "white",
-precision = 1, dom = "0", fondChx = NULL, zoomMaille = NULL, map_proxy = NULL)
+bornes = NULL, stylePalette = "defaut", opacityElargi = 0.6, colBorderPos = "white",
+colBorderNeg = "white", epaisseurBorder = 1, precision = 1, emprise = "FRM",
+fondEtranger = NULL, fondChx = NULL, zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_classes_ronds(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL,
 idData, varVolume, varRatio, rayonRond = NULL,
 rapportRond = NULL, methode = "kmeans", nbClasses = 3,
 bornes = NULL, stylePalette = "defaut", opacityElargi = 0.6,
-colBorderClasses = "white", colBorderRonds = "#303030", precision = 1, dom = "0",
-fondChx = NULL, zoomMaille = NULL, map_proxy = NULL)
+colBorderClasses = "white", colBorderRondsPos = "#303030",
+colBorderRondsNeg = "#303030", epaisseurBorder = 1.5, precision = 1, emprise = "FRM",
+fondEtranger = NULL, fondChx = NULL, zoomMaille = NULL, map_proxy = NULL)
 
-leaflet_typo(data, fondMaille, fondSuppl = NULL, idData, varTypo, dom = "0",
-zoomMaille = NULL, map_proxy = NULL)
+leaflet_typo(data, fondMaille, fondSuppl = NULL, idData, varTypo, emprise = "FRM",
+fondEtranger = NULL, zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_oursins(data, fondMaille, fondSuppl = NULL, idDataDepart, idDataArrivee,
 varFlux, filtreVol = 0, filtreDist = 100, filtreMajeurs = 10,
-decalageAllerRetour = 0, decalageCentroid = 0, dom = "0", zoomMaille = NULL,
-map_proxy = NULL)
+decalageAllerRetour = 0, decalageCentroid = 0, emprise = "FRM", fondEtranger = NULL,
+zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_joignantes(data, fondMaille, typeMaille, fondSuppl = NULL, idDataDepart,
 idDataArrivee, varFlux, largeurFlecheMax = NULL, filtreVol = 0,
 filtreDist = 100, filtreMajeurs = 10, decalageAllerRetour = 0,
-decalageCentroid = 0, colFleche = "#CD853F", colBorder = "#303030", dom = "0",
-zoomMaille = NULL, map_proxy = NULL)
+decalageCentroid = 0, colFleche = "#CD853F", colBorder = "#303030", emprise = "FRM",
+fondEtranger = NULL, zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_saphirs(data, fondMaille, typeMaille, fondSuppl = NULL, idDataDepart,
 idDataArrivee, varFlux, largeurFlecheMax = NULL, direction = "Ent",
 filtreVol = 0, colEntree = "#CD853F", colSortie = "#6495ED",
-colBorder = "#303030", dom = "0", zoomMaille = NULL, map_proxy = NULL)
+colBorder = "#303030", emprise = "FRM", fondEtranger = NULL, zoomMaille = NULL,
+map_proxy = NULL)
 }
 \arguments{
   \item{data}{
@@ -154,13 +158,25 @@ colBorder = "#303030", dom = "0", zoomMaille = NULL, map_proxy = NULL)
 	chaine de caracteres (character). Couleur nommee (par exemple "blue") ou hexadecimal (par exemple "#0000FF"). Par defaut "#6495ED".
 }
   \item{colBorder}{
-	chaine de caracteres (character). Couleur nommee (par exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white" (ou "#303030" pour les fleches).
+	chaine de caracteres (character). Couleur nommee (par exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white" pour les classes, "#303030" pour les fleches.
 }
-  \item{colBorderRonds}{
+  \item{colBorderPos}{
+	chaine de caracteres (character). Couleur nommee (par exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white".
+}
+  \item{colBorderNeg}{
+	chaine de caracteres (character). Couleur nommee (par exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white".
+}
+  \item{colBorderRondsPos}{
+	chaine de caracteres (character). Couleur nommee (par exemple "grey") ou hexadecimal (par exemple "#808080"). Par defaut "#303030".
+}
+  \item{colBorderRondsNeg}{
 	chaine de caracteres (character). Couleur nommee (par exemple "grey") ou hexadecimal (par exemple "#808080"). Par defaut "#303030".
 }
   \item{colBorderClasses}{
 	chaine de caracteres (character). Couleur nommee (par exemple "grey") ou hexadecimal (par exemple "#808080"). Par defaut "white".
+}
+  \item{epaisseurBorder}{
+	chaine de caracteres (numeric). Epaisseur de la bordure des ronds. Par defaut a 1".
 }
   \item{stylePalette}{
 	chaine de caracteres (character). Palette de la charte INSEE. A choisir entre "InseeFlash", "InseeAnalyse", "InseeDossier", "InseePremiere" ou "defaut" (par defaut).
@@ -177,14 +193,17 @@ colBorder = "#303030", dom = "0", zoomMaille = NULL, map_proxy = NULL)
   \item{opacityElargi}{
 	valeur numerique (numeric). Opacite de la representation elargie. Par defaut a 0.6 (valeur comprise entre 0-transparent et 1-opaque).
 }
-  \item{dom}{
-	chaine de caracteres (character). "0" (par defaut pour la France metropolitaine), "971" (Guadeloupe), "972" (Martinique), "973" (Guyane), "974" (La Reunion) ou "976" (Mayotte). Ce parametre permet de definir le systeme de projection de la carte.
+  \item{emprise}{
+	chaine de caracteres (character). "FRM" (par defaut pour la France metropolitaine), "971" (Guadeloupe), "972" (Martinique), "973" (Guyane), "974" (La Reunion), "976" (Mayotte) ou "999" (Etranger). Ce parametre permet de definir le systeme de projection de la carte.
+}
+  \item{fondEtranger}{
+	objet sf. Fond de carte d'habillage personnalisable pour les fonds autres que la France (metropolitaine et DOM). Par defaut a NULL.
 }
   \item{fondChx}{
 	objet sf. Fond des chefs-lieux. Pour les ronds proportionnels avec une maille communale, choix entre la position du centre des ronds sur les centroides des communes (NULL par defaut) ou sur les chefs-lieux (chx) des communes.
 }
   \item{zoomMaille}{
-	vecteur de caracteres ou numeriques (character ou numeric). Identifiant(s) de la maille du parametre fondMaille. Permet de zoomer sur une ou plusieurs entites de la maille. Par defaut a NULL (zoom sur l'emprise de la maille).
+	vecteur de caracteres ou numeriques (character ou numeric). Identifiant(s) de la maille du parametre fondMaille. Permet de zoomer sur une ou plusieurs entités de la maille. Par defaut a NULL (zoom sur l'emprise de la maille).
 }
   \item{map_proxy}{
 	objet leaflet ou leaflet_proxy. Pour l'integration des fonctions leaflet dans les applications shiny (cf vignette). Par defaut a NULL.
@@ -204,6 +223,10 @@ colBorder = "#303030", dom = "0", zoomMaille = NULL, map_proxy = NULL)
 	Les fonctions leaflet_() retournent un objet de type leaflet. Si vous executez une fonction leaflet_() sans recuperer le resultat dans une variable, la carte s'affichera automatiquement dans la fenetre viewer de RStudio mais ne pourra pas etre reutilisee pour etre modifiee.
 	Si vous sauvegardez le resultat dans une variable, la carte ne s'affichera qu'a l'execution de cette variable (voir exemples).
 
+	Il est possible de remplacer le fond d'habillage par defaut (France metropolitaine ou DOM) par un autre fond. Pour cela, il faut specifier le parametre emprise="999" ET ajouter un fond sf dans le parametre fondEtranger, par exemple, une carte de l'Europe ou d'un pays particulier.
+	Le systeme de coordonnees du fond doit etre projete (en unite de longueur) et non geographique (lng/lat).
+	Si aucun code EPSG valide n'est trouve pour ce fond, le code EPSG 3395 est choisi (projection Mercator). Attention car la legende des ronds sera d'autant plus deformee qu'elle se situera loin de l'equateur.
+	
 	Les fonctions leaflet peuvent etre integrees dans les applications shiny. Le parametre map_proxy permet d'actualiser uniquement les couches modifiees et non toute la carte entiere (voir vignette).
 	
   \describe{

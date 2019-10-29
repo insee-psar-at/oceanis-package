@@ -5,7 +5,7 @@ export(
 "zonage_a_facon",
 "add_typo_symboles",
 "add_legende_fonds_simples","add_legende_ronds","add_legende_classes","add_legende_typo","add_legende_typo_symboles","add_legende_joignantes","add_legende_saphirs","add_titre","add_source","add_fond_osm",
-"set_fonds_simples","set_couleur_classes","set_opacite_elargi","set_couleur_ronds","set_couleur_typo","set_style_oursins","set_couleur_joignantes","set_couleur_saphirs",
+"set_fonds_simples","set_couleur_classes","set_opacite_elargi","set_couleur_ronds","set_couleur_typo","set_style_oursins","set_couleur_joignantes","set_couleur_saphirs","set_pop_up","set_bordure_ronds",
 "rayon_ronds","rapport_ronds","largeur_fleche",
 "coord_legende",
 "calcul_ratio","calcul_tx_evol_global","calcul_tx_evol_ann_moy","calcul_part_ens","calculette",

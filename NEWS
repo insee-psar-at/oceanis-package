@@ -1,4 +1,25 @@
-﻿Changes in version 1.0.4
+﻿Changes in version 1.0.6
+
+FEATURES
+
+- Pour les fonctions leaflet_xxx et shiny_xxx, possibilite de choisir un fond d'habillage personnalise (par defaut France metro+DOM). Utile pour creer des cartes avec l'Europe ou d'autres pays par exemple. Le parametre dom est renomme emprise (par defaut emprise="FRM"), ajout de la modalite "999" pour etranger. 
+- Nouvelle fonction pour le groupe leaflet : set_pop_up pour modifier le texte des pop-up lors du clic sur un element de la maille. Possibilite d'inclure du HTML. Uniquement pour les analyses en ronds, en classes et les combines des deux.
+- Nouvelle fonction pour le groupe leaflet : set_bordure_ronds pour modifier l'apparence des bordures des ronds (couleur et epaisseur). La gestion de le bordure des ronds est dissocies de la fonction set_couleur_ronds.
+- Nouveau parametre 'epaisseurBorder', 'colBorderPos' et 'colBorderNeg' aux fonctions leaflet_ronds, leaflet_ronds_classes et leaflet_classes_ronds. Suppression du parametre 'colBorder' pour ces memes fonctions.
+
+BUG FIXES and IMPROVEMENTS
+
+- Correction d'un bug sur la fonction coord_legende().
+
+
+Changes in version 1.0.5
+
+BUG FIXES
+
+- Bug corrige apparu avec la montee de version de shiny. Mise à jour du namespace.
+
+
+Changes in version 1.0.4
 
 FEATURES
 

@@ -35,7 +35,6 @@ map_leaflet = NULL)
 add_legende_saphirs(map, titre = NULL, lng = NULL, lat = NULL, precision = 0, zoom = 8,
 map_leaflet = NULL)
 }
-
 \arguments{
   \item{map}{
 	objet leaflet.

@@ -1,10 +1,10 @@
 leaflet_classes_ronds <-
-function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,stylePalette="defaut",opacityElargi=0.6,colBorderClasses="white",colBorderRonds="#303030",precision=1,dom="0",fondChx=NULL,zoomMaille=NULL,map_proxy=NULL)
+function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,stylePalette="defaut",opacityElargi=0.6,colBorderClasses="white",colBorderRondsPos="#303030",colBorderRondsNeg="#303030",epaisseurBorder=1.5,precision=1,emprise="FRM",fondEtranger=NULL,fondChx=NULL,zoomMaille=NULL,map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
     # Verification des parametres
-    leafletVerifParamClassesRonds(data,fondMaille,fondMailleElargi,fondSuppl,idData,varVolume,varRatio,rayonRond,rapportRond,methode,nbClasses,bornes,stylePalette,opacityElargi,colBorderClasses,colBorderRonds,precision,dom,fondChx,map_proxy)
+    leafletVerifParamClassesRonds(data,fondMaille,fondMailleElargi,fondSuppl,idData,varVolume,varRatio,rayonRond,rapportRond,methode,nbClasses,bornes,stylePalette,opacityElargi,colBorderClasses,colBorderRondsPos,colBorderRondsNeg,epaisseurBorder,precision,emprise,fondEtranger,fondChx,map_proxy)
     
     if(!is.null(fondChx))
     {
@@ -28,6 +28,19 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
       names(fondSuppl)[1] <- "CODE"
       names(fondSuppl)[2] <- "LIBELLE"
       fondSuppl$LIBELLE<-iconv(fondSuppl$LIBELLE,"latin1","utf8")
+    }
+    epsg_etranger <- NULL
+    if(!is.null(fondEtranger)) 
+    {
+      names(fondEtranger)[1] <- "CODE"
+      names(fondEtranger)[2] <- "LIBELLE"
+      fondEtranger$LIBELLE<-iconv(fondEtranger$LIBELLE,"latin1","utf8")
+      
+      epsg_etranger <- st_crs(fondEtranger)$epsg
+      if(is.na(epsg_etranger) | epsg_etranger=="4326")
+      {
+        epsg_etranger <- "3395" # Mercator
+      }
     }
     if(!is.null(fondChx)) 
     {
@@ -55,20 +68,21 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
       elargi <- TRUE
     }
     
-    code_epsg <- switch(dom, #DOM
-                        "0"="2154",# Lambert 93
+    code_epsg <- switch(emprise,
+                        "FRM"="2154",# Lambert 93
                         "971"="32620",# UTM 20 N
                         "972"="32620",# UTM 20 N
                         "973"="2972",# UTM 22 N
                         "974"="2975",# UTM 40 S
-                        "976"="4471")# UTM 38 S
+                        "976"="4471",# UTM 38 S
+                        "999"=epsg_etranger)
     
     # Calcul du rayon du rond max
     
     #Aire totale du territoire d'etude
     aire_territoire <- as.numeric(sum(st_area(fondMaille[fondMaille$CODE %in% data[,"CODE"],]))) #Superficie du territoire
     #valeur max de la serie de donnees
-    suppressWarnings(max_var <- max(data[data[,"CODE"] %in% fondMaille$CODE,varVolume], na.rm = TRUE))
+    suppressWarnings(max_var <- max(abs(data[data[,"CODE"] %in% fondMaille$CODE,varVolume]), na.rm = TRUE))
     
     serie <- data[data[,"CODE"] %in% fondMaille$CODE,varVolume]
     serie <- serie[!is.na(serie)]
@@ -89,10 +103,10 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
         {
           if(!is.null(map_proxy))
           {
-            showModal(modalDialog(HTML(paste0("Le rayon du rond le plus grand est trop \u00e9lev\u00e9 et ne permet pas de respecter la r\u00e8gle s\u00e9miologique des 1/7\u00e8me. Le rayon max est ",round(max_rayon_metres,2)," m\u00e8tres.")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
+            showModal(modalDialog(HTML(paste0("Le rayon du rond le plus grand est trop \u00e9lev\u00e9 et ne permet pas de respecter la r\u00e8gle s\u00e9miologique des 1/7\u00e8me. Le rayon max conseill\u00e9 est ",round(max_rayon_metres,2)," m\u00e8tres.")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
           }else
           {
-            stop(simpleError(paste0("Le rayon du rond le plus grand est trop eleve et ne permet pas de respecter la regle semiologique des 1/7eme. Le rayon max est ",round(max_rayon_metres,2)," metres.")))
+            message(simpleMessage(paste0("Le rayon du rond le plus grand est trop eleve et ne permet pas de respecter la regle semiologique des 1/7eme. Le rayon max conseille est ",round(max_rayon_metres,2)," metres.")))
           }
         }
       }else
@@ -235,40 +249,42 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
     
     # Fonds habillages
     
-    if(dom=="0")
+    if(emprise=="FRM")
     {
-      pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-      fra <- st_transform(sf_fram(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-    }else
+      fond_pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+      fond_france <- st_transform(sf_fram(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+    }else if(emprise!="999")
     {
-      if(dom=="971")
+      if(emprise=="971")
       {
-        fra <- st_transform(sf_reg01(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        pays <- fra
+        fond_france <- st_transform(sf_reg01(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_pays <- fond_france
       }
-      if(dom=="972")
+      if(emprise=="972")
       {
-        fra <- st_transform(sf_reg02(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        pays <- fra
+        fond_france <- st_transform(sf_reg02(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_pays <- fond_france
       }
-      if(dom=="973")
+      if(emprise=="973")
       {
-        fra <- st_transform(sf_reg03(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        pays <- st_transform(sf_pays973(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_france <- st_transform(sf_reg03(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_pays <- st_transform(sf_pays973(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
       }
-      if(dom=="974")
+      if(emprise=="974")
       {
-        fra <- st_transform(sf_reg04(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        pays <- fra
+        fond_france <- st_transform(sf_reg04(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_pays <- fond_france
       }
-      if(dom=="976")
+      if(emprise=="976")
       {
-        fra <- st_transform(sf_reg06(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        pays <- fra
+        fond_france <- st_transform(sf_reg06(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_pays <- fond_france
       }
-    }
-    fond_france <- fra
-    fond_pays <- pays
+    }else if(emprise=="999")
+    {
+      fond_etranger <- st_transform(fondEtranger,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+      fond_pays <- fond_etranger
+    }else{}
     
     maille_WGS84 <- st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
     
@@ -321,12 +337,13 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
         # Pour gerer l'ordre des calques
         addMapPane(name = "fond_pays", zIndex = 401) %>%
         addMapPane(name = "fond_france", zIndex = 402) %>%
-        addMapPane(name = "fond_territoire", zIndex = 403) %>%
-        addMapPane(name = "fond_classes_elargi", zIndex = 404) %>%
-        addMapPane(name = "fond_classes", zIndex = 405) %>%
-        addMapPane(name = "fond_ronds_elargi", zIndex = 406) %>%
-        addMapPane(name = "fond_ronds", zIndex = 407) %>%
-        addMapPane(name = "fond_legende", zIndex = 408) %>%
+        addMapPane(name = "fond_etranger", zIndex = 403) %>%
+        addMapPane(name = "fond_territoire", zIndex = 404) %>%
+        addMapPane(name = "fond_classes_elargi", zIndex = 405) %>%
+        addMapPane(name = "fond_classes", zIndex = 406) %>%
+        addMapPane(name = "fond_ronds_elargi", zIndex = 407) %>%
+        addMapPane(name = "fond_ronds", zIndex = 408) %>%
+        addMapPane(name = "fond_legende", zIndex = 409) %>%
       
         # On ajoute une barre d'echelle
         addScaleBar(position = 'bottomright',
@@ -334,29 +351,51 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
         )
       
       # AFFICHAGE DES FONDS D'HABILLAGE
-      if(dom %in% c("0","973"))
+      
+      if(emprise %in% c("FRM","973")) # France metro ou Guyane
       {
-        map <- addPolygons(map = map, data = fond_pays[,"LIBGEO"], opacity = 1, # fond_pays sauf la France
-                           stroke = TRUE, color = colBorderClasses,
+        map <- addPolygons(map = map, data = fond_pays[,"LIBGEO"], opacity = 1,
+                           stroke = TRUE, color = "white",
                            weight = 1,
                            popup = as.data.frame(fond_pays[,"LIBGEO"])[,-ncol(as.data.frame(fond_pays[,"LIBGEO"]))],
-                           options = pathOptions(pane = "fond_pays", clickable = F),
+                           options = pathOptions(pane = "fond_pays", clickable = T),
                            fill = T, fillColor = "#CCCCCC", fillOpacity = 1,
                            group = "carte_classes_ronds_init",
                            layerId = list(fond_pays=fond_pays,code_epsg=code_epsg,nom_fond="fond_pays")
-                           
+        )
+        
+        map <- addPolygons(map = map, data = fond_france[,"LIBGEO"], opacity = 1,
+                           stroke = TRUE, color = "black",
+                           weight = 1.5,
+                           popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
+                           options = pathOptions(pane = "fond_france", clickable = T),
+                           fill = T, fillColor = "white", fillOpacity = 1,
+                           group = "carte_classes_ronds_init",
+                           layerId = list(fond_france=fond_france,code_epsg=code_epsg,nom_fond="fond_france")
+        )
+      }else if(!emprise %in% c("999")) # 971, 972, 974 ou 976
+      {
+        map <- addPolygons(map = map, data = fond_france[,"LIBGEO"], opacity = 1,
+                           stroke = TRUE, color = "black",
+                           weight = 1.5,
+                           popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
+                           options = pathOptions(pane = "fond_france", clickable = T),
+                           fill = T, fillColor = "white", fillOpacity = 1,
+                           group = "carte_classes_ronds_init",
+                           layerId = list(fond_france=fond_france,code_epsg=code_epsg,nom_fond="fond_france")
+        )
+      }else if(emprise %in% c("999")) # Etranger
+      {
+        map <- addPolygons(map = map, data = fond_etranger[,"LIBELLE"], opacity = 1,
+                           stroke = TRUE, color = "black",
+                           weight = 1,
+                           popup = as.data.frame(fond_etranger[,"LIBELLE"])[,-ncol(as.data.frame(fond_etranger[,"LIBELLE"]))],
+                           options = pathOptions(pane = "fond_etranger", clickable = T),
+                           fill = T, fillColor = "white", fillOpacity = 1,
+                           group = "carte_classes_ronds_init",
+                           layerId = list(fond_etranger=fond_etranger,code_epsg=code_epsg,nom_fond="fond_etranger")
         )
       }
-      
-      map <- addPolygons(map = map, data = fond_france[,"LIBGEO"], opacity = 1, # fond_france
-                         stroke = TRUE, color = "black",
-                         weight = 1.5,
-                         popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
-                         options = pathOptions(pane = "fond_france", clickable = F),
-                         fill = T, fillColor = "white", fillOpacity = 1,
-                         group = "carte_classes_ronds_init",
-                         layerId = list(fond_france=fond_france,code_epsg=code_epsg,nom_fond="fond_france")
-      )
       
       # AFFICHAGE DU FOND TERRITOIRE
       
@@ -395,7 +434,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
                          fillColor = palette(analyse_maille_classe_elargi),
                          fillOpacity = opacityElargi,
                          group = "carte_classes_elargi",
-                         layerId = list(analyse_maille_elargi=analyse_maille_elargi,analyse_maille_classe_elargi=analyse_maille_classe_elargi,code_epsg=code_epsg,dom=dom,nom_fond="fond_maille_elargi_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal_classes,col_border_classes=colBorderClasses)
+                         layerId = list(analyse_maille_elargi=analyse_maille_elargi,analyse_maille_classe_elargi=analyse_maille_classe_elargi,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_maille_elargi_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal_classes,col_border_classes=colBorderClasses)
       )
     }
     
@@ -415,7 +454,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
                        fillColor = palette(analyse_maille_classe),
                        fillOpacity = 1,
                        group = "carte_classes",
-                       layerId = list(analyse_maille=analyse_maille,analyse_maille_classe=analyse_maille_classe,code_epsg=code_epsg,dom=dom,nom_fond="fond_maille_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal_classes,col_border_classes=colBorderClasses)
+                       layerId = list(analyse_maille=analyse_maille,analyse_maille_classe=analyse_maille_classe,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_maille_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal_classes,col_border_classes=colBorderClasses)
     )
     
     if(!is.null(fondMailleElargi))
@@ -425,15 +464,15 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
       map <- addCircles(map = map,
                         lng = st_coordinates(analyse_WGS84_elargi)[,1],
                         lat = st_coordinates(analyse_WGS84_elargi)[,2],
-                        stroke = TRUE, color = colBorderRonds,
+                        stroke = TRUE, color = sapply(analyse$donnees_elargi$save, function(x) if(x>0){colBorderRondsPos}else{colBorderRondsNeg}),
                         opacity = opacityElargi,
-                        weight = 1.5,
+                        weight = epaisseurBorder,
                         radius = rayonRond*sqrt(analyse$donnees_elargi[,varVolume]/max_var),
-                        options = pathOptions(pane = "fond_ronds_elargi", clickable = F),
-                        popup = paste0("<b> <font color=#2B3E50>",as.data.frame(analyse_maille_elargi)$LIBELLE, "</font> </b><br><b> <font color=#2B3E50>",varVolume," : </font></b>",as.data.frame(analyse_maille_elargi)$TXT1),
+                        options = pathOptions(pane = "fond_ronds_elargi", clickable = T),
+                        popup = paste0("<b> <font color=#2B3E50>",analyse$donnees_elargi$LIBELLE, "</font> </b><br><b> <font color=#2B3E50>",varVolume," : </font></b>",analyse$donnees_elargi$TXT1),
                         fill = F,
                         group = "carte_ronds_elargi",
-                        layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse=analyse,analyse_maille_elargi=analyse_maille_elargi,code_epsg=code_epsg,dom=dom,nom_fond="fond_classes_ronds_elargi_carte",max_var=max_var,var_volume=varVolume,rayonRond=rayonRond,col_border_ronds=colBorderRonds)
+                        layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse=analyse,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_classes_ronds_elargi_carte",max_var=max_var,var_volume=varVolume,rayonRond=rayonRond,col_border_ronds_pos=colBorderRondsPos,col_border_ronds_neg=colBorderRondsNeg,epaisseurBorder=epaisseurBorder)
       )
     }
     
@@ -442,15 +481,15 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
     map <- addCircles(map = map,
                       lng = st_coordinates(analyse_WGS84)[,1],
                       lat = st_coordinates(analyse_WGS84)[,2],
-                      stroke = TRUE, color = colBorderRonds,
+                      stroke = TRUE, color = sapply(analyse$donnees$save, function(x) if(x>0){colBorderRondsPos}else{colBorderRondsNeg}),
                       opacity = 1,
-                      weight = 1.5,
+                      weight = epaisseurBorder,
                       radius = rayonRond*sqrt(analyse$donnees[,varVolume]/max_var),
-                      options = pathOptions(pane = "fond_ronds", clickable = F),
-                      popup = paste0("<b> <font color=#2B3E50>",as.data.frame(analyse_maille)$LIBELLE, "</font> </b><br><b> <font color=#2B3E50>",varVolume," : </font></b>",as.data.frame(analyse_maille)$TXT1),
+                      options = pathOptions(pane = "fond_ronds", clickable = T),
+                      popup = paste0("<b> <font color=#2B3E50>",analyse$donnees$LIBELLE, "</font> </b><br><b> <font color=#2B3E50>",varVolume," : </font></b>",analyse$donnees$TXT1),
                       fill = F,
                       group = "carte_ronds",
-                      layerId = list(analyse_WGS84=analyse_WGS84,analyse=analyse,analyse_maille=analyse_maille,code_epsg=code_epsg,dom=dom,nom_fond="fond_classes_ronds_carte",max_var=max_var,var_volume=varVolume,rayonRond=rayonRond,col_border_ronds=colBorderRonds)
+                      layerId = list(analyse_WGS84=analyse_WGS84,analyse=analyse,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_classes_ronds_carte",max_var=max_var,var_volume=varVolume,rayonRond=rayonRond,col_border_ronds_pos=colBorderRondsPos,col_border_ronds_neg=colBorderRondsNeg,epaisseurBorder=epaisseurBorder)
     )
     
     return(map)

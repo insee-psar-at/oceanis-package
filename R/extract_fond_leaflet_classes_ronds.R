@@ -65,7 +65,7 @@ function(map)
       var_classes <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[2]]$var_ratio
       
       code_epsg <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[2]]$code_epsg
-      dom <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[2]]$dom
+      emprise <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[2]]$emprise
       
       list_fonds <- list()
       nom_fonds <- c()
@@ -217,6 +217,6 @@ function(map)
         }
       }
       
-      return(list(list_fonds,nom_fonds,titre,source,table_classe,titre_leg,var_classes,var_ronds,dom))
+      return(list(list_fonds,nom_fonds,titre,source,table_classe,titre_leg,var_classes,var_ronds,emprise))
     }
   }

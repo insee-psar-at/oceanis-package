@@ -1,5 +1,5 @@
 zonage_a_facon <-
-function(fondMaille,groupe,idMaille,idGroupe,libGroupe,fondContour=NULL,dom="0")
+function(fondMaille,groupe,idMaille,idGroupe,libGroupe,fondContour=NULL)
   {
     msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10 <- NULL
     
@@ -8,8 +8,7 @@ function(fondMaille,groupe,idMaille,idGroupe,libGroupe,fondContour=NULL,dom="0")
     if(any(class(idMaille)!="character")) msg_error3 <- "Le nom de la variable doit etre de type caractere / "
     if(any(class(idGroupe)!="character")) msg_error4 <- "Le nom de la variable doit etre de type caractere / "
     if(any(class(libGroupe)!="character")) msg_error5 <- "Le nom de la variable doit etre de type caractere / "
-    if(!is.null(fondContour)) if(any(!any(class(fondContour) %in% "sf"),!any(class(fondContour) %in% "data.frame"))) msg_error1 <- "Le fond du contour doit etre un objet sf / "
-    if(any(class(dom)!="character")) msg_error6 <- "La valeur doit etre de type caractere ('0', '971', '972', '973', '974' ou '976') / "
+    if(!is.null(fondContour)) if(any(!any(class(fondContour) %in% "sf"),!any(class(fondContour) %in% "data.frame"))) msg_error6 <- "Le fond du contour doit etre un objet sf / "
     
     if(!any(names(groupe) %in% idMaille))  msg_error7 <- "La variable identifiant la maille n'existe pas dans la table / "
     if(!any(names(groupe) %in% idGroupe))  msg_error8 <- "La variable identifiant le groupe n'existe pas dans la table / "

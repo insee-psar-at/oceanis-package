@@ -69,7 +69,7 @@ function(map)
       
       for(i in 1:length(idx_carte_ronds))
       {
-        dom <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$dom
+        emprise <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$emprise
         
         centres_ronds <- data.frame(lng=map$x$calls[[idx_carte_ronds[i]]]$args[[2]],lat=map$x$calls[[idx_carte_ronds[i]]]$args[[1]])
         aa <- apply(centres_ronds,1, function(x) st_sf(geometry=st_sfc(st_point(x),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84")))
@@ -81,7 +81,8 @@ function(map)
         ronds_pl <- cbind(COL_BOR=col_bor,ronds_pl)
         col <- map$x$calls[[idx_carte_ronds[i]]]$args[[6]]$fillColor
         ronds_pl <- cbind(COL=col,ronds_pl)
-        val <- as.numeric(str_replace_all(str_replace_all(substring(map$x$calls[[idx_carte_ronds[i]]]$args[[7]],str_locate_all(map$x$calls[[idx_carte_ronds[i]]]$args[[7]],">")[[1]][6]+1,nchar(map$x$calls[[idx_carte_ronds[i]]]$args[[7]])-11)," ",""),",","."))
+        varVolume <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$var_volume
+        val <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$analyse$donnees[,varVolume]
         ronds_pl <- cbind(VAL=val,ronds_pl)
         
         fond_pos <- NULL
@@ -158,5 +159,5 @@ function(map)
       }
     }
     
-    return(list(list_fonds,nom_fonds,dom))
+    return(list(list_fonds,nom_fonds,emprise))
   }

@@ -96,7 +96,7 @@ function(map,paletteTypo=NULL,colBorder="white",map_leaflet=NULL)
       analyse_WGS84 <- map_leaflet$x$calls[[idx_carte]]$args[[2]]$analyse_WGS84
       analyse <- map_leaflet$x$calls[[idx_carte]]$args[[2]]$analyse
       code_epsg <- map_leaflet$x$calls[[idx_carte]]$args[[2]]$code_epsg
-      dom <- map_leaflet$x$calls[[idx_carte]]$args[[2]]$dom
+      emprise <- map_leaflet$x$calls[[idx_carte]]$args[[2]]$emprise
       varTypo <- map_leaflet$x$calls[[idx_carte]]$args[[2]]$var_typo
       
       map <- addPolygons(map = map, data = analyse_WGS84, opacity = 1,
@@ -107,7 +107,7 @@ function(map,paletteTypo=NULL,colBorder="white",map_leaflet=NULL)
                          fillColor = analyse$col,
                          fillOpacity = 1,
                          group = "carte_typo",
-                         layerId = list(analyse_WGS84=analyse_WGS84,analyse=analyse,code_epsg=code_epsg,dom=dom,nom_fond="fond_maille_typo_carte",var_typo=varTypo)
+                         layerId = list(analyse_WGS84=analyse_WGS84,analyse=analyse,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_maille_typo_carte",var_typo=varTypo)
       )
     }
     return(map)

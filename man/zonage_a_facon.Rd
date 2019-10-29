@@ -8,8 +8,7 @@
 	Creating a custom zoning from a group of entities.
 }
 \usage{
-zonage_a_facon(fondMaille, groupe, idMaille, idGroupe, libGroupe, fondContour = NULL,
-dom = "0")
+zonage_a_facon(fondMaille, groupe, idMaille, idGroupe, libGroupe, fondContour = NULL)
 }
 \arguments{
   \item{fondMaille}{
@@ -29,9 +28,6 @@ dom = "0")
 }
   \item{fondContour}{
 	objet sf. Fond de carte. Par defaut a NULL.
-}
-  \item{dom}{
-	chaine de caracteres (character). "0" (par defaut pour la France metropolitaine), "971" (Guadeloupe), "972" (Martinique), "973" (Guyane), "974" (La Reunion) ou "976" (Mayotte). Ce parametre permet de definir le systeme de projection de la carte.
 }
 }
 \details{
@@ -60,10 +56,10 @@ data("depm")
 
 ze13etplus <- zonage_a_facon(fondMaille = com_dep_13_30_83_84, groupe = donnees_a_facon,
 idMaille = "DEPCOM", idGroupe = "ZE2010", libGroupe = "LIB_ZE2010",
-fondContour = NULL, dom = "0") # sans contour
+fondContour = NULL) # sans contour
 ze13 <- zonage_a_facon(fondMaille = com_dep_13_30_83_84, groupe = donnees_a_facon,
 idMaille = "DEPCOM", idGroupe = "ZE2010", libGroupe = "LIB_ZE2010",
-fondContour = depm[depm$CODE=="13",], dom = "0") # avec contour
+fondContour = depm[depm$CODE=="13",]) # avec contour
 
 \donttest{
 # affiche les ZE2010 ayant au moins une partie dans les Bouches-du-Rhone

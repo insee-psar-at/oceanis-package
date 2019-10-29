@@ -15,31 +15,32 @@
 }
 \usage{
 shiny_ronds(data, fondMaille, fondMailleElargi = NULL, fondContour, fondSuppl = NULL,
-idData, varVolume, dom = "0", fondChx = NULL)
+idData, varVolume, emprise = "FRM", fondEtranger = NULL, fondChx = NULL)
 
 shiny_classes(data, fondMaille, fondMailleElargi = NULL, fondContour, fondSuppl = NULL,
-idData, varRatio, dom = "0")
+idData, varRatio, emprise = "FRM", fondEtranger = NULL)
 
 shiny_ronds_classes(data, fondMaille, fondMailleElargi = NULL, fondContour,
-fondSuppl = NULL, idData, varVolume, varRatio, dom = "0",
+fondSuppl = NULL, idData, varVolume, varRatio, emprise = "FRM", fondEtranger = NULL,
 fondChx = NULL)
 
 shiny_classes_ronds(data, fondMaille, fondMailleElargi = NULL, fondContour,
-fondSuppl = NULL, idData, varVolume, varRatio, dom = "0",
+fondSuppl = NULL, idData, varVolume, varRatio, emprise = "FRM", fondEtranger = NULL,
 fondChx = NULL)
 
-shiny_typo(data, fondMaille, fondContour, fondSuppl = NULL, idData, varTypo, dom = "0")
+shiny_typo(data, fondMaille, fondContour, fondSuppl = NULL, idData, varTypo,
+emprise = "FRM", fondEtranger = NULL)
 
 shiny_oursins(data, fondMaille, fondContour, fondSuppl = NULL, idDataDepart,
 idDataArrivee, varFlux, decalageAllerRetour = 0, decalageCentroid = 0,
-dom = "0")
+emprise = "FRM", fondEtranger = NULL)
 
 shiny_joignantes(data, fondMaille, typeMaille, fondContour, fondSuppl = NULL,
 idDataDepart, idDataArrivee, varFlux, decalageAllerRetour = 0,
-decalageCentroid = 0, dom = "0")
+decalageCentroid = 0, emprise = "FRM", fondEtranger = NULL)
 
 shiny_saphirs(data, fondMaille, typeMaille, fondContour, fondSuppl = NULL, idDataDepart,
-idDataArrivee, varFlux, direction = "Ent", dom = "0")
+idDataArrivee, varFlux, direction = "Ent", emprise = "FRM", fondEtranger = NULL)
 }
 \arguments{
   \item{data}{
@@ -90,8 +91,11 @@ idDataArrivee, varFlux, direction = "Ent", dom = "0")
   \item{decalageCentroid}{
 	valeur numerique (numeric). Decalage des fleches depuis et vers les centroides des territoires (km).
 }
-  \item{dom}{
-	chaine de caracteres (character). "0" (par defaut pour la France metropolitaine), "971" (Guadeloupe), "972" (Martinique), "973" (Guyane), "974" (La Reunion) ou "976" (Mayotte). Ce parametre permet de definir le systeme de projection de la carte.
+  \item{emprise}{
+	chaine de caracteres (character). "FRM" (par defaut pour la France metropolitaine), "971" (Guadeloupe), "972" (Martinique), "973" (Guyane), "974" (La Reunion), "976" (Mayotte) ou "999" (Etranger). Ce parametre permet de definir le systeme de projection de la carte.
+}
+  \item{fondEtranger}{
+	objet sf. Fond de carte d'habillage personnalisable pour les fonds autres que la France (metropolitaine et DOM). Par defaut a NULL.
 }
   \item{fondChx}{
 	objet sf. Fond des chefs-lieux. Pour les ronds proportionnels avec une maille communale uniquement, choix entre position du centre des ronds sur les centroides des communes (NULL par defaut) ou sur les chefs-lieux (chx) des communes.
@@ -109,6 +113,10 @@ idDataArrivee, varFlux, direction = "Ent", dom = "0")
 	L'apparence des cartes (choix de la palette et des couleurs, etiquettes) n'est cependant pas modifiable. Le but des fonctions shiny est de proposer des cartes realisables et modifiables rapidement avec un minimum de parametrage. En effet, une mise en forme specifique pourra s'effecuer dans Qgis pour la diffusion par exemple.
 	
 	Il est obligatoire de renseigner le contour du territoire d'études dans le paramètre \code{fondContour}.
+	
+	Il est possible de remplacer le fond d'habillage par defaut (France metropolitaine ou DOM) par un autre fond. Pour cela, il faut specifier le parametre emprise="999" ET ajouter un fond sf dans le parametre fondEtranger, par exemple, une carte de l'Europe ou d'un pays particulier.
+	Le systeme de coordonnees du fond doit etre projete (en unite de longueur) et non geographique (lng/lat).
+	Si aucun code EPSG valide n'est trouve pour ce fond, le code EPSG 3395 est choisi (projection Mercator). Attention car la legende des ronds sera d'autant plus deformee qu'elle se situera loin de l'equateur.
 	
   \describe{
 	\item{Ronds proportionnels}{

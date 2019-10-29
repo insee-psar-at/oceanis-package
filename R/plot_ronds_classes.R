@@ -1,5 +1,5 @@
 plot_ronds_classes <-
-function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,precisionLegRonds=0,precisionLegClasses=1,dom="0",fondChx=NULL,titreLegRonds="",titreLegClasses="",xLegRonds=NULL,yLegRonds=NULL,xLegClasses=NULL,yLegClasses=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
+function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,precisionLegRonds=0,precisionLegClasses=1,emprise="FRM",fondChx=NULL,titreLegRonds="",titreLegClasses="",xLegRonds=NULL,yLegRonds=NULL,xLegClasses=NULL,yLegClasses=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
@@ -21,7 +21,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     if(!is.null(bornes)) if(any(class(bornes)!="numeric")) msg_error12 <- "La variable doit etre un vecteur numerique / "
     if(any(class(precisionLegRonds)!="numeric")) msg_error13 <- "La variable precisionLegRonds doit etre de type numerique / "
     if(any(class(precisionLegClasses)!="numeric")) msg_error14 <- "La variable precisionLegClasses doit etre de type numerique / "
-    if(any(class(dom)!="character")) msg_error15 <- "La valeur doit etre de type caractere ('0', '971', '972', '973', '974' ou '976') / "
+    if(any(class(emprise)!="character")) msg_error15 <- "La valeur doit etre de type caractere ('FRM', '971', '972', '973', '974' ou '976') / "
     if(!is.null(fondChx)) if(any(!any(class(fondChx) %in% "sf"),!any(class(fondChx) %in% "data.frame"))) msg_error16 <- "Le fond des chx doit etre un objet sf / "
     if(any(class(titreLegRonds)!="character")) msg_error17 <- "Le titre de la legende doit etre de type caractere / "
     if(any(class(titreLegClasses)!="character")) msg_error18 <- "Le titre de la legende doit etre de type caractere / "
@@ -47,7 +47,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     if(!any(names(data) %in% varVolume))  msg_error36 <- "La variable a representer n'existe pas dans la table des donnees / "
     if(!any(names(data) %in% varRatio))  msg_error37 <- "La variable a representer n'existe pas dans la table des donnees / "
     if(!methode %in% c("kmeans","fisher","jenks","quantile")) msg_error38 <- "Le nom de la methode doit etre 'kmeans', 'fisher', 'jenks' ou 'quantile' / "
-    if(!dom %in% c("0","971","972","973","974","976")) msg_error39 <- "La variable dom doit etre '0', '971', '972', '973', '974' ou '976' / "
+    if(!emprise %in% c("FRM","971","972","973","974","976")) msg_error39 <- "La variable emprise doit etre 'FRM', '971', '972', '973', '974' ou '976' / "
     
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
@@ -114,8 +114,8 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
       sourceCarte<-iconv(sourceCarte,"latin1","utf8")
     }
     
-    code_epsg <- switch(dom, #DOM
-                        "0"="2154",# Lambert 93
+    code_epsg <- switch(emprise, #emprise
+                        "FRM"="2154",# Lambert 93
                         "971"="32620",# UTM 20 N
                         "972"="32620",# UTM 20 N
                         "973"="2972",# UTM 22 N

@@ -84,7 +84,7 @@ function(map)
       {
         var_classes <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$var_ratio
         var_ronds <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$var_volume
-        dom <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$dom
+        emprise <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$emprise
         
         if(length(map$x$calls[[idx_carte_ronds[1]]]$args[[4]][[2]])==4) # representation elargie
         {
@@ -129,7 +129,7 @@ function(map)
         gg <- lapply(1:length(pal_classes), function(x) ronds_pl[ronds_pl$classe %in% rev(pal_classes)[x],"classe"] <<- x)
         rm(gg)
         
-        list_fonds[[l]] <- ronds_pl
+        list_fonds[[l]] <- st_sf(geometry=ronds_pl, crs = paste0("+init=epsg:",code_epsg))
         nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$nom_fond)
         l <- l+1
       }
@@ -223,6 +223,6 @@ function(map)
         }
       }
       
-      return(list(list_fonds,nom_fonds,titre,source,table_classe,titre_leg,var_classes,var_ronds,dom))
+      return(list(list_fonds,nom_fonds,titre,source,table_classe,titre_leg,var_classes,var_ronds,emprise))
     }
   }

@@ -250,11 +250,8 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
         )
       }
     }
-    
-    if(!is.null(map_leaflet))
-    {
-      message(simpleMessage(paste0("[INFO] Les coordonn","\u00e9","es de la l\u00e9gende des ronds sont : longitude (x) = ",lng," degr\u00e9 ; latitude (y) = ",lat," degr\u00e9")))
-    }
+
+    message(simpleMessage(paste0("[INFO] Les coordonn","\u00e9","es de la l\u00e9gende des ronds sont : longitude (x) = ",lng," degr\u00e9 ; latitude (y) = ",lat," degr\u00e9")))
     
     return(map)
   }

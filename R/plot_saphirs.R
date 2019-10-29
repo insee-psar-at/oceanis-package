@@ -1,5 +1,5 @@
 plot_saphirs <-
-function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idDataDepart,idDataArrivee,varFlux,largeurFlecheMax=NULL,direction="Ent",filtreVol=0,dom="0",precisionLegFleches=0,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,colEntree="#CD853F",colSortie="#6495ED",colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
+function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idDataDepart,idDataArrivee,varFlux,largeurFlecheMax=NULL,direction="Ent",filtreVol=0,emprise="FRM",precisionLegFleches=0,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,colEntree="#CD853F",colSortie="#6495ED",colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
@@ -18,7 +18,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
     if(!is.null(largeurFlecheMax)) if(any(class(largeurFlecheMax)!="numeric")) msg_error9 <- "La largeur de la fleche max doit etre de type numerique (en km) / "
     if(any(class(direction)!="character")) msg_error10 <- "La direction des fleches doit etre de type caractere / "
     if(any(class(filtreVol)!="numeric")) msg_error11 <- "Le filtre doit etre de type numerique / "
-    if(any(class(dom)!="character")) msg_error12 <- "La valeur doit etre de type caractere ('0', '971', '972', '973', '974' ou '976') / "
+    if(any(class(emprise)!="character")) msg_error12 <- "La valeur doit etre de type caractere ('FRM', '971', '972', '973', '974' ou '976') / "
     if(any(class(precisionLegFleches)!="numeric")) msg_error13 <- "La variable precisionLegFleches doit etre de type numerique / "
     if(any(class(titreLeg)!="character")) msg_error14 <- "Le titre de la legende doit etre de type caractere / "
     if(!is.null(xLeg)) if(any(class(xLeg)!="numeric")) msg_error15 <- "La variable xLeg doit etre de type numerique / "
@@ -40,7 +40,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
     if(!any(names(data) %in% idDataDepart))  msg_error29 <- "La variable de depart n'existe pas dans la table des donnees / "
     if(!any(names(data) %in% idDataArrivee))  msg_error30 <- "La variable d'arrivee n'existe pas dans la table des donnees / "
     if(!any(names(data) %in% varFlux))  msg_error31 <- "La variable a representer n'existe pas dans la table des donnees / "
-    if(!dom %in% c("0","971","972","973","974","976")) msg_error32 <- "La variable dom doit etre '0', '971', '972', '973', '974' ou '976' / "
+    if(!emprise %in% c("FRM","971","972","973","974","976")) msg_error32 <- "La variable emprise doit etre 'FRM', '971', '972', '973', '974' ou '976' / "
     
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
@@ -93,8 +93,8 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
       sourceCarte<-iconv(sourceCarte,"latin1","utf8")
     }
     
-    code_epsg <- switch(dom, #DOM
-                        "0"="2154",# Lambert 93
+    code_epsg <- switch(emprise, #emprise
+                        "FRM"="2154",# Lambert 93
                         "971"="32620",# UTM 20 N
                         "972"="32620",# UTM 20 N
                         "973"="2972",# UTM 22 N

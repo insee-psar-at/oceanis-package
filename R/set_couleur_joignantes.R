@@ -54,7 +54,7 @@ function(map,colFleche="#CD853F",colBorder="black",map_leaflet=NULL)
       analyse_WGS84 <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$analyse_WGS84
       donnees <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$donnees
       code_epsg <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$code_epsg
-      dom <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$dom
+      emprise <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$emprise
       varFlux <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$var_flux
       max_var <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$max_var
       largeurFlecheMax <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$largeur
@@ -69,7 +69,7 @@ function(map,colFleche="#CD853F",colBorder="black",map_leaflet=NULL)
                          popup = paste0("<b><font color=#2B3E50>",donnees$CODE1," vers ",donnees$CODE2,"<br>",varFlux," : ",donnees[,varFlux],"</font></b>"),
                          fill = T, fillColor = colFleche, fillOpacity = 1,
                          group = "carte_joignantes",
-                         layerId = list(analyse_WGS84=analyse_WGS84,donnees=donnees,code_epsg=code_epsg,dom=dom,nom_fond="fond_flux",var_flux=varFlux,max_var=max_var,largeur=largeurFlecheMax,distance=large_pl)
+                         layerId = list(analyse_WGS84=analyse_WGS84,donnees=donnees,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_flux",var_flux=varFlux,max_var=max_var,largeur=largeurFlecheMax,distance=large_pl)
       )
       
       if(!is.null(idx_legende))

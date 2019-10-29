@@ -44,7 +44,7 @@ function(map)
       var_flux <- map$x$calls[[idx_fleche]]$args[[2]]$var_flux
       
       code_epsg <- map$x$calls[[idx_fleche]]$args[[2]]$code_epsg
-      dom <- map$x$calls[[idx_fleche]]$args[[2]]$dom
+      emprise <- map$x$calls[[idx_fleche]]$args[[2]]$emprise
       
       list_fonds <- list()
       nom_fonds <- c()
@@ -136,6 +136,6 @@ function(map)
       }
       colBorder <- map$x$calls[[idx_fleche]]$args[4][[1]]$color
       
-      return(list(list_fonds,nom_fonds,titre,source,colEntree,colSortie,colBorder,dom))
+      return(list(list_fonds,nom_fonds,titre,source,colEntree,colSortie,colBorder,emprise))
     }
   }

@@ -22,6 +22,7 @@ function(map,cheminDossier,nomFichier,titre1="",titre2="",source="")
     
     if(any(list_fonds[[2]] %in% "fond_france")) l <- c(l,"fond_france")
     if(any(list_fonds[[2]] %in% "fond_pays"))l <- c(l,"fond_pays")
+    if(any(list_fonds[[2]] %in% "fond_etranger"))l <- c(l,"fond_etranger")
     
     if(any(list_fonds[[2]] %in% "fond_territoire")) l <- c(l,"fond_territoire")
     if(any(list_fonds[[2]] %in% "fond_departement")) l <- c(l,"fond_departement")

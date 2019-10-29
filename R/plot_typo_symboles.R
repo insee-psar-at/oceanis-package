@@ -1,5 +1,5 @@
 plot_typo_symboles <-
-function(fondPoints,listFonds,dom="0",types=NULL,couleurs=NULL,tailles=NULL,epaisseurs=NULL,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,labels=NULL,xlim=NULL,ylim=NULL)
+function(fondPoints,listFonds,emprise="FRM",types=NULL,couleurs=NULL,tailles=NULL,epaisseurs=NULL,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,labels=NULL,xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
@@ -9,7 +9,7 @@ function(fondPoints,listFonds,dom="0",types=NULL,couleurs=NULL,tailles=NULL,epai
     
     if(any(!any(class(fondPoints) %in% "sf"),!any(class(fondPoints) %in% "data.frame"))) msg_error1 <- "Le fond de points doit etre un objet sf / "
     if(any(!any(class(listFonds[[1]]) %in% "sf"),!any(class(listFonds[[1]]) %in% "data.frame"))) msg_error2 <- "La liste des fonds doit etre une liste d'objets sf / "
-    if(any(class(dom)!="character")) msg_error3 <- "La valeur doit etre de type caractere ('0', '971', '972', '973', '974' ou '976') / "
+    if(any(class(emprise)!="character")) msg_error3 <- "La valeur doit etre de type caractere ('FRM', '971', '972', '973', '974' ou '976') / "
     if(!is.null(types)) if(any(class(types)!="numeric")) msg_error4 <- "Le type des symboles doit etre un vecteur de valeurs numeriques (de 0 a 25 - voir aide) / "
     if(!is.null(couleurs)) if(any(class(couleurs)!="character")) msg_error5 <- "La couleur des symboles doit etre un vecteur de chaines de caracteres (nommee ou hexadecimal) / "
     if(!is.null(tailles)) if(any(class(tailles)!="numeric")) msg_error6 <- "La taille des symboles doit etre un vecteur de valeurs numeriques / "
@@ -20,7 +20,7 @@ function(fondPoints,listFonds,dom="0",types=NULL,couleurs=NULL,tailles=NULL,epai
     if(any(class(titreCarte)!="character")) msg_error11 <- "Le titre de la carte doit etre de type caractere / "
     if(any(class(sourceCarte)!="character")) msg_error12 <- "La source de la carte doit etre de type caractere / "
     if(!is.null(etiquettes)) if(!any(class(etiquettes) %in% "character" | class(etiquettes) %in% "data.frame")) msg_error13 <- "La table des etiquettes peut etre soit un vecteur caractere soit un data.frame (voir aide) / "
-    if(!dom %in% c("0","971","972","973","974","976")) msg_error14 <- "La variable dom doit etre '0', '971', '972', '973', '974' ou '976' / "
+    if(!emprise %in% c("FRM","971","972","973","974","976")) msg_error14 <- "La variable emprise doit etre 'FRM', '971', '972', '973', '974' ou '976' / "
     if(!is.null(labels)) if(any(class(labels)!="character")) msg_error15 <- "Les labels doivent etre un vecteur de type caractere / "
     if(!is.null(xlim)) if(any(class(xlim)!="numeric")) msg_error16 <- "La variable xlim doit etre de type numerique / "
     if(!is.null(ylim)) if(any(class(ylim)!="numeric")) msg_error17 <- "La variable yim doit etre de type numerique / "
@@ -38,8 +38,8 @@ function(fondPoints,listFonds,dom="0",types=NULL,couleurs=NULL,tailles=NULL,epai
     names(fondPoints)[2] <- "LIBELLE"
     fondPoints$LIBELLE<-iconv(fondPoints$LIBELLE,"latin1","utf8")
     
-    code_epsg <- switch(dom, #DOM
-                        "0"="2154",# Lambert 93
+    code_epsg <- switch(emprise, #emprise
+                        "FRM"="2154",# Lambert 93
                         "971"="32620",# UTM 20 N
                         "972"="32620",# UTM 20 N
                         "973"="2972",# UTM 22 N

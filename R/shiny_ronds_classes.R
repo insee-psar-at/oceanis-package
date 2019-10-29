@@ -1,10 +1,10 @@
 shiny_ronds_classes <-
-function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData,varVolume,varRatio,dom="0",fondChx=NULL)
+function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData,varVolume,varRatio,emprise="FRM",fondEtranger=NULL,fondChx=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
     # Verification des parametres
-    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19 <- NULL
+    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20<-msg_error21 <- NULL
     
     if(any(class(data)!="data.frame")) msg_error1 <- "Les donnees doivent etre dans un data.frame / "
     if(any(!any(class(fondMaille) %in% "sf"),!any(class(fondMaille) %in% "data.frame"))) msg_error2 <- "Le fond de maille doit etre un objet sf / "
@@ -14,7 +14,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
     if(any(class(idData)!="character")) msg_error6 <- "Le nom de la variable doit etre de type caractere / "
     if(any(class(varVolume)!="character")) msg_error7 <- "Le nom de la variable doit etre de type caractere / "
     if(any(class(varRatio)!="character")) msg_error8 <- "Le nom de la variable doit etre de type caractere / "
-    if(any(class(dom)!="character")) msg_error9 <- "La valeur doit etre de type caractere ('0', '971', '972', '973', '974' ou '976') / "
+    if(any(class(emprise)!="character")) msg_error9 <- "La valeur doit etre de type caractere ('FRM', '971', '972', '973', '974', '976' ou '999') / "
     if(!is.null(fondChx)) if(any(!any(class(fondChx) %in% "sf"),!any(class(fondChx) %in% "data.frame"))) msg_error10 <- "Le fond des chx doit etre un objet sf / "
     
     if(length(names(data))<3) msg_error11 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et les 2 variables a representer / "
@@ -26,16 +26,20 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
     if(!any(names(data) %in% idData))  msg_error16 <- "La variable identifiant les donnees n'existe pas dans la table des donnees / "
     if(!any(names(data) %in% varVolume))  msg_error17 <- "La variable a representer n'existe pas dans la table des donnees / "
     if(!any(names(data) %in% varRatio))  msg_error18 <- "La variable a representer n'existe pas dans la table des donnees / "
-    if(!dom %in% c("0","971","972","973","974","976")) msg_error19 <- "La variable dom doit etre '0', '971', '972', '973', '974' ou '976' / "
+    if(!emprise %in% c("FRM","971","972","973","974","976","999")) msg_error19 <- "La variable emprise doit etre 'FRM', '971', '972', '973', '974', '976' ou '999' / "
+    if(!is.null(fondEtranger)) if(any(!any(class(fondEtranger) %in% "sf"),!any(class(fondEtranger) %in% "data.frame"))) msg_error20 <- "Le fond etranger doit etre un objet sf / "
+    if(!is.null(fondEtranger)) if(length(names(fondEtranger))<3) msg_error21 <- "Le fond etranger n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
     
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
            !is.null(msg_error9),!is.null(msg_error10),!is.null(msg_error11),!is.null(msg_error12),
            !is.null(msg_error13),!is.null(msg_error14),!is.null(msg_error15),!is.null(msg_error16),
-           !is.null(msg_error17),!is.null(msg_error18),!is.null(msg_error18)))
+           !is.null(msg_error17),!is.null(msg_error18),!is.null(msg_error18),!is.null(msg_error19),
+           !is.null(msg_error20),!is.null(msg_error21)))
     {
       stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6,msg_error7,msg_error8,
-                              msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,msg_error16,msg_error17,msg_error18,msg_error19)))
+                              msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,
+                              msg_error16,msg_error17,msg_error18,msg_error19,msg_error20,msg_error21)))
     }
     
     nb_up <- reactiveValues(a=0)
@@ -65,6 +69,19 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       names(fondMailleElargi)[1] <- "CODE"
       names(fondMailleElargi)[2] <- "LIBELLE"
       fondMailleElargi$LIBELLE<-iconv(fondMailleElargi$LIBELLE,"latin1","utf8")
+    }
+    epsg_etranger <- NULL
+    if(!is.null(fondEtranger)) 
+    {
+      names(fondEtranger)[1] <- "CODE"
+      names(fondEtranger)[2] <- "LIBGEO"
+      fondEtranger$LIBGEO<-iconv(fondEtranger$LIBGEO,"latin1","utf8")
+      
+      epsg_etranger <- st_crs(fondEtranger)$epsg
+      if(is.na(epsg_etranger) | epsg_etranger=="4326")
+      {
+        epsg_etranger <- "3395" # Mercator
+      }
     }
     if(!is.null(fondSuppl)) 
     {
@@ -868,13 +885,14 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       })
       
       code_epsg_rp_ac <- reactive({
-        code_epsg <- switch(dom, #DOM
-                            "0"="2154",# Lambert 93
+        code_epsg <- switch(emprise,
+                            "FRM"="2154",# Lambert 93
                             "971"="32620",# UTM 20 N
                             "972"="32620",# UTM 20 N
                             "973"="2972",# UTM 22 N
                             "974"="2975",# UTM 40 S
-                            "976"="4471")# UTM 38 S
+                            "976"="4471",# UTM 38 S
+                            "999"=epsg_etranger)
         return(code_epsg)
       })
       
@@ -914,40 +932,43 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       })
       
       fond_habillage_rp_ac <- reactive({
-        if(dom=="0")
+        
+        if(emprise=="FRM")
         {
-          pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-          fra <- st_transform(sf_fram(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        }else
+          fond_pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          fond_france <- st_transform(sf_fram(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        }else if(emprise!="999")
         {
-          if(dom=="971")
+          if(emprise=="971")
           {
-            fra <- st_transform(sf_reg01(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-            pays <- fra
+            fond_france <- st_transform(sf_reg01(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_pays <- fond_france
           }
-          if(dom=="972")
+          if(emprise=="972")
           {
-            fra <- st_transform(sf_reg02(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-            pays <- fra
+            fond_france <- st_transform(sf_reg02(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_pays <- fond_france
           }
-          if(dom=="973")
+          if(emprise=="973")
           {
-            fra <- st_transform(sf_reg03(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-            pays <- st_transform(sf_pays973(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_france <- st_transform(sf_reg03(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_pays <- st_transform(sf_pays973(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
           }
-          if(dom=="974")
+          if(emprise=="974")
           {
-            fra <- st_transform(sf_reg04(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-            pays <- fra
+            fond_france <- st_transform(sf_reg04(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_pays <- fond_france
           }
-          if(dom=="976")
+          if(emprise=="976")
           {
-            fra <- st_transform(sf_reg06(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-            pays <- fra
+            fond_france <- st_transform(sf_reg06(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_pays <- fond_france
           }
-        }
-        fond_france <- fra
-        fond_pays <- pays
+        }else if(emprise=="999")
+        {
+          fond_france <- st_transform(fondEtranger,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          fond_pays <- fond_france
+        }else{}
         
         return(list(fond_france,fond_pays))
       })
@@ -998,11 +1019,9 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         {
           if(input$taille_rond_rp_ac_id>calcul_max_rayon_metres_rp_ac()[[1]])
           {
-            taille_rond_m <- calcul_max_rayon_metres_rp_ac()[[1]]
-          }else
-          {
-            taille_rond_m <- input$taille_rond_rp_ac_id
+            showModal(modalDialog(HTML(paste0("Le rayon du rond le plus grand est trop \u00e9lev\u00e9 et ne permet pas de respecter la r\u00e8gle s\u00e9miologique des 1/7\u00e8me. Le rayon max conseill\u00e9 est ",round(calcul_max_rayon_metres_rp_ac()[[1]],2)," m\u00e8tres.")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
           }
+          taille_rond_m <- input$taille_rond_rp_ac_id
         }else
         {
           taille_rond_m <- NULL
@@ -1197,7 +1216,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
             addMapPane(name = "fond_legende", zIndex = 411)
           
           # AFFICHAGE DES FONDS D'HABILLAGE
-          if(dom %in% c("0","973"))
+          
+          if(emprise %in% c("FRM","973"))
           {
             # fond des pays
             m <- addPolygons(map = m, data = fond_habillage_rp_ac()[[2]][,"LIBGEO"], opacity = 1, # fond_pays sauf la France
@@ -1209,7 +1229,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
             )
           }
           
-          # fond de la France metro ou d'un DOM
+          # fond de la France metro, DOM ou etranger
           m <- addPolygons(map = m, data = fond_habillage_rp_ac()[[1]][,"LIBGEO"], opacity = 1, # fond_france
                            stroke = TRUE, color = "black",
                            weight = 1.5,
@@ -1330,7 +1350,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         
         clearGroup(map = proxy, group = "region")
         
-        if(dom=="0")
+        if(emprise=="FRM")
         {
           if(input$ajout_reg_rp_ac_id)
           {
@@ -1352,7 +1372,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         
         clearGroup(map = proxy, group = "departement")
         
-        if(dom=="0")
+        if(emprise=="FRM")
         {
           if(input$ajout_dep_rp_ac_id)
           {

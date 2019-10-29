@@ -11,8 +11,7 @@
 	Modify the colors of 'leaflet' map's analysis.
 }
 \usage{
-set_couleur_ronds(map, colorPos = "#CD853F", colorNeg = "#6495ED", colBorder = "white",
-map_leaflet = NULL)
+set_couleur_ronds(map, colorPos = "#CD853F", colorNeg = "#6495ED", map_leaflet = NULL)
 
 set_couleur_classes(map, stylePalette = "defaut", palettePos = NULL, paletteNeg = NULL,
 colBorder = "white", map_leaflet = NULL)
@@ -48,7 +47,7 @@ colBorder = "black", map_leaflet = NULL)
 	vecteur de caracteres (character). Specifier le vecteur de couleurs (nommees ou hexadecimal) de la typologie (au choix). Par defaut a NULL.
 }
   \item{colBorder}{
-	chaine de caracteres (character). Couleur nommee (par exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white".
+	chaine de caracteres (character). Couleur nommee (par exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white" pour classes et typo, "black" pour joignantes et saphirs.
 }
   \item{colFleche}{
 	chaine de caracteres (character). Couleur nommee ou hexadecimal. Par defaut "#CD853F".
@@ -101,10 +100,17 @@ data("depm")
 
 data("donnees_monoloc")
 
+# Ronds proportionnels
+map <- leaflet_ronds(data = donnees_monoloc, fondMaille = depm, idData = "COD_DEP",
+varVolume = "POP_2015")
+map <- set_couleur_ronds(map = map, colorPos = "orange")
+\donttest{
+ map
+}
+
 # Ronds proportionnels sur une analyse en classes
 map <- leaflet_classes_ronds(data = donnees_monoloc, fondMaille = depm, idData = "COD_DEP",
 varVolume = "POP_2015", varRatio = "VAR_AN_MOY", nbClasses = 4)
-map <- set_couleur_ronds(map = map, colBorder = "grey")
 map <- set_couleur_classes(map = map, stylePalette = "InseePremiere", colBorder = "black")
 \donttest{
  map

@@ -14,9 +14,12 @@ function(map)
     lng_ronds <- NULL
     lat_ronds <- NULL
     
-    if(any(map$x$calls[[12]]$args[[3]] %in% c("carte_ronds_init","carte_ronds_classes_init","carte_classes_ronds_init")))
+    for(i in 1:length(map$x$calls))
     {
-      ronds <- TRUE
+      if(map$x$calls[[i]]$method %in% "addCircles")
+      {
+        ronds <- TRUE
+      }
     }
     
     if(ronds) # La map comporte une une analyse en ronds
@@ -32,8 +35,8 @@ function(map)
       
       if(length(j)==1) # La legende n'a pas encore ete creee, on recupere une position par defaut de la legende
       {
-        lng_classes <- map$x$fitBounds[[4]]
-        lat_classes <- map$x$fitBounds[[3]]
+        lng_ronds <- map$x$fitBounds[[4]]
+        lat_ronds <- map$x$fitBounds[[3]]
       }else # On recupere la derniere position connue de la legende
       {
         lng_ronds <- map$x$calls[[j[length(j)]]]$args[[2]][[1]]
@@ -44,9 +47,15 @@ function(map)
     classes <- FALSE
     lng_classes <- NULL
     lat_classes <- NULL
-    if(any(map$x$calls[[12]]$args[[3]] %in% c("carte_classes_init","carte_ronds_classes_init","carte_classes_ronds_init","carte_typo_init")))
+    for(i in 1:length(map$x$calls))
     {
-      classes <- TRUE
+      if(map$x$calls[[i]]$method %in% "addPolygons")
+      {
+        if(any(map$x$calls[[i]]$args[[3]] %in% c("carte_classes_init","carte_ronds_classes_init","carte_classes_ronds_init","carte_typo_init")))
+        {
+          classes <- TRUE
+        }
+      }
     }
     
     if(classes) # La map comporte une une analyse en classes
@@ -54,7 +63,7 @@ function(map)
       j <- NULL
       for(i in 1:length(map$x$calls))
       {
-        if(map$x$calls[[i]]$method %in% "addPolygons")
+        if(map$x$calls[[i]]$method %in% "addPolygons")# On compte le nombre d'objets polygons dans le leaflet
         {
           j <- c(j,i)
         }
@@ -74,12 +83,18 @@ function(map)
     fleches <- FALSE
     lng_fleches <- NULL
     lat_fleches <- NULL
-    if(any(map$x$calls[[12]]$args[[3]] %in% c("carte_joignantes_init","carte_saphirs_init")))
+    for(i in 1:length(map$x$calls))
     {
-      fleches <- TRUE
+      if(map$x$calls[[i]]$method %in% "addPolygons")
+      {
+        if(any(map$x$calls[[i]]$args[[3]] %in% c("carte_joignantes_init","carte_saphirs_init")))
+        {
+          fleches <- TRUE
+        }
+      }
     }
     
-    if(fleches) # La map comporte une une analyse en ronds
+    if(fleches) # La map comporte une une analyse en fleches
     {
       j <- NULL
       for(i in 1:length(map$x$calls)) # On compte le nombre d'objets circle dans le leaflet

@@ -138,16 +138,14 @@ ze13etplus <- zonage_a_facon(fondMaille = com_dep_13_30_83_84,
                              idMaille = "DEPCOM",
                              idGroupe = "ZE2010",
                              libGroupe = "LIB_ZE2010",
-                             fondContour = NULL,
-                             dom = "0")
+                             fondContour = NULL)
 # creation du zonage des zones d'emploi des Bouches-du-Rhone (partie tronquee des ze au contour du departement)
 ze13 <- zonage_a_facon(fondMaille = com_dep_13_30_83_84,
                        groupe = donnees_a_facon,
                        idMaille = "DEPCOM",
                        idGroupe = "ZE2010",
                        libGroupe = "LIB_ZE2010",
-                       fondContour = depm[depm$code=="13",],
-                       dom = "0")
+                       fondContour = depm[depm$code=="13",])
 
 # visualisation de la geometrie
 # modification des marges
@@ -662,7 +660,7 @@ map <- add_titre(map = map,
                  titre = "Population des departements de la region Provence-Alpes-Cote d'Azur en 2015 et son evolution depuis 2010")
 # modification de la couleur de bordure des ronds
 map <- set_couleur_ronds(map = map,
-                         colBorder = "grey")
+                         colBorderPos = "grey")
 # modification du style de la palette
 map <- set_couleur_classes(map = map,
                            stylePalette = "InseePremiere")

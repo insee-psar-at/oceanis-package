@@ -43,7 +43,7 @@ function(map,epaisseur=2,colTrait="black",map_leaflet=NULL)
       analyse_WGS84 <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$analyse_WGS84
       donnees <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$donnees
       code_epsg <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$code_epsg
-      dom <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$dom
+      emprise <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$emprise
       varFlux <- map_leaflet$x$calls[[idx_fleche]]$args[[2]]$var_flux
       
       map <- addPolylines(map = map,
@@ -54,7 +54,7 @@ function(map,epaisseur=2,colTrait="black",map_leaflet=NULL)
                           options = pathOptions(pane = "fond_oursins", clickable = T),
                           popup = paste0("<b><font color=#2B3E50>",donnees$CODE1," vers ",donnees$CODE2,"<br>",varFlux," : ",donnees[,varFlux],"</font></b>"),
                           group = "carte_oursins",
-                          layerId = list(analyse_WGS84=analyse_WGS84,donnees=donnees,code_epsg=code_epsg,dom=dom,nom_fond="fond_flux",var_flux=varFlux)
+                          layerId = list(analyse_WGS84=analyse_WGS84,donnees=donnees,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_flux",var_flux=varFlux)
       )
     }
     

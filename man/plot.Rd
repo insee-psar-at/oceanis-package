@@ -16,7 +16,7 @@
 }
 \usage{
 plot_ronds(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL, idData,
-varVolume, rayonRond = NULL, rapportRond = NULL, dom = "0", fondChx = NULL,
+varVolume, rayonRond = NULL, rapportRond = NULL, emprise = "FRM", fondChx = NULL,
 precisionLegRonds = 0, titreLeg = "", xLeg = NULL, yLeg = NULL,
 titreCarte = "", sourceCarte = "", etiquettes = NULL, colPos = "#CD853F",
 colNeg = "#6495ED", colBorder = "white", colBorderMaille = "black",
@@ -32,7 +32,7 @@ colBorder = "white", xlim = NULL, ylim = NULL)
 plot_ronds_classes(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL,
 idData, varVolume, varRatio, rayonRond = NULL, rapportRond = NULL,
 methode = "kmeans", nbClasses = 3, bornes = NULL,
-precisionLegRonds = 0, precisionLegClasses = 1, dom = "0",
+precisionLegRonds = 0, precisionLegClasses = 1, emprise = "FRM",
 fondChx = NULL, titreLegRonds = "", titreLegClasses = "",
 xLegRonds = NULL, yLegRonds = NULL, xLegClasses = NULL,
 yLegClasses = NULL, titreCarte = "", sourceCarte = "",
@@ -43,7 +43,7 @@ xlim = NULL, ylim = NULL)
 plot_classes_ronds(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL,
 idData, varVolume, varRatio, rayonRond = NULL, rapportRond = NULL,
 methode = "kmeans", nbClasses = 3, bornes = NULL,
-precisionLegRonds = 0, precisionLegClasses = 1, dom = "0",
+precisionLegRonds = 0, precisionLegClasses = 1, emprise = "FRM",
 fondChx = NULL, titreLegRonds = "", titreLegClasses = "",
 xLegRonds = NULL, yLegRonds = NULL, xLegClasses = NULL,
 yLegClasses = NULL, titreCarte = "", sourceCarte = "",
@@ -56,9 +56,9 @@ varTypo, titreLeg = "", xLeg = NULL, yLeg = NULL, titreCarte = "",
 sourceCarte = "", etiquettes = NULL, paletteTypo = NULL, labels = NULL,
 colBorder = "white", xlim = NULL, ylim = NULL)
 
-plot_typo_symboles(fondPoints, listFonds, dom = "0", types = NULL, couleurs = NULL,
-tailles = NULL, epaisseurs = NULL, titreLeg = "", xLeg = NULL, yLeg = NULL,
-titreCarte = "", sourceCarte = "", etiquettes = NULL, labels = NULL,
+plot_typo_symboles(fondPoints, listFonds, emprise = "FRM", types = NULL,
+couleurs = NULL, tailles = NULL, epaisseurs = NULL, titreLeg = "", xLeg = NULL,
+yLeg = NULL, titreCarte = "", sourceCarte = "", etiquettes = NULL, labels = NULL,
 xlim = NULL, ylim = NULL)
 
 plot_oursins(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL,
@@ -71,14 +71,14 @@ plot_joignantes(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL,
 typeMaille, idDataDepart, idDataArrivee, varFlux,
 largeurFlecheMax = NULL, filtreVol = 0, filtreDist = 100,
 filtreMajeurs = 10, decalageAllerRetour = 0, decalageCentroid = 0,
-dom = "0", precisionLegFleches = 0, titreLeg = "",
+emprise = "FRM", precisionLegFleches = 0, titreLeg = "",
 xLeg = NULL, yLeg = NULL, titreCarte = "", sourceCarte = "",
 etiquettes = NULL, colFleche = "#CD853F",
 colBorder = "white", colBorderMaille = "black", xlim = NULL, ylim = NULL)
 
 plot_saphirs(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL,
 typeMaille, idDataDepart, idDataArrivee, varFlux, largeurFlecheMax = NULL,
-direction = "Ent", filtreVol = 0, dom = "0",  precisionLegFleches = 0,
+direction = "Ent", filtreVol = 0, emprise = "FRM",  precisionLegFleches = 0,
 titreLeg = "", xLeg = NULL, yLeg = NULL, titreCarte = "", sourceCarte = "",
 etiquettes = NULL, colEntree = "#CD853F", colSortie = "#6495ED",
 colBorder = "white",  colBorderMaille = "black", xlim = NULL, ylim = NULL)
@@ -171,8 +171,8 @@ colBorder = "white",  colBorderMaille = "black", xlim = NULL, ylim = NULL)
   \item{decalageCentroid}{
 	valeur numerique (numeric). Decalage des fleches depuis et vers les centroides des territoires (km).
 }
-  \item{dom}{
-	chaine de caracteres (character). "0" (par defaut pour la France metropolitaine), "971" (Guadeloupe), "972" (Martinique), "973" (Guyane), "974" (La Reunion) ou "976" (Mayotte). Ce parametre permet de definir le systeme de projection de la carte.
+  \item{emprise}{
+	chaine de caracteres (character). "FRM" (par defaut pour la France metropolitaine), "971" (Guadeloupe), "972" (Martinique), "973" (Guyane), "974" (La Reunion) ou "976" (Mayotte). Ce parametre permet de definir le systeme de projection de la carte.
 }
   \item{fondChx}{
 	objet sf. Fond des chefs-lieux. Pour les ronds proportionnels avec une maille communale uniquement, choix entre position du centre des ronds sur les centroides des communes (NULL par defaut) ou sur les chefs-lieux (chx) des communes.

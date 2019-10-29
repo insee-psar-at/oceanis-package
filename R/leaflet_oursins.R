@@ -1,10 +1,10 @@
 leaflet_oursins <-
-function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtreVol=0,filtreDist=100,filtreMajeurs=10,decalageAllerRetour=0,decalageCentroid=0,dom="0",zoomMaille=NULL,map_proxy=NULL)
+function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtreVol=0,filtreDist=100,filtreMajeurs=10,decalageAllerRetour=0,decalageCentroid=0,emprise="FRM",fondEtranger=NULL,zoomMaille=NULL,map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
     # Verification des parametres
-    leafletVerifParamOursins(data,fondMaille,fondSuppl,idDataDepart,idDataArrivee,varFlux,filtreVol,filtreDist,filtreMajeurs,decalageAllerRetour,decalageCentroid,dom,map_proxy)
+    leafletVerifParamOursins(data,fondMaille,fondSuppl,idDataDepart,idDataArrivee,varFlux,filtreVol,filtreDist,filtreMajeurs,decalageAllerRetour,decalageCentroid,emprise,fondEtranger,map_proxy)
       
     names(data)[names(data)==idDataDepart] <- "CODE1"
     names(data)[names(data)==idDataArrivee] <- "CODE2"
@@ -16,7 +16,19 @@ function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtr
       names(fondSuppl)[2] <- "LIBELLE"
       fondSuppl$LIBELLE<-iconv(fondSuppl$LIBELLE,"latin1","utf8")
     }
-    
+    epsg_etranger <- NULL
+    if(!is.null(fondEtranger)) 
+    {
+      names(fondEtranger)[1] <- "CODE"
+      names(fondEtranger)[2] <- "LIBELLE"
+      fondEtranger$LIBELLE<-iconv(fondEtranger$LIBELLE,"latin1","utf8")
+      
+      epsg_etranger <- st_crs(fondEtranger)$epsg
+      if(is.na(epsg_etranger) | epsg_etranger=="4326")
+      {
+        epsg_etranger <- "3395" # Mercator
+      }
+    }
     fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","utf8")
     
     if(!is.null(map_proxy))
@@ -27,13 +39,14 @@ function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtr
       }
     }
     
-    code_epsg <- switch(dom, #DOM
-                        "0"="2154",# Lambert 93
+    code_epsg <- switch(emprise,
+                        "FRM"="2154",# Lambert 93
                         "971"="32620",# UTM 20 N
                         "972"="32620",# UTM 20 N
                         "973"="2972",# UTM 22 N
                         "974"="2975",# UTM 40 S
-                        "976"="4471")# UTM 38 S
+                        "976"="4471",# UTM 38 S
+                        "999"=epsg_etranger)
     
     # Analyse
     
@@ -45,40 +58,42 @@ function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtr
     
     # Fonds habillages
     
-    if(dom=="0")
+    if(emprise=="FRM")
     {
-      pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-      fra <- st_transform(sf_fram(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-    }else
+      fond_pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+      fond_france <- st_transform(sf_fram(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+    }else if(emprise!="999")
     {
-      if(dom=="971")
+      if(emprise=="971")
       {
-        fra <- st_transform(sf_reg01(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        pays <- fra
+        fond_france <- st_transform(sf_reg01(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_pays <- fond_france
       }
-      if(dom=="972")
+      if(emprise=="972")
       {
-        fra <- st_transform(sf_reg02(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        pays <- fra
+        fond_france <- st_transform(sf_reg02(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_pays <- fond_france
       }
-      if(dom=="973")
+      if(emprise=="973")
       {
-        fra <- st_transform(sf_reg03(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        pays <- st_transform(sf_pays973(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_france <- st_transform(sf_reg03(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_pays <- st_transform(sf_pays973(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
       }
-      if(dom=="974")
+      if(emprise=="974")
       {
-        fra <- st_transform(sf_reg04(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        pays <- fra
+        fond_france <- st_transform(sf_reg04(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_pays <- fond_france
       }
-      if(dom=="976")
+      if(emprise=="976")
       {
-        fra <- st_transform(sf_reg06(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        pays <- fra
+        fond_france <- st_transform(sf_reg06(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_pays <- fond_france
       }
-    }
-    fond_france <- fra
-    fond_pays <- pays
+    }else if(emprise=="999")
+    {
+      fond_etranger <- st_transform(fondEtranger,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+      fond_pays <- fond_etranger
+    }else{}
     
     maille_WGS84 <- st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
     
@@ -158,9 +173,10 @@ function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtr
         # Pour gerer l'ordre des calques
         addMapPane(name = "fond_pays", zIndex = 401) %>%
         addMapPane(name = "fond_france", zIndex = 402) %>%
-        addMapPane(name = "fond_territoire", zIndex = 403) %>%
-        addMapPane(name = "fond_maille", zIndex = 404) %>%
-        addMapPane(name = "fond_oursins", zIndex = 405) %>%
+        addMapPane(name = "fond_etranger", zIndex = 403) %>%
+        addMapPane(name = "fond_territoire", zIndex = 404) %>%
+        addMapPane(name = "fond_maille", zIndex = 405) %>%
+        addMapPane(name = "fond_oursins", zIndex = 406) %>%
         
         # On ajoute une barre d'echelle
         addScaleBar(position = 'bottomright',
@@ -168,29 +184,51 @@ function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtr
         )
       
       # AFFICHAGE DES FONDS D'HABILLAGE
-      if(dom %in% c("0","973"))
+      
+      if(emprise %in% c("FRM","973")) # France metro ou Guyane
       {
-        map <- addPolygons(map = map, data = fond_pays[,"LIBGEO"], opacity = 1, # fond_pays sauf la France
+        map <- addPolygons(map = map, data = fond_pays[,"LIBGEO"], opacity = 1,
                            stroke = TRUE, color = "white",
                            weight = 1,
                            popup = as.data.frame(fond_pays[,"LIBGEO"])[,-ncol(as.data.frame(fond_pays[,"LIBGEO"]))],
-                           options = pathOptions(pane = "fond_pays", clickable = F),
+                           options = pathOptions(pane = "fond_pays", clickable = T),
                            fill = T, fillColor = "#CCCCCC", fillOpacity = 1,
                            group = "carte_oursins_init",
                            layerId = list(fond_pays=fond_pays,code_epsg=code_epsg,nom_fond="fond_pays")
-                           
+        )
+        
+        map <- addPolygons(map = map, data = fond_france[,"LIBGEO"], opacity = 1,
+                           stroke = TRUE, color = "black",
+                           weight = 1.5,
+                           popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
+                           options = pathOptions(pane = "fond_france", clickable = T),
+                           fill = T, fillColor = "white", fillOpacity = 1,
+                           group = "carte_oursins_init",
+                           layerId = list(fond_france=fond_france,code_epsg=code_epsg,nom_fond="fond_france")
+        )
+      }else if(!emprise %in% c("999")) # 971, 972, 974 ou 976
+      {
+        map <- addPolygons(map = map, data = fond_france[,"LIBGEO"], opacity = 1,
+                           stroke = TRUE, color = "black",
+                           weight = 1.5,
+                           popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
+                           options = pathOptions(pane = "fond_france", clickable = T),
+                           fill = T, fillColor = "white", fillOpacity = 1,
+                           group = "carte_oursins_init",
+                           layerId = list(fond_france=fond_france,code_epsg=code_epsg,nom_fond="fond_france")
+        )
+      }else if(emprise %in% c("999")) # Etranger
+      {
+        map <- addPolygons(map = map, data = fond_etranger[,"LIBELLE"], opacity = 1,
+                           stroke = TRUE, color = "black",
+                           weight = 1,
+                           popup = as.data.frame(fond_etranger[,"LIBELLE"])[,-ncol(as.data.frame(fond_etranger[,"LIBELLE"]))],
+                           options = pathOptions(pane = "fond_etranger", clickable = T),
+                           fill = T, fillColor = "white", fillOpacity = 1,
+                           group = "carte_oursins_init",
+                           layerId = list(fond_etranger=fond_etranger,code_epsg=code_epsg,nom_fond="fond_etranger")
         )
       }
-      
-      map <- addPolygons(map = map, data = fond_france[,"LIBGEO"], opacity = 1, # fond_france
-                         stroke = TRUE, color = "black",
-                         weight = 1.5,
-                         popup = as.data.frame(fond_france[,"LIBGEO"])[,-ncol(as.data.frame(fond_france[,"LIBGEO"]))],
-                         options = pathOptions(pane = "fond_france", clickable = F),
-                         fill = T, fillColor = "white", fillOpacity = 1,
-                         group = "carte_oursins_init",
-                         layerId = list(fond_france=fond_france,code_epsg=code_epsg,nom_fond="fond_france")
-      )
       
       # AFFICHAGE DU FOND TERRITOIRE
       
@@ -232,7 +270,7 @@ function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtr
                         options = pathOptions(pane = "fond_oursins", clickable = T),
                         popup = paste0("<b><font color=#2B3E50>",donnees$CODE1," vers ",donnees$CODE2,"<br>",varFlux," : ",donnees[,varFlux],"</font></b>"),
                         group = "carte_oursins",
-                        layerId = list(analyse_WGS84=analyse_WGS84,donnees=donnees,code_epsg=code_epsg,dom=dom,nom_fond="fond_flux",var_flux=varFlux)
+                        layerId = list(analyse_WGS84=analyse_WGS84,donnees=donnees,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_flux",var_flux=varFlux)
     )
     
     return(map)

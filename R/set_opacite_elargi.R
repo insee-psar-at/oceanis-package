@@ -77,7 +77,7 @@ function(map,opacite=0.6,map_leaflet=NULL)
         analyse_maille_elargi <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$analyse_maille_elargi
         analyse_maille_classe_elargi <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$analyse_maille_classe_elargi
         code_epsg <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$code_epsg
-        dom <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$dom
+        emprise <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$emprise
         varRatio <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$var_ratio
         bornes <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$bornes
         precision <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$precision
@@ -95,7 +95,7 @@ function(map,opacite=0.6,map_leaflet=NULL)
                            fillColor = palette(analyse_maille_classe_elargi),
                            fillOpacity = opacite,
                            group = "carte_classes_elargi",
-                           layerId = list(analyse_maille_elargi=analyse_maille_elargi,analyse_maille_classe_elargi=analyse_maille_classe_elargi,code_epsg=code_epsg,dom=dom,nom_fond="fond_maille_elargi_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal,col_border_classes=col_border_classes)
+                           layerId = list(analyse_maille_elargi=analyse_maille_elargi,analyse_maille_classe_elargi=analyse_maille_classe_elargi,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_maille_elargi_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal,col_border_classes=col_border_classes)
         )
       }else if(ronds==T & classes==F)
       {
@@ -105,13 +105,15 @@ function(map,opacite=0.6,map_leaflet=NULL)
         analyse_WGS84_elargi <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$analyse_WGS84_elargi
         analyse <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$analyse
         code_epsg <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$code_epsg
-        dom <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$dom
+        emprise <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$emprise
         max_var <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$max_var
         varVolume <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$var_volume
         rayonRond <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$rayonRond
         colPos <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$colPos
         colNeg <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$colNeg
-        colBorder <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$colBorder
+        colBorderPos <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$colBorderPos
+        colBorderNeg <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$colBorderNeg
+        colBorderNeg <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$colBorderNeg
         
         map <- addPolygons(map = map, data = maille_WGS84_elargi,
                            stroke = TRUE, color = "grey", opacity = opacite,
@@ -126,7 +128,7 @@ function(map,opacite=0.6,map_leaflet=NULL)
         map <- addCircles(map = map,
                           lng = st_coordinates(analyse_WGS84_elargi)[,1],
                           lat = st_coordinates(analyse_WGS84_elargi)[,2],
-                          stroke = TRUE, color = colBorder,
+                          stroke = TRUE, color = sapply(analyse$donnees_elargi$save, function(x) if(x>0){colBorderPos}else{colBorderNeg}),
                           opacity = opacite,
                           weight = 1,
                           radius = rayonRond*sqrt(analyse$donnees_elargi[,varVolume]/max_var),
@@ -136,10 +138,10 @@ function(map,opacite=0.6,map_leaflet=NULL)
                           fillColor = sapply(analyse$donnees_elargi$save, function(x) if(x>0){colPos}else{colNeg}),
                           fillOpacity = opacite,
                           group = "carte_ronds_elargi",
-                          layerId = list(analyse=analyse,analyse_WGS84_elargi=analyse_WGS84_elargi,rayonRond=rayonRond,code_epsg=code_epsg,dom=dom,
+                          layerId = list(analyse=analyse,analyse_WGS84_elargi=analyse_WGS84_elargi,rayonRond=rayonRond,code_epsg=code_epsg,emprise=emprise,
                                          nom_fond=c(if(max(analyse$donnees_elargi$save)>0){"fond_ronds_pos_elargi_carte"}else{" "},
                                                     if(min(analyse$donnees_elargi$save)<0){"fond_ronds_neg_elargi_carte"}else{" "}),
-                                         max_var=max_var,var_volume=varVolume,colPos=colPos,colNeg=colNeg,colBorder=colBorder)
+                                         max_var=max_var,var_volume=varVolume,colPos=colPos,colNeg=colNeg,colBorderPos=colBorderPos,colBorderNeg=colBorderNeg)
         )
         
       }else if(ronds_classes==T)
@@ -151,7 +153,7 @@ function(map,opacite=0.6,map_leaflet=NULL)
         analyse_WGS84_elargi <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$analyse_WGS84_elargi
         analyse <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$analyse
         code_epsg <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$code_epsg
-        dom <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$dom
+        emprise <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$emprise
         varRatio <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$var_ratio
         bornes <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$bornes
         precision <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$precision
@@ -188,7 +190,7 @@ function(map,opacite=0.6,map_leaflet=NULL)
                           fillColor = palette(analyse_maille_classe_elargi),
                           fillOpacity = opacite,
                           group = "carte_ronds_elargi",
-                          layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse=analyse,code_epsg=code_epsg,dom=dom,nom_fond="fond_ronds_classes_elargi_carte",bornes=bornes,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal,col_border_classes=col_border_classes)
+                          layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse=analyse,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_ronds_classes_elargi_carte",bornes=bornes,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal,col_border_classes=col_border_classes)
         )
       }else if(classes_ronds==T)
       {
@@ -200,7 +202,7 @@ function(map,opacite=0.6,map_leaflet=NULL)
         analyse_WGS84_elargi <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$analyse_WGS84_elargi
         analyse <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$analyse
         code_epsg <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$code_epsg
-        dom <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$dom
+        emprise <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$emprise
         varRatio <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$var_ratio
         bornes <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$bornes
         precision <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$precision
@@ -210,7 +212,8 @@ function(map,opacite=0.6,map_leaflet=NULL)
         varVolume <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$var_volume
         rayonRond <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$rayonRond
         col_border_classes <- map_leaflet$x$calls[[idx_maille]]$args[[2]]$col_border_classes
-        col_border_ronds <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$col_border_ronds
+        col_border_ronds_pos <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$col_border_ronds_pos
+        col_border_ronds_neg <- map_leaflet$x$calls[[idx_carte_ronds]]$args[[4]]$col_border_ronds_neg
         
         palette<-colorBin(palette=rev(pal), domain=0:100, bins=bornes, na.color="grey")
         
@@ -222,13 +225,13 @@ function(map,opacite=0.6,map_leaflet=NULL)
                            fillColor = palette(analyse_maille_classe_elargi),
                            fillOpacity = opacite,
                            group = "carte_classes_elargi",
-                           layerId = list(analyse_maille_elargi=analyse_maille_elargi,analyse_maille_classe_elargi=analyse_maille_classe_elargi,code_epsg=code_epsg,dom=dom,nom_fond="fond_maille_elargi_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal,col_border_classes=col_border_classes)
+                           layerId = list(analyse_maille_elargi=analyse_maille_elargi,analyse_maille_classe_elargi=analyse_maille_classe_elargi,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_maille_elargi_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal,col_border_classes=col_border_classes)
         )
         
         map <- addCircles(map = map,
                           lng = st_coordinates(analyse_WGS84_elargi)[,1],
                           lat = st_coordinates(analyse_WGS84_elargi)[,2],
-                          stroke = TRUE, color = col_border_ronds,
+                          stroke = TRUE, color = sapply(analyse$donnees_elargi$save, function(x) if(x>0){col_border_ronds_pos}else{col_border_ronds_neg}),
                           opacity = opacite,
                           weight = 1.5,
                           radius = rayonRond*sqrt(analyse$donnees_elargi[,varVolume]/max_var),
@@ -236,7 +239,7 @@ function(map,opacite=0.6,map_leaflet=NULL)
                           popup = paste0("<b> <font color=#2B3E50>",as.data.frame(analyse_maille_elargi)$LIBELLE, "</font> </b><br><b> <font color=#2B3E50>",varVolume," : </font></b>",as.data.frame(analyse_maille_elargi)$TXT1),
                           fill = F,
                           group = "carte_ronds_elargi",
-                          layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse=analyse,code_epsg=code_epsg,dom=dom,nom_fond="fond_classes_ronds_elargi_carte",max_var=max_var,var_volume=varVolume,rayonRond=rayonRond,col_border_ronds=col_border_ronds)
+                          layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse=analyse,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_classes_ronds_elargi_carte",max_var=max_var,var_volume=varVolume,rayonRond=rayonRond,col_border_ronds_pos=col_border_ronds_pos,col_border_ronds_neg=col_border_ronds_neg)
         )
       }else
       {}

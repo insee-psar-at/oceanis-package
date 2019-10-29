@@ -71,7 +71,7 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,epaisseur,colTra
       
       remplissagefond="no"
       
-      if (l[i] %in% c("fond_maille","fond_departement","fond_region","fond_pays"))
+      if (l[i] %in% c("fond_maille","fond_departement","fond_region","fond_pays","fond_etranger"))
       {
         couleurbordure="128,128,128"
       }else if (l[i]=="fond_territoire")
@@ -83,7 +83,7 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,epaisseur,colTra
       }
       
       stylebordure="solid"
-      if (l[i] %in% c("fond_flux","fond_maille","fond_departement","fond_pays","fond_territoire"))
+      if (l[i] %in% c("fond_flux","fond_maille","fond_departement","fond_pays","fond_etranger","fond_territoire"))
       {
         epaisseurbordure=0.26
       }else

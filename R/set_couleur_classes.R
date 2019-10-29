@@ -113,7 +113,10 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
       
       map$x$calls[[idx_carte[i]]]$args[[arg]]$fillColor <- couleur_analyse
       
-      map$x$calls[[idx_carte[i]]]$args[[arg]]$color <- colBorder
+      if(!ronds)
+      {
+        map$x$calls[[idx_carte[i]]]$args[[arg]]$color <- colBorder
+      }
     }
 
     if(!is.null(idx_legende))
@@ -136,7 +139,7 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
       {
         varRatio <- map_leaflet$x$calls[[idx_carte[i]]]$args[[arg]]$var_ratio
         code_epsg <- map_leaflet$x$calls[[idx_carte[i]]]$args[[arg]]$code_epsg
-        dom <- map_leaflet$x$calls[[idx_carte[i]]]$args[[arg]]$dom
+        emprise <- map_leaflet$x$calls[[idx_carte[i]]]$args[[arg]]$emprise
         precision <- map_leaflet$x$calls[[idx_carte[i]]]$args[[arg]]$precision
         
         pal_new[is.na(pal_new)] <- "grey"
@@ -160,7 +163,7 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
                                fillColor = palette(analyse_maille_classe_elargi),
                                fillOpacity = opacityElargi,
                                group = "carte_classes_elargi",
-                               layerId = list(analyse_maille_elargi=analyse_maille_elargi,analyse_maille_classe_elargi=analyse_maille_classe_elargi,code_epsg=code_epsg,dom=dom,nom_fond="fond_maille_elargi_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal_new)
+                               layerId = list(analyse_maille_elargi=analyse_maille_elargi,analyse_maille_classe_elargi=analyse_maille_classe_elargi,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_maille_elargi_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal_new,col_border_classes=colBorder)
             )
           }else
           {
@@ -177,7 +180,7 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
                                fillColor = palette(analyse_maille_classe),
                                fillOpacity = 1,
                                group = "carte_classes",
-                               layerId = list(analyse_maille=analyse_maille,analyse_maille_classe=analyse_maille_classe,code_epsg=code_epsg,dom=dom,nom_fond="fond_maille_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal_new)
+                               layerId = list(analyse_maille=analyse_maille,analyse_maille_classe=analyse_maille_classe,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_maille_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal_new,col_border_classes=colBorder)
             )
           }
         }else if(ronds) #analyse en ronds_classes
@@ -187,6 +190,9 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
           varVolume <- map_leaflet$x$calls[[idx_carte[i]]]$args[[4]]$var_volume
           rayonRond <- map_leaflet$x$calls[[idx_carte[i]]]$args[[4]]$rayonRond
           max_var <- map_leaflet$x$calls[[idx_carte[i]]]$args[[4]]$max_var
+          col_border_ronds_pos <- map_leaflet$x$calls[[idx_carte[i]]]$args[[4]]$col_border_ronds_pos
+          col_border_ronds_neg <- map_leaflet$x$calls[[idx_carte[i]]]$args[[4]]$col_border_ronds_neg
+          epaisseurBorder <- map_leaflet$x$calls[[idx_carte[i]]]$args[[4]]$epaisseurBorder
           
           if(map_leaflet$x$calls[[idx_carte[i]]]$args[[4]]$nom_fond %in% "fond_ronds_classes_elargi_carte")
           {
@@ -199,9 +205,9 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
             map <- addCircles(map = map,
                               lng = st_coordinates(analyse_WGS84_elargi)[,1],
                               lat = st_coordinates(analyse_WGS84_elargi)[,2],
-                              stroke = TRUE, color = colBorder,
+                              stroke = TRUE, color = sapply(analyse$donnees_elargi$save, function(x) if(x>0){col_border_ronds_pos}else{col_border_ronds_neg}),
                               opacity = opacityElargi,
-                              weight = 1,
+                              weight = epaisseurBorder,
                               radius = rayonRond*sqrt(analyse$donnees_elargi[,varVolume]/max_var),
                               options = pathOptions(pane = "fond_ronds_elargi", clickable = T),
                               popup = paste0("<b> <font color=#2B3E50>",analyse$donnees_elargi$LIBELLE, "</font> </b><br><b> <font color=#2B3E50>",varVolume," : </font></b>",analyse$donnees_elargi$TXT1,"<br><b><font color=#2B3E50>",varRatio," : </font></b>",analyse$donnees_elargi$TXT2),
@@ -209,7 +215,7 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
                               fillColor = palette(analyse_maille_classe_elargi),
                               fillOpacity = opacityElargi,
                               group = "carte_ronds_elargi",
-                              layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse_maille_classe_elargi=analyse_maille_classe_elargi,code_epsg=code_epsg,dom=dom,nom_fond="fond_ronds_classes_elargi_carte",bornes=bornes,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal_new)
+                              layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse_maille_classe_elargi=analyse_maille_classe_elargi,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_ronds_classes_elargi_carte",bornes=bornes,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal_new,col_border_ronds_pos=col_border_ronds_pos,col_border_ronds_neg=col_border_ronds_neg,epaisseurBorder=epaisseurBorder)
             )
           }else
           {
@@ -221,9 +227,9 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
             map <- addCircles(map = map,
                               lng = st_coordinates(analyse_WGS84)[,1],
                               lat = st_coordinates(analyse_WGS84)[,2],
-                              stroke = TRUE, color = colBorder,
+                              stroke = TRUE, color = sapply(analyse$donnees$save, function(x) if(x>0){col_border_ronds_pos}else{col_border_ronds_neg}),
                               opacity = 1,
-                              weight = 1,
+                              weight = epaisseurBorder,
                               radius = rayonRond*sqrt(analyse$donnees[,varVolume]/max_var),
                               options = pathOptions(pane = "fond_ronds", clickable = T),
                               popup = paste0("<b> <font color=#2B3E50>",analyse$donnees$LIBELLE, "</font> </b><br><b> <font color=#2B3E50>",varVolume," : </font></b>",analyse$donnees$TXT1,"<br><b><font color=#2B3E50>",varRatio," : </font></b>",analyse$donnees$TXT2),
@@ -231,7 +237,7 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
                               fillColor = palette(analyse_maille_classe),
                               fillOpacity = 1,
                               group = "carte_ronds",
-                              layerId = list(analyse_WGS84=analyse_WGS84,analyse_maille_classe=analyse_maille_classe,code_epsg=code_epsg,dom=dom,nom_fond="fond_ronds_classes_carte",bornes=bornes,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal_new)
+                              layerId = list(analyse_WGS84=analyse_WGS84,analyse_maille_classe=analyse_maille_classe,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_ronds_classes_carte",bornes=bornes,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal_new,col_border_ronds_pos=col_border_ronds_pos,col_border_ronds_neg=col_border_ronds_neg,epaisseurBorder=epaisseurBorder)
             )
           }
         }else

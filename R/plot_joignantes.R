@@ -1,5 +1,5 @@
 plot_joignantes <-
-function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idDataDepart,idDataArrivee,varFlux,largeurFlecheMax=NULL,filtreVol=0,filtreDist=100,filtreMajeurs=10,decalageAllerRetour=0,decalageCentroid=0,dom="0",precisionLegFleches=0,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,colFleche="#CD853F",colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
+function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idDataDepart,idDataArrivee,varFlux,largeurFlecheMax=NULL,filtreVol=0,filtreDist=100,filtreMajeurs=10,decalageAllerRetour=0,decalageCentroid=0,emprise="FRM",precisionLegFleches=0,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,colFleche="#CD853F",colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
     
@@ -21,7 +21,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
     if(any(class(filtreMajeurs)!="numeric")) msg_error12 <- "Le filtre doit etre de type numerique / "
     if(any(class(decalageAllerRetour)!="numeric")) msg_error13 <- "La variable decalageAllerRetour doit etre de type numerique / "
     if(any(class(decalageCentroid)!="numeric")) msg_error14 <- "La variable decalageCentroid doit etre de type numerique / "
-    if(any(class(dom)!="character")) msg_error15 <- "La valeur doit etre de type caractere ('0', '971', '972', '973', '974' ou '976') / "
+    if(any(class(emprise)!="character")) msg_error15 <- "La valeur doit etre de type caractere ('FRM', '971', '972', '973', '974' ou '976') / "
     if(any(class(precisionLegFleches)!="numeric")) msg_error16 <- "La variable precisionLegFleches doit etre de type numerique / "
     if(any(class(titreLeg)!="character")) msg_error17<- "Le titre de la legende doit etre de type caractere / "
     if(!is.null(xLeg)) if(any(class(xLeg)!="numeric")) msg_error18 <- "La variable xLeg doit etre de type numerique / "
@@ -42,7 +42,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
     if(!any(names(data) %in% idDataDepart))  msg_error31 <- "La variable de depart n'existe pas dans la table des donnees / "
     if(!any(names(data) %in% idDataArrivee))  msg_error32 <- "La variable d'arrivee n'existe pas dans la table des donnees / "
     if(!any(names(data) %in% varFlux))  msg_error33 <- "La variable a representer n'existe pas dans la table des donnees / "
-    if(!dom %in% c("0","971","972","973","974","976")) msg_error34 <- "La variable dom doit etre '0', '971', '972', '973', '974' ou '976' / "
+    if(!emprise %in% c("FRM","971","972","973","974","976")) msg_error34 <- "La variable emprise doit etre 'FRM', '971', '972', '973', '974' ou '976' / "
     
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
@@ -95,8 +95,8 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
       sourceCarte<-iconv(sourceCarte,"latin1","utf8")
     }
     
-    code_epsg <- switch(dom, #DOM
-                        "0"="2154",# Lambert 93
+    code_epsg <- switch(emprise, #emprise
+                        "FRM"="2154",# Lambert 93
                         "971"="32620",# UTM 20 N
                         "972"="32620",# UTM 20 N
                         "973"="2972",# UTM 22 N
