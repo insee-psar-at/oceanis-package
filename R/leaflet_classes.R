@@ -2,32 +2,32 @@ leaflet_classes <-
 function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,methode="kmeans",nbClasses=3,bornes=NULL,stylePalette="defaut",opacityElargi=0.6,colBorder="white",precision=1,emprise="FRM",fondEtranger=NULL,zoomMaille=NULL,map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
-    
+
     # Verification des parametres
     leafletVerifParamClasses(data,fondMaille,fondMailleElargi,fondSuppl,idData,varRatio,methode,nbClasses,bornes,stylePalette,opacityElargi,colBorder,precision,emprise,fondEtranger,map_proxy)
-    
+
     names(data)[names(data)==idData] <- "CODE"
     names(fondMaille)[1] <- "CODE"
     names(fondMaille)[2] <- "LIBELLE"
-    if(!is.null(fondMailleElargi)) 
+    if(!is.null(fondMailleElargi))
     {
       names(fondMailleElargi)[1] <- "CODE"
       names(fondMailleElargi)[2] <- "LIBELLE"
       fondMailleElargi$LIBELLE<-iconv(fondMailleElargi$LIBELLE,"latin1","utf8")
     }
-    if(!is.null(fondSuppl)) 
+    if(!is.null(fondSuppl))
     {
       names(fondSuppl)[1] <- "CODE"
       names(fondSuppl)[2] <- "LIBELLE"
       fondSuppl$LIBELLE<-iconv(fondSuppl$LIBELLE,"latin1","utf8")
     }
     epsg_etranger <- NULL
-    if(!is.null(fondEtranger)) 
+    if(!is.null(fondEtranger))
     {
       names(fondEtranger)[1] <- "CODE"
       names(fondEtranger)[2] <- "LIBELLE"
       fondEtranger$LIBELLE<-iconv(fondEtranger$LIBELLE,"latin1","utf8")
-      
+
       epsg_etranger <- st_crs(fondEtranger)$epsg
       if(is.na(epsg_etranger) | epsg_etranger=="4326")
       {
@@ -35,7 +35,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
       }
     }
     fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","utf8")
-    
+
     if(!is.null(map_proxy))
     {
       if(any(class(map_proxy) %in% "leaflet_proxy")) # Contexte shiny/proxy
@@ -44,7 +44,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
         clearGroup(map_proxy, group = "carte_classes_elargi")
       }
     }
-    
+
     if(is.null(fondMailleElargi))
     {
       elargi <- FALSE
@@ -52,7 +52,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
     {
       elargi <- TRUE
     }
-    
+
     code_epsg <- switch(emprise,
                         "FRM"="2154",# Lambert 93
                         "971"="32620",# UTM 20 N
@@ -61,12 +61,12 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
                         "974"="2975",# UTM 40 S
                         "976"="4471",# UTM 38 S
                         "999"=epsg_etranger)
-    
+
     # Analyse
     data[,varRatio] <- round(data[,varRatio],precision)
-    
+
     analyse <- k_classes(fondMaille,fondMailleElargi,names(fondMaille)[1],data,"CODE",varRatio,elargi)
-    
+
     if(elargi)
     {
       analyse <- list(donnees=analyse[[1]],fond_maille=fondMaille,donnees_elargi=analyse[[2]],fond_maille_elargi=fondMailleElargi)
@@ -74,15 +74,15 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
     {
       analyse <- list(donnees=analyse[[1]],fond_maille=fondMaille)
     }
-    
+
     analyse$donnees[,varRatio] <- round(analyse$donnees[,varRatio],precision)
-    
+
     analyse$donnees[,"TXT1"] <- paste0("<b> <font color=#2B3E50>",format(round(analyse$donnees[,varRatio],3), big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
     if(elargi)
     {
       analyse$donnees_elargi[,"TXT1"] <- paste0("<b> <font color=#2B3E50>",format(round(analyse$donnees_elargi[,varRatio],3), big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
     }
-    
+
     max <- max(analyse$donnees[,varRatio])
     min <- min(analyse$donnees[,varRatio])
     if(elargi)
@@ -90,11 +90,11 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
       max <- max(analyse$donnees_elargi[,varRatio])
       min <- min(analyse$donnees_elargi[,varRatio])
     }
-    
+
     if(is.null(bornes))
     {
       suppressWarnings(test_bornes_analyse <- try(classIntervals(as.numeric(analyse$donnees[,varRatio]),nbClasses,style=methode,rtimes=10,intervalClosure="left"),silent=TRUE))
-      
+
       if(!class(test_bornes_analyse) %in% "try-error")
       {
         suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse$donnees[,varRatio]),nbClasses,style=methode,rtimes=10,intervalClosure="left"))
@@ -109,9 +109,9 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
           stop(simpleError("Le nombre de classes n'est pas adapte a l'analyse."))
         }
       }
-      
+
       suppressWarnings(test_calcul_bornes <- try(calcul_bornes(analyse$donnees,bornes_analyse,varRatio,nbClasses,methode,stylePalette),silent=TRUE))
-      
+
       if(!class(test_calcul_bornes) %in% "try-error")
       {
         carac_bornes <- calcul_bornes(analyse$donnees,bornes_analyse,varRatio,nbClasses,methode,stylePalette)
@@ -126,7 +126,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
           stop(simpleError("La maille ne correspond pas au niveau geographique du fichier de donnees. Veuillez svp choisir une maille adaptee ou modifier le fichier de donnees"))
         }
       }
-      
+
       bornes <- carac_bornes[[1]]
       bornes[1] <- max(as.numeric(analyse$donnees[,varRatio]))
       bornes_sansext <- bornes[-1]
@@ -135,19 +135,21 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
       bornes <- unique(c(max,bornes_sansext,min))
       bornes <- round(bornes,precision)
       pal_classes <- carac_bornes[[2]]
-      
+
     }else
     {
       bornes_sansext <- sort(bornes, decreasing = TRUE)
       bornes <- unique(c(max,bornes_sansext,min))
       bornes <- round(bornes,precision)
-      
+
       pal_classes_pos <- recup_palette(stylePalette)[[1]]
       pal_classes_neg <- recup_palette(stylePalette)[[2]]
-      
+
+      nb_col_pos <- length(pal_classes_pos)
+
       if(min<0 & max>=0) # Si - et +
       {
-        pal_classes_pos <- pal_classes_pos[(7-length(bornes[bornes>0])+1):7]
+        pal_classes_pos <- pal_classes_pos[(nb_col_pos-length(bornes[bornes>0])+1):nb_col_pos]
         pal_classes_neg <- pal_classes_neg[1:length(bornes[bornes<0])]
         pal_classes <- c(pal_classes_pos,pal_classes_neg)
       }
@@ -158,7 +160,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
           pal_classes <- pal_classes_pos
         }else
         {
-          pal_classes <- pal_classes_pos[-c(1:(7-length(bornes)+1))] # On enleve les couleurs fonces inutiles
+          pal_classes <- pal_classes_pos[-c(1:(nb_col_pos-length(bornes)+1))] # On enleve les couleurs fonces inutiles
         }
       }
       if(max<0) # Si -
@@ -172,12 +174,12 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
         }
       }
     }
-    
+
     pal_classes[is.na(pal_classes)] <- "grey"
     palette<-colorBin(palette=rev(pal_classes), domain=0:100, bins=bornes, na.color="grey")
-    
+
     # Fonds habillages
-    
+
     if(emprise=="FRM")
     {
       fond_pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
@@ -214,14 +216,14 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
       fond_etranger <- st_transform(fondEtranger,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
       fond_pays <- fond_etranger
     }else{}
-    
+
     maille_WGS84 <- st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-    
+
     if(elargi)
     {
       maille_WGS84_elargi <- st_transform(fondMailleElargi,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
     }
-    
+
     if(!is.null(zoomMaille))
     {
       zoom_maille_WGS84 <- maille_WGS84[maille_WGS84$CODE %in% zoomMaille,]
@@ -236,14 +238,14 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
     {
       list_bbox <- list(c(st_bbox(maille_WGS84)[1],st_bbox(maille_WGS84)[3]),c(st_bbox(maille_WGS84)[2],st_bbox(maille_WGS84)[4]))
     }
-    
+
     if(!is.null(fondSuppl))
     {
       fond_territoire <- st_transform(fondSuppl,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
     }
-    
+
     # Construction de la map par defaut
-    
+
     if(is.null(map_proxy) | (!is.null(map_proxy) & class(map_proxy)=="character"))
     {
       map <- leaflet(padding = 0,
@@ -251,17 +253,17 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
                        preferCanvas = TRUE,
                        transition = 2
                      )) %>%
-        
+
         setMapWidgetStyle(list(background = "#AFC9E0")) %>%
-        
+
         addTiles_insee(attribution = paste0("<a href=\"http://www.insee.fr\">OCEANIS - \u00A9 IGN - INSEE ",format(Sys.time(), format = "%Y"),"</a>")) %>%
-        
+
         fitBounds(lng1 = min(list_bbox[[1]]),
                   lat1 = min(list_bbox[[2]]),
                   lng2 = max(list_bbox[[1]]),
                   lat2 = max(list_bbox[[2]])
         ) %>%
-        
+
         # Pour gerer l'ordre des calques
         addMapPane(name = "fond_pays", zIndex = 401) %>%
         addMapPane(name = "fond_etranger", zIndex = 402) %>%
@@ -270,12 +272,12 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
         addMapPane(name = "fond_classes_elargi", zIndex = 405) %>%
         addMapPane(name = "fond_classes", zIndex = 406) %>%
         addMapPane(name = "fond_legende", zIndex = 407) %>%
-        
+
         # On ajoute une barre d'echelle
         addScaleBar(position = 'bottomright',
                     options = scaleBarOptions(metric = TRUE, imperial = FALSE)
         )
-      
+
       # AFFICHAGE DES FONDS D'HABILLAGE
 
       if(emprise %in% c("FRM","973")) # France metro ou Guyane
@@ -289,7 +291,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
                            group = "carte_classes_init",
                            layerId = list(fond_pays=fond_pays,code_epsg=code_epsg,nom_fond="fond_pays")
         )
-        
+
         map <- addPolygons(map = map, data = fond_france[,"LIBGEO"], opacity = 1,
                            stroke = TRUE, color = "black",
                            weight = 1.5,
@@ -322,9 +324,9 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
                            layerId = list(fond_etranger=fond_etranger,code_epsg=code_epsg,nom_fond="fond_etranger")
         )
       }
-    
+
       # AFFICHAGE DU FOND TERRITOIRE
-      
+
       if(!is.null(fondSuppl))
       {
         map <- addPolygons(map = map, data = fond_territoire,
@@ -341,17 +343,17 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
     {
       map <- map_proxy
     }
-    
+
     if(!is.null(fondMailleElargi))
     {
       # AFFICHAGE DE LA MAILLE ET DE L'ANALYSE ELARGIE
-      
+
       analyse_maille_classe_elargi <- analyse$donnees_elargi[rev(order(analyse$donnees_elargi[,varRatio])),varRatio]
-      
+
       analyse_maille_elargi <- merge(maille_WGS84_elargi[,c("CODE","geometry")],analyse$donnees_elargi,by="CODE")
       analyse_maille_elargi <- analyse_maille_elargi[rev(order(as.data.frame(analyse_maille_elargi)[,varRatio])),c("CODE","LIBELLE",varRatio,"TXT1","geometry")]
       analyse_maille_elargi <- st_sf(analyse_maille_elargi,stringsAsFactors = FALSE)
-      
+
       map <- addPolygons(map = map, data = analyse_maille_elargi, opacity = 0.6,
                          stroke = TRUE, color = colBorder, weight = 1,
                          options = pathOptions(pane = "fond_classes_elargi", clickable = T),
@@ -363,15 +365,15 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
                          layerId = list(analyse_maille_elargi=analyse_maille_elargi,analyse_maille_classe_elargi=analyse_maille_classe_elargi,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_maille_elargi_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal_classes,col_border_classes=colBorder)
       )
     }
-    
+
     # AFFICHAGE DE LA MAILLE ET DE L'ANALYSE
-    
+
     analyse_maille_classe <- analyse$donnees[rev(order(analyse$donnees[,varRatio])),varRatio]
-    
+
     analyse_maille <- merge(maille_WGS84[,c("CODE","geometry")],analyse$donnees,by="CODE")
     analyse_maille <- analyse_maille[rev(order(as.data.frame(analyse_maille)[,varRatio])),c("CODE","LIBELLE",varRatio,"TXT1","geometry")]
     analyse_maille <- st_sf(analyse_maille,stringsAsFactors = FALSE)
-    
+
     map <- addPolygons(map = map, data = analyse_maille, opacity = 1,
                        stroke = TRUE, color = colBorder, weight = 1,
                        options = pathOptions(pane = "fond_classes", clickable = T),
@@ -382,6 +384,6 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
                        group = "carte_classes",
                        layerId = list(analyse_maille=analyse_maille,analyse_maille_classe=analyse_maille_classe,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_maille_carte",bornes=bornes,var_ratio=varRatio,precision=precision,style=stylePalette,palette=pal_classes,col_border_classes=colBorder)
     )
-    
+
     return(map)
   }

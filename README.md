@@ -1,7 +1,6 @@
 
-# oceanis-package (version 1.0.6)
+# oceanis-package (version 1.0.7)
 [![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](http://www.awesomeofficialstatistics.org)
-[![](https://www.r-pkg.org/badges/version/oceanis)](https://cran.r-project.org/package=oceanis)
 [![](https://cranlogs.r-pkg.org/badges/oceanis?color=brightgreen)](https://cran.r-project.org/package=oceanis)
 
 Le package _oceanis_ permet de réaliser des cartes d'analyses. Il propose plusieurs représentations cartographiques possibles :

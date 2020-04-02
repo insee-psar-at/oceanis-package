@@ -2,10 +2,10 @@ shiny_joignantes <-
 function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,decalageAllerRetour=0,decalageCentroid=0,emprise="FRM",fondEtranger=NULL)
   {
     options("stringsAsFactors"=FALSE)
-    
+
     # Verification des parametres
     msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20<-msg_error21<-msg_error22 <- NULL
-    
+
     if(any(class(data)!="data.frame")) msg_error1 <- "Les donnees doivent etre dans un data.frame / "
     if(any(!any(class(fondMaille) %in% "sf"),!any(class(fondMaille) %in% "data.frame"))) msg_error2 <- "Le fond de maille doit etre un objet sf / "
     if(any(!any(class(fondContour) %in% "sf"),!any(class(fondContour) %in% "data.frame"))) msg_error3 <- "Le fond de contour doit etre un objet sf / "
@@ -17,12 +17,12 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
     if(any(class(decalageAllerRetour)!="numeric")) msg_error9 <- "La variable decalageAllerRetour doit etre de type numerique / "
     if(any(class(decalageCentroid)!="numeric")) msg_error10 <- "La variable decalageCentroid doit etre de type numerique / "
     if(any(class(emprise)!="character")) msg_error11 <- "La valeur doit etre de type caractere ('FRM', '971', '972', '973', '974', '976' ou '999') / "
-    
+
     if(length(names(data))<3) msg_error12 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant de depart, une variable identifiant d'arrivee et la variable a representer / "
     if(length(names(fondMaille))<3) msg_error13 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
     if(length(names(fondContour))<3) msg_error14 <- "Le fond de contour n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
     if(!is.null(fondSuppl)) if(length(names(fondSuppl))<3) msg_error15 <- "Le fond supplementaire n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
-    
+
     if(!any(names(data) %in% idDataDepart))  msg_error16 <- "La variable identifiant de depart n'existe pas dans la table des donnees / "
     if(!any(names(data) %in% idDataArrivee))  msg_error17 <- "La variable identifiant d'arrivee n'existe pas dans la table des donnees / "
     if(!any(names(data) %in% varFlux))  msg_error18 <- "La variable a representer n'existe pas dans la table des donnees / "
@@ -30,7 +30,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
     if(!emprise %in% c("FRM","971","972","973","974","976","999")) msg_error20 <- "La variable emprise doit etre 'FRM', '971', '972', '973', '974', '976' ou '999' / "
     if(!is.null(fondEtranger)) if(any(!any(class(fondEtranger) %in% "sf"),!any(class(fondEtranger) %in% "data.frame"))) msg_error21 <- "Le fond etranger doit etre un objet sf / "
     if(!is.null(fondEtranger)) if(length(names(fondEtranger))<3) msg_error22 <- "Le fond etranger n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
-    
+
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
            !is.null(msg_error10),!is.null(msg_error11),!is.null(msg_error12),!is.null(msg_error13),
@@ -41,7 +41,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                               msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,msg_error16,
                               msg_error17,msg_error18,msg_error19,msg_error20,msg_error21,msg_error22)))
     }
-    
+
     nb_up <- reactiveValues(a=0)
     nb_down <- reactiveValues(a=0)
     ordre_analyse <- reactiveValues(a=1,b=2)
@@ -49,18 +49,18 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
     remove_carte <- reactiveValues(a=0)
     liste_fonds <- reactiveValues(a=c("analyse","maille","contour"))
     m_save_fj <- reactiveValues(a=0)
-    
+
     flux_min <- reactiveValues(a=100)
     distance_max <- reactiveValues(a=300)
     flux_majeur <- reactiveValues(a=10)
     largeur <- reactiveValues(a=0)
-    
+
     erreur_maille <- reactiveValues(a=FALSE)
-    
+
     legende <- reactiveValues(a=NULL)
-    
+
     sourc <- "Source : Insee"
-    
+
     names(data)[names(data)==idDataDepart] <- "CODE1"
     names(data)[names(data)==idDataArrivee] <- "CODE2"
     names(fondMaille)[1] <- "CODE"
@@ -68,35 +68,35 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
     names(fondContour)[1] <- "CODE"
     names(fondContour)[2] <- "LIBELLE"
     epsg_etranger <- NULL
-    if(!is.null(fondEtranger)) 
+    if(!is.null(fondEtranger))
     {
       names(fondEtranger)[1] <- "CODE"
       names(fondEtranger)[2] <- "LIBGEO"
       fondEtranger$LIBGEO<-iconv(fondEtranger$LIBGEO,"latin1","utf8")
-      
+
       epsg_etranger <- st_crs(fondEtranger)$epsg
       if(is.na(epsg_etranger) | epsg_etranger=="4326")
       {
         epsg_etranger <- "3395" # Mercator
       }
     }
-    if(!is.null(fondSuppl)) 
+    if(!is.null(fondSuppl))
     {
       names(fondSuppl)[1] <- "CODE"
       names(fondSuppl)[2] <- "LIBELLE"
       fondSuppl$LIBELLE<-iconv(fondSuppl$LIBELLE,"latin1","utf8")
     }
-    
+
     fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","utf8")
     fondContour$LIBELLE<-iconv(fondContour$LIBELLE,"latin1","utf8")
-    
+
     ui <- navbarPage("OCEANIS", id="menu",
-                     
+
                      theme = shinytheme("superhero"),
-                     
+
                      tabPanel("Carte",value="carte",
                               sidebarLayout(
-                                
+
                                 sidebarPanel(width = 3,
                                              style = "overflow-y:scroll; min-height: 840px; max-height: 840px",
                                              h4(HTML("<b><font color=#95BAE2>VARIABLES</font></b>")),
@@ -183,24 +183,24 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
     )
     )
     )
-    
+
     server <- function(input, output, session) {
-      
+
       #################
       #Onglet Carte
       #################
-      
+
       #Charge les donnees et fonds en memoire et affiche les widgets adequats dans le sidePanel de l'onglet "Carte"
       observe({
-        
+
         # VARIABLES
-        
+
         output$variable_flux_fj <- renderUI({
           selectInput("variable_flux_fj_id", label=h5("Variable des flux (en volume)"), choices = varFlux, selected = varFlux)
         })
-        
+
         # FONDS
-        
+
         output$ordre_fonds_fj <- renderUI({
           selectInput("ordre_fonds_fj_id", label=h5("Modifier l'ordre des fonds"), choices = liste_fonds$a, multiple=TRUE, selectize=FALSE, selected = "analyse")
         })
@@ -210,7 +210,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         output$descendre_fond_fj <- renderUI({
           actionButton("descendre_fond_fj_id", label="", icon=icon("arrow-down"))
         })
-        
+
         output$ajout_territoire_fj <- renderUI({
           checkboxInput("ajout_territoire_fj_id", label = "Afficher le fond des territoires",
                         value = if(is.null(fondSuppl)) FALSE else TRUE)
@@ -223,72 +223,72 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           checkboxInput("ajout_dep_fj_id", label = "Afficher le fond des d\u00e9partements",
                         value = FALSE)
         })
-        
+
         # FLUX
-        
+
         output$flux_min_fj <- renderUI({
           numericInput("flux_min_fj_id", label = h5("Seuil de flux minimal"), value=flux_min$a, step=10)
         })
-        
+
         output$distance_max_fj <- renderUI({
           numericInput("distance_max_fj_id", label = h5("Seuil de distance maximale (km)"), value=distance_max$a, step=10)
         })
-        
+
         output$flux_majeur_fj <- renderUI({
           numericInput("flux_majeur_fj_id", label = h5("Nombre de flux majeurs"), value=flux_majeur$a, step=1)
         })
-        
+
         output$largeur_fj <- renderUI({
           numericInput("largeur_fj_id", label = h5("Largeur de la fleche la plus large (km)"), value=largeur$a, step=10)
         })
-        
+
         output$decalage_aller_retour_fj <- renderUI({
           numericInput("decalage_aller_retour_fj_id", label = h5(paste0("D","\u00e9","calage des fleches allers-retours (km)")), value=decalageAllerRetour, step=1)
         })
-        
+
         output$decalage_centroid_fj <- renderUI({
           numericInput("decalage_centroid_fj_id", label = h5(paste0("D","\u00e9","calage des fleches du centroid (km)")), value=decalageCentroid, step=1)
         })
-        
+
         # LEGENDE
-        
+
         output$titre_flux_legende_fj <- renderUI({
           textInput("titre_flux_legende_fj_id", label = h5("Titre de la l\u00e9gende des flux"), value = "")
         })
-        
+
         output$affiche_legende_fj <- renderUI({
           checkboxInput("affiche_legende_fj_id", label = "Activer le d\u00e9placement de la l\u00e9gende au clic",
                         value = TRUE)
         })
-        
+
         # SAUVEGARDE
-        
+
         output$save_carte_fj <- renderUI({
           actionButton("save_carte_fj_id", label=HTML("<font size=3>Sauvegarder la carte dans un onglet</font>"), style="color:#FFFFFF; background-color:#DF691A")
         })
-        
+
         output$entrees_qgis_fj <- renderUI({
           actionButton("entrees_qgis_fj_id", label="Exporter en projet Qgis")
         })
-        
+
         output$sortie_qgis_fj <- renderUI({
           tags$div(class="input-group",
                    HTML('<input type="text" id="sortie_qgis_fj_id" class="form-control" placeholder="Nom du projet" aria-describedby="sortie_qgis_fj_id">
                         <span class="input-group-addon" id="sortie_qgis_fj_id">.qgs</span>'))
         })
-        
+
         output$titre1_qgis_fj <- renderUI({
           textInput("titre1_qgis_fj_id", label = h5("Titre informatif"), value = "", placeholder= "Facultatif")
         })
-        
+
         output$titre2_qgis_fj <- renderUI({
           textInput("titre2_qgis_fj_id", label = h5("Titre descriptif"), value = "", placeholder= "Facultatif")
         })
-        
+
         output$source_qgis_fj <- renderUI({
           textInput("source_qgis_fj_id", label = h5("Source de la carte"), value = sourc)
         })
-        
+
         output$aide_image_fj <- renderUI({
           tags$div(class="dropup",
                    HTML(paste0('<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
@@ -325,10 +325,10 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                    )
         })
         })
-      
+
       # Pour modifier l'ordre des fonds
       observeEvent(list(input$monter_fond_fj_id,input$descendre_fond_fj_id),{
-        
+
         if(as.numeric(input$monter_fond_fj_id)==0 & as.numeric(input$descendre_fond_fj_id)==0) return(NULL)
         ordre <- c()
         if(as.numeric(input$monter_fond_fj_id)>nb_up$a)
@@ -341,70 +341,70 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           ordre <- c(1,2)
           nb_down$a <- nb_down$a+1
         }
-        
+
         if(is.null(input$ordre_fonds_fj_id)) pos_select <- 0 else pos_select <- which(liste_fonds$a==input$ordre_fonds_fj_id)
-        
+
         if(pos_select>0)
         {
           if(pos_select==ordre[1]) liste_fonds$a <- liste_fonds$a[c(2,1,3)]
           if(pos_select==ordre[2]) liste_fonds$a <- liste_fonds$a[c(1,3,2)]
-          
+
           updateSelectInput(session, "ordre_fonds_fj_id",
                             choices = liste_fonds$a,
                             selected = input$ordre_fonds_fj_id
           )
         }
       },ignoreInit = TRUE)
-      
+
       flux_min_fj <- reactive({
-        
+
         if(is.null(input$flux_min_fj_id)) return(flux_min$a)
-        
+
         return(input$flux_min_fj_id)
       })
-      
+
       distance_max_fj <- reactive({
-        
+
         if(is.null(input$distance_max_fj_id)) return(distance_max$a)
-        
+
         return(input$distance_max_fj_id)
       })
-      
+
       flux_majeur_fj <- reactive({
-        
+
         if(is.null(input$flux_majeur_fj_id)) return(flux_majeur$a)
-        
+
         return(input$flux_majeur_fj_id)
       })
-      
+
       # Pour exporter la carte en projet Qgis
-      
+
       output$export_qgis_fj <- renderUI({
         downloadButton("downloadProjetQgis_fj", label="Exporter")
       })
-      
+
       output$downloadProjetQgis_fj <- downloadHandler(contentType = "zip",
                                                       filename = function(){
                                                         paste0(input$sortie_qgis_fj_id,".zip")
                                                       },
                                                       content = function(file){
                                                         files <- EXPORT_PROJET_QGIS_FJ(file)
-                                                        
+
                                                         zip(file,files, flags = "-j9X")
                                                       }
       )
-      
+
       # Pour exporter la carte en projet Qgis
       EXPORT_PROJET_QGIS_FJ <- function(file)
       {
         showModal(modalDialog(HTML("<i class=\"fa fa-spinner fa-spin fa-2x fa-fw\"></i> <font size=+1>Export du projet Qgis en cours...</font> "), size="m", footer=NULL, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-        
+
         sortie <- input$sortie_qgis_fj_id
         rep_sortie <- dirname(file)
         files <- c(paste0(rep_sortie,"/",sortie,".qgs"))
-        
+
         fond_flux <- analyse_apres_filtre_fj()[[1]]
-        
+
         vmax <- max(abs(data.frame(analyse_fj()[[2]])[,varFlux]))
         coord_fleche_max_pl <- st_coordinates(analyse_fj()[[1]][abs(data.frame(analyse_fj()[[1]])[,varFlux])==vmax,])
         large_pl <- max(st_distance(st_sfc(st_point(c(coord_fleche_max_pl[5,1],coord_fleche_max_pl[5,2])),st_point(c(coord_fleche_max_pl[6,1],coord_fleche_max_pl[6,2])))))
@@ -414,9 +414,9 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         flux_leg <- flux_legende_joignantes_pl(lon_lat_fj()[[1]],lon_lat_fj()[[2]],long_pl,large_pl,code_epsg_fj())
         flux_leg <- cbind(flux_leg,VALEUR=c(max(data[,varFlux]),max(data[,varFlux])/3))
         fond_flux_leg <- flux_leg
-        
+
         fond_flux <- st_transform(fond_flux,paste0("+init=epsg:",code_epsg_fj()))
-        
+
         fond_maille <- st_transform(fondMaille,paste0("+init=epsg:",code_epsg_fj()))
         fond_contour <- st_transform(fondContour,paste0("+init=epsg:",code_epsg_fj()))
         if(!is.null(fondSuppl) && input$ajout_territoire_fj_id) fond_territoire <- st_transform(fond_territoire_fj(),paste0("+init=epsg:",code_epsg_fj()))
@@ -424,7 +424,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         if(input$ajout_reg_fj_id) fond_region <- st_transform(fond_region_fj(),paste0("+init=epsg:",code_epsg_fj()))
         fond_france <- st_transform(fond_habillage_fj()[[1]],paste0("+init=epsg:",code_epsg_fj()))
         fond_pays <- st_transform(fond_habillage_fj()[[2]],paste0("+init=epsg:",code_epsg_fj()))
-        
+
         st_write(fond_flux, paste0(rep_sortie,"/fond_flux.shp"), delete_dsn = TRUE, quiet = TRUE)
         st_write(fond_flux_leg, paste0(rep_sortie,"/fond_flux_leg.shp"), delete_dsn = TRUE, quiet = TRUE)
         st_write(fond_maille, paste0(rep_sortie,"/fond_maille.shp"), delete_dsn = TRUE, quiet = TRUE)
@@ -434,7 +434,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         if(exists("fond_region")) if(!is.null(fond_region)) st_write(fond_region,paste0(rep_sortie,"/fond_region.shp"), delete_dsn = TRUE, quiet = TRUE)
         st_write(fond_france,paste0(rep_sortie,"/fond_france.shp"), delete_dsn = TRUE, quiet = TRUE)
         if(exists("fond_pays")) if(!is.null(fond_pays)) st_write(fond_pays,paste0(rep_sortie,"/fond_pays.shp"), delete_dsn = TRUE, quiet = TRUE)
-        
+
         files <- c(paste0(rep_sortie,"/fond_flux.shp"),paste0(rep_sortie,"/fond_flux.dbf"),paste0(rep_sortie,"/fond_flux.prj"),paste0(rep_sortie,"/fond_flux.shx"),files)
         files <- c(paste0(rep_sortie,"/fond_flux_leg.shp"),paste0(rep_sortie,"/fond_flux_leg.dbf"),paste0(rep_sortie,"/fond_flux_leg.prj"),paste0(rep_sortie,"/fond_flux_leg.shx"),files)
         files <- c(paste0(rep_sortie,"/fond_maille.shp"),paste0(rep_sortie,"/fond_maille.dbf"),paste0(rep_sortie,"/fond_maille.prj"),paste0(rep_sortie,"/fond_maille.shx"),files)
@@ -444,19 +444,19 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         if(exists("fond_region")) if(!is.null(fond_region)) files <- c(paste0(rep_sortie,"/fond_region.shp"),paste0(rep_sortie,"/fond_region.dbf"),paste0(rep_sortie,"/fond_region.prj"),paste0(rep_sortie,"/fond_region.shx"),files)
         files <- c(paste0(rep_sortie,"/fond_france.shp"),paste0(rep_sortie,"/fond_france.dbf"),paste0(rep_sortie,"/fond_france.prj"),paste0(rep_sortie,"/fond_france.shx"),files)
         if(exists("fond_pays")) if(!is.null(fond_pays)) files <- c(paste0(rep_sortie,"/fond_pays.shp"),paste0(rep_sortie,"/fond_pays.dbf"),paste0(rep_sortie,"/fond_pays.prj"),paste0(rep_sortie,"/fond_pays.shx"),files)
-        
+
         chemin_fonds <- rep_sortie
         titre1 <- paste0(input$titre1_qgis_fj_id,"\n")
         titre2 <- input$titre2_qgis_fj_id
         source <- input$source_qgis_fj_id
         annee <- format(Sys.time(), format = "%Y")
         variable_a_representer <- varFlux
-        
+
         l <- c()
         if(exists("fond_territoire")) l <- "fond_territoire"
         if(exists("fond_departement")) l <- c(l,"fond_departement")
         if(exists("fond_region")) l <- c(l,"fond_region")
-        
+
         l=c("fond_france",
             "fond_contour",
             "fond_maille",
@@ -464,18 +464,18 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
             "fond_flux",
             "fond_flux_leg"
         )
-        
+
         if(exists("fond_pays")) l <- c(l,"fond_pays")
-        
+
         export_projet_qgis_fleches_joignantes(l,rep_sortie,sortie,titre1,titre2,source,"#CD853F","#303030",annee)
-        
+
         removeModal()
-        
+
         showModal(modalDialog(HTML(paste0("<font size=+1>Le projet Qgis a \u00e9t\u00e9 cr","\u00e9","ee.</font>")), size="m", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-        
+
         return(files)
       }
-      
+
       code_epsg_fj <- reactive({
         code_epsg <- switch(emprise,
                             "FRM"="2154",# Lambert 93
@@ -487,11 +487,11 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                             "999"=epsg_etranger)
         return(code_epsg)
       })
-      
+
       largeur_max_fj <- reactive({
-        
+
         if(is.null(input$largeur_fj_id)) return(NULL)
-        
+
         if (typeMaille=="REG") largeur$a<-100
         if (typeMaille=="DEP") largeur$a<-30
         if (substr(typeMaille,1,2)=="ZE") largeur$a<-10
@@ -500,7 +500,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         if (substr(typeMaille,1,2)=="UU") largeur$a<-6
         if (typeMaille=="EPCI") largeur$a<-4
         if (typeMaille=="DEPCOM") largeur$a<-2
-        
+
         if(input$largeur_fj_id==0)
         {
           largeur_max <- largeur$a*1000
@@ -508,15 +508,15 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         {
           largeur_max <- input$largeur_fj_id*1000
         }
-        
+
         return(largeur_max)
       })
-      
+
       analyse_fj <- reactive({
         req(input$decalage_aller_retour_fj_id,input$decalage_centroid_fj_id)
-        
+
         suppressWarnings(test_k_joignantes <- try(k_joignantes(fondMaille,names(fondMaille)[1],data,"CODE1","CODE2",varFlux,largeur_max_fj(),input$decalage_aller_retour_fj_id,input$decalage_centroid_fj_id),silent=TRUE))
-        
+
         if(!class(test_k_joignantes) %in% "try-error")
         {
           analyse<-k_joignantes(fondMaille,names(fondMaille)[1],data,"CODE1","CODE2",varFlux,largeur_max_fj(),input$decalage_aller_retour_fj_id,input$decalage_centroid_fj_id)
@@ -526,20 +526,20 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           erreur_maille$a <- TRUE
           return(NULL)
         }
-        
+
         if(is.null(analyse))
         {
           showModal(modalDialog(HTML(paste0("<font size=+1>La maille ne correspond pas au niveau g\u00e9ographique du fichier de donn","\u00e9","es.<br><br>Veuillez svp choisir une maille adapt","\u00e9","e ou modifier le fichier de donn","\u00e9","es.</font>")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
           erreur_maille$a <- TRUE
           return(NULL)
         }
-        
+
         analyse_WGS84 <- st_transform(analyse[[1]],"+init=epsg:4326 +proj=longlat +ellps=WGS84")
         return(list(analyse[[1]],analyse_WGS84))
       })
-      
+
       fond_habillage_fj <- reactive({
-        
+
         if(emprise=="FRM")
         {
           fond_pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
@@ -576,15 +576,15 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           fond_france <- st_transform(fondEtranger,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
           fond_pays <- fond_france
         }else{}
-        
+
         return(list(fond_france,fond_pays))
       })
-      
+
       fond_contour_maille_fj <- reactive({
-        
+
         test_contour <- try(st_transform(fondContour,"+init=epsg:4326 +proj=longlat +ellps=WGS84"), silent = TRUE)
         test_maille <- try(st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84"), silent = TRUE)
-        
+
         if(any(list(class(test_contour),class(test_maille)) %in% "try-error"))
         {
           showModal(modalDialog(HTML(paste0("<font size=+1>Une erreur est survenue dans la cr","\u00e9","ation du territoire.<br><br>Veuillez svp v\u00e9rifier vos donn","\u00e9","es et les variables choisies.</font>")), size="m", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4"))
@@ -595,17 +595,17 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           contour_WGS84 <- st_transform(fondContour,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
           maille_WGS84 <- st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
         }
-        
+
         return(list(contour_WGS84,maille_WGS84))
       })
-      
+
       list_bbox_fj <- reactive({
         req(fond_contour_maille_fj())
-        
+
         list_bbox <- list(c(st_bbox(fond_contour_maille_fj()[[1]])[1],st_bbox(fond_contour_maille_fj()[[1]])[3]),c(st_bbox(fond_contour_maille_fj()[[1]])[2],st_bbox(fond_contour_maille_fj()[[1]])[4]))
         return(list_bbox)
       })
-      
+
       fond_territoire_fj <- reactive({
         if(!is.null(fondSuppl))
         {
@@ -616,42 +616,42 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           return(NULL)
         }
       })
-      
+
       fond_region_fj <- reactive({
         fond_region <- st_transform(sf_regm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
         return(fond_region)
       })
-      
+
       fond_departement_fj <- reactive({
         fond_departement <- st_transform(sf_depm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
         return(fond_departement)
       })
-      
+
       fond_select_donnees_fj <- reactive({
         req(analyse_apres_filtre_fj())
-        
+
         fond_donnees <- analyse_apres_filtre_fj()[[1]][input$mydonnees_fj_rows_selected,]
         fond_donnees <- st_transform(fond_donnees,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
         return(fond_donnees)
       })
-      
+
       fond_select_maille_fj <- reactive({
         req(fond_contour_maille_fj())
-        
+
         fond_maille <- fond_contour_maille_fj()[[2]][as.data.frame(fond_contour_maille_fj()[[2]])[,"CODE"] %in% as.data.frame(fondMaille)[input$mymaille_fj_rows_selected,"CODE"],]
         return(fond_maille)
       })
-      
+
       fond_select_contour_fj <- reactive({
         req(fond_contour_maille_fj())
-        
+
         fond_contour <- fond_contour_maille_fj()[[1]][as.data.frame(fond_contour_maille_fj()[[1]])[,"CODE"] %in% as.data.frame(fondContour)[input$mycontour_fj_rows_selected,"CODE"],]
         return(fond_contour)
       })
-      
+
       analyse_apres_filtre_fj <- reactive({
         req(analyse_fj(),flux_majeur_fj(),distance_max_fj(),flux_min_fj())
-        
+
         if(flux_majeur_fj()>nrow(analyse_fj()[[2]]))
         {
           nb_flux_majeur <- nrow(analyse_fj()[[2]])
@@ -660,38 +660,38 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           nb_flux_majeur <- flux_majeur_fj()
           if(nb_flux_majeur<1) nb_flux_majeur <- 1
         }
-        
+
         analyse_WGS84_list <- split(analyse_fj()[[2]],factor(analyse_fj()[[2]]$CODE1))
         analyse_WGS84_1 <- data.frame()
         aa <- lapply(1:length(analyse_WGS84_list), function(x) analyse_WGS84_1 <<- rbind(analyse_WGS84_1,as.data.frame(analyse_WGS84_list[[x]])[rev(order(as.data.frame(analyse_WGS84_list[[x]])[,varFlux]))[c(1:nb_flux_majeur)],]))
         analyse_WGS84_1 <- analyse_WGS84_1[!is.na(analyse_WGS84_1[,varFlux]),]
-        
+
         analyse_WGS84_list <- split(analyse_fj()[[2]],factor(analyse_fj()[[2]]$CODE2))
         analyse_WGS84_2 <- data.frame()
         aa <- lapply(1:length(analyse_WGS84_list), function(x) analyse_WGS84_2 <<- rbind(analyse_WGS84_2,as.data.frame(analyse_WGS84_list[[x]])[rev(order(as.data.frame(analyse_WGS84_list[[x]])[,varFlux]))[c(1:nb_flux_majeur)],]))
         analyse_WGS84_2 <- analyse_WGS84_2[!is.na(analyse_WGS84_2[,varFlux]),]
-        
+
         analyse_WGS84 <- unique(rbind(analyse_WGS84_1,analyse_WGS84_2))
-        
+
         analyse_WGS84 <- st_as_sf(analyse_WGS84)
-        
+
         analyse_WGS84 <- analyse_WGS84[as.vector(st_length(analyse_WGS84)/2.2)<=distance_max_fj()*1000,]
-        
+
         analyse_WGS84 <- analyse_WGS84[as.data.frame(analyse_WGS84)[,varFlux]>=flux_min_fj(),]
-        
+
         analyse_WGS84 <- analyse_WGS84[rev(order(as.data.frame(analyse_WGS84)[,varFlux])),]
-        
+
         donnees <- merge(as.data.frame(analyse_WGS84)[,c("CODE1","CODE2")],data,by=c("CODE1","CODE2"),all.x=T)
-        
+
         donnees <- sort(donnees[,varFlux], decreasing = TRUE)
-        
+
         return(list(analyse_WGS84,donnees))
       })
-      
+
       analyse_apres_filtre_init_fj <- reactive({
-        
+
         analyse <- analyse_fj()
-        
+
         if(nrow(analyse[[2]])<10)
         {
           nb_flux_majeur <- nrow(analyse[[2]])
@@ -699,64 +699,64 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         {
           nb_flux_majeur <- 10
         }
-        
+
         analyse_WGS84_list <- split(analyse[[2]],factor(analyse[[2]]$CODE1))
         analyse_WGS84_1 <- data.frame()
         aa <- lapply(1:length(analyse_WGS84_list), function(x) analyse_WGS84_1 <<- rbind(analyse_WGS84_1,as.data.frame(analyse_WGS84_list[[x]])[rev(order(as.data.frame(analyse_WGS84_list[[x]])[,varFlux]))[c(1:nb_flux_majeur)],]))
         analyse_WGS84_1 <- analyse_WGS84_1[!is.na(analyse_WGS84_1[,varFlux]),]
-        
+
         analyse_WGS84_list <- split(analyse[[2]],factor(analyse[[2]]$CODE2))
         analyse_WGS84_2 <- data.frame()
         aa <- lapply(1:length(analyse_WGS84_list), function(x) analyse_WGS84_2 <<- rbind(analyse_WGS84_2,as.data.frame(analyse_WGS84_list[[x]])[rev(order(as.data.frame(analyse_WGS84_list[[x]])[,varFlux]))[c(1:nb_flux_majeur)],]))
         analyse_WGS84_2 <- analyse_WGS84_2[!is.na(analyse_WGS84_2[,varFlux]),]
-        
+
         analyse_WGS84 <- unique(rbind(analyse_WGS84_1,analyse_WGS84_2))
-        
+
         analyse_WGS84 <- st_as_sf(analyse_WGS84)
-        
+
         analyse_WGS84 <- analyse_WGS84[as.vector(st_length(analyse_WGS84)/2.2)<=300*1000,]
-        
+
         analyse_WGS84 <- analyse_WGS84[as.data.frame(analyse_WGS84)[,varFlux]>=100,]
-        
+
         analyse_WGS84 <- analyse_WGS84[rev(order(as.data.frame(analyse_WGS84)[,varFlux])),]
-        
+
         donnees <- merge(as.data.frame(analyse_WGS84)[,c("CODE1","CODE2")],data,by=c("CODE1","CODE2"),all.x=T)
-        
+
         donnees <- sort(donnees[,varFlux], decreasing = TRUE)
-        
+
         return(list(analyse_WGS84,donnees))
       })
-      
+
       # Pour construire la map en leaflet
       react_fond_fj <- reactive({
-        
+
         if(input$menu=="carte")
         {
           showModal(modalDialog(HTML("<i class=\"fa fa-spinner fa-spin fa-2x fa-fw\"></i><font size=+1>\u00c9laboration de la carte...</font> "), size="m", footer=NULL, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-          
+
           # Construction de la map par defaut
-          
+
           m <- leaflet(padding = 0,
                        options = leafletOptions(
                          preferCanvas = TRUE,
                          transition = 2
                        )) %>%
-            
+
             setMapWidgetStyle(list(background = "#AFC9E0")) %>%
-            
+
             addTiles_insee(attribution = paste0("<a href=\"http://www.insee.fr\">OCEANIS - \u00A9 IGN - INSEE ",format(Sys.time(), format = "%Y"),"</a>")) %>%
-            
+
             fitBounds(lng1 = min(list_bbox_fj()[[1]]),
                       lat1 = min(list_bbox_fj()[[2]]),
                       lng2 = max(list_bbox_fj()[[1]]),
                       lat2 = max(list_bbox_fj()[[2]])
             ) %>%
-            
+
             # On ajoute une barre d'echelle
             addScaleBar(position = 'bottomright',
                         options = scaleBarOptions(metric = TRUE, imperial = FALSE)
             ) %>%
-            
+
             # Pour gerer l'ordre des calques
             addMapPane(name = "fond_pays", zIndex = 401) %>%
             addMapPane(name = "fond_france", zIndex = 402) %>%
@@ -768,11 +768,11 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
             addMapPane(name = "fond_trio2", zIndex = 408) %>%
             addMapPane(name = "fond_trio1", zIndex = 409) %>%
             addMapPane(name = "selection", zIndex = 410) %>%
-            
+
             addMapPane(name = "fond_legende", zIndex = 411)
-          
+
           # AFFICHAGE DES FONDS D'HABILLAGE
-          
+
           if(emprise %in% c("FRM","973"))
           {
             # fond des pays
@@ -790,11 +790,11 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                            options = pathOptions(pane = "fond_france", clickable = F),
                            fill = T, fillColor = "white", fillOpacity = 1
           )
-          
+
           m_save_fj$a <- m
-          
+
           # AFFICHAGE DU FOND TERRITOIRE
-          
+
           if(!is.null(fondSuppl))
           {
             m <- addPolygons(map = m, data = fond_territoire_fj(),
@@ -806,9 +806,9 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                              group = "territoire"
             )
           }
-          
+
           # AFFICHAGE DES FONDS CONTOUR ET MAILLE
-          
+
           # fond du contour
           m <- addPolygons(map = m, data = fond_contour_maille_fj()[[1]], opacity = 0.3,
                            stroke = TRUE, color = "black", weight = 3,
@@ -817,7 +817,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                            fill = T, fillColor = "white", fillOpacity = 0.3,
                            group = "maille_contour"
           )
-          
+
           # fond de la maille
           m <- addPolygons(map = m, data = fond_contour_maille_fj()[[2]], opacity = 1,
                            stroke = TRUE, color = "grey", weight = 1,
@@ -826,12 +826,12 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                            fill = T, fillColor = "white", fillOpacity = 0.001,
                            group = "maille_contour"
           )
-          
+
           # AFFICHAGE DE L'ANALYSE
-          
+
           analyse_WGS84 <- analyse_apres_filtre_init_fj()[[1]]
           donnees <- analyse_apres_filtre_init_fj()[[2]]
-          
+
           m <- addPolygons(map = m,
                            data = analyse_WGS84,
                            stroke = TRUE, color = "#303030",
@@ -842,23 +842,23 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                            fill = T, fillColor = "#CD853F", fillOpacity = 1,
                            group = "fleche"
           )
-          
+
           removeModal()
-          
+
           showModal(modalDialog(HTML("<font size=+1>Veuillez patientez svp, la carte va s'afficher dans quelques secondes...<br><br><i class=\"fa fa-hand-pointer-o fa-fw\"></i><b>Double-cliquez</b> ensuite sur la carte pour afficher la l\u00e9gende.</font> "), size="m", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
-          
+
           return(m)
         }
       })
-      
+
       # MODIFICATION DES FONDS TERRITOIRE D'ETUDES, REGION ET DEPARTEMENT
-      
+
       observeEvent(input$ajout_territoire_fj_id,{
-        
+
         proxy <- leafletProxy("mymap_fj")
-        
+
         clearGroup(map = proxy, group = "territoire")
-        
+
         # fond du territoire d'etudes
         if(!is.null(fondSuppl))
         {
@@ -875,13 +875,13 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           }
         }
       },ignoreInit = TRUE)
-      
+
       observeEvent(input$ajout_reg_fj_id,{
-        
+
         proxy <- leafletProxy("mymap_fj")
-        
+
         clearGroup(map = proxy, group = "region")
-        
+
         if(emprise=="FRM")
         {
           if(input$ajout_reg_fj_id)
@@ -892,18 +892,18 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                  weight = 1.5,
                                  options = pathOptions(pane = "fond_reg", clickable = F),
                                  fill = F,
-                                 group = "region"      
+                                 group = "region"
             )
           }
         }
       },ignoreInit = TRUE)
-      
+
       observeEvent(input$ajout_dep_fj_id,{
-        
+
         proxy <- leafletProxy("mymap_fj")
-        
+
         clearGroup(map = proxy, group = "departement")
-        
+
         if(emprise=="FRM")
         {
           if(input$ajout_dep_fj_id)
@@ -919,27 +919,27 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           }
         }
       },ignoreInit = TRUE)
-      
+
       # MODIFICATION DE L'ORDRE DES CALQUES
-      
+
       observeEvent(list(input$monter_fond_fj_id,input$descendre_fond_fj_id),{
-        
+
         if(as.numeric(input$monter_fond_fj_id)==0 & as.numeric(input$descendre_fond_fj_id)==0) return(NULL)
-        
+
         proxy <- leafletProxy("mymap_fj")
-        
+
         clearGroup(map = proxy, group = "maille_contour")
         clearGroup(map = proxy, group = "fleche")
-        
+
         i <- 1 #pour gerer l'ordre des fonds dans le pane
-        
+
         for(fond in liste_fonds$a)
         {
           if(fond=="analyse")
           {
             analyse_WGS84 <- analyse_apres_filtre_fj()[[1]]
             donnees <- analyse_apres_filtre_fj()[[2]]
-            
+
             proxy <- addPolygons(map = proxy,
                                  data = analyse_WGS84,
                                  stroke = TRUE, color = "#303030",
@@ -950,10 +950,10 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                  fill = T, fillColor = "#CD853F", fillOpacity = 1,
                                  group = "fleche"
             )
-            
+
             ordre_analyse$a <- i
           }
-          
+
           if(fond=="maille")
           {
             proxy <- addPolygons(map = proxy, data = fond_contour_maille_fj()[[2]], opacity = 1,
@@ -964,7 +964,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                  group = "maille_contour"
             )
           }
-          
+
           if(fond=="contour")
           {
             proxy <- addPolygons(map = proxy, data = fond_contour_maille_fj()[[1]], opacity = 0.3,
@@ -975,23 +975,23 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                  group = "maille_contour"
             )
           }
-          
+
           i <- i + 1
         }
       },ignoreInit = TRUE)
-      
+
       # MODIFICATION DES FLUX
-      
+
       observeEvent(list(input$flux_min_fj_id,input$distance_max_fj_id,input$flux_majeur_fj_id,input$largeur_fj_id,input$decalage_aller_retour_fj_id,input$decalage_centroid_fj_id),{
         req(input$flux_min_fj_id,input$distance_max_fj_id,input$flux_majeur_fj_id,input$largeur_fj_id,input$decalage_aller_retour_fj_id,input$decalage_centroid_fj_id)
-        
+
         proxy <- leafletProxy("mymap_fj")
-        
+
         clearGroup(map = proxy, group = "fleche")
-        
+
         analyse_WGS84 <- analyse_apres_filtre_fj()[[1]]
         donnees <- analyse_apres_filtre_fj()[[2]]
-        
+
         proxy <- addPolygons(map = proxy,
                              data = analyse_WGS84,
                              stroke = TRUE, color = "#303030",
@@ -1003,18 +1003,18 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                              group = "fleche"
         )
       },ignoreInit = TRUE)
-      
+
       # MODIFICATION DE LA SELECTION DES OBJETS VIA LES TABLEAUX
-      
+
       observeEvent(input$onglets_fj,{
         req(input$onglets_fj)
-        
+
         if(input$onglets_fj == "carte")
         {
           proxy <- leafletProxy("mymap_fj")
-          
+
           clearGroup(map = proxy, group = "select_donnees")
-          
+
           if(!is.null(input$mydonnees_fj_rows_selected))
           {
             proxy <- addPolylines(map = proxy,
@@ -1029,16 +1029,16 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           }
         }
       },ignoreInit = TRUE)
-      
+
       observeEvent(input$onglets_fj,{
         req(input$onglets_fj)
-        
+
         if(input$onglets_fj == "carte")
         {
           proxy <- leafletProxy("mymap_fj")
-          
+
           clearGroup(map = proxy, group = "select_maille")
-          
+
           if(!is.null(input$mymaille_fj_rows_selected))
           {
             proxy <- addPolygons(map = proxy, data = fond_select_maille_fj(),
@@ -1052,16 +1052,16 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           }
         }
       },ignoreInit = TRUE)
-      
+
       observeEvent(input$onglets_fj,{
         req(input$onglets_fj)
-        
+
         if(input$onglets_fj == "carte")
         {
           proxy <- leafletProxy("mymap_fj")
-          
+
           clearGroup(map = proxy, group = "select_contour")
-          
+
           if(!is.null(input$mycontour_fj_rows_selected))
           {
             proxy <- addPolygons(map = proxy, data = fond_select_contour_fj(),
@@ -1075,48 +1075,48 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           }
         }
       },ignoreInit = TRUE)
-      
+
       # CONSTRUCTION DE LA LEGENDE
-      
+
       lon_lat_fj <- reactive({
         click <- input$mymap_fj_click
         lon <- click$lng
         lat <- click$lat
         return(list(lon,lat))
       })
-      
+
       observeEvent(list(input$mymap_fj_zoom,input$mymap_fj_click,input$titre_flux_legende_fj_id,input$flux_min_fj_id,input$distance_max_fj_id,input$flux_majeur_fj_id,input$largeur_fj_id),{
         if(is.null(input$affiche_legende_fj_id)) return(NULL)
-        
+
         if(input$affiche_legende_fj_id==FALSE) return(NULL)
-        
+
         if(is.null(lon_lat_fj()[[1]])) return(NULL)
-        
+
         CONSTRUCTION_LEGENDE_FJ()
       })
-      
+
       CONSTRUCTION_LEGENDE_FJ <- function()
       {
         proxy <- leafletProxy("mymap_fj")
-        
+
         proxy <- clearGroup(map=proxy, group="leg")
         proxy <- clearMarkers(map=proxy)
-        
+
         zoom <- as.numeric(input$mymap_fj_zoom)
         coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-        
+
         vmax <- max(abs(data.frame(analyse_fj()[[2]])[,varFlux]))
-        
+
         coord_fleche_max <- st_coordinates(analyse_fj()[[2]][abs(data.frame(analyse_fj()[[2]])[,varFlux])==vmax,])
         large <- max(st_distance(st_sfc(st_point(c(coord_fleche_max[2,1],coord_fleche_max[2,2])),st_point(c(coord_fleche_max[6,1],coord_fleche_max[6,2])))))
-        
+
         long <- coeff*2
-        
+
         flux_legWGS84_j <- flux_legende_joignantes(lon_lat_fj()[[1]],lon_lat_fj()[[2]],long,large)
         flux_legWGS84 <- flux_legWGS84_j[[1]]
         pointe1 <- flux_legWGS84_j[[2]]
         pointe2 <- flux_legWGS84_j[[3]]
-        
+
         # leaflet du cadre blanc en 1er
         proxy <- addRectangles(map = proxy,
                                lng1 = st_bbox(flux_legWGS84)[1]-coeff/2, lat1 = st_bbox(flux_legWGS84)[2]-coeff/2,
@@ -1128,7 +1128,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                fillOpacity = 0.8,
                                group="leg"
         )
-        
+
         suppressWarnings(proxy <- addPolygons(map = proxy,
                                               data=flux_legWGS84,
                                               stroke = TRUE,
@@ -1141,7 +1141,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                               fillOpacity = 1,
                                               group="leg"
         ))
-        
+
         # leaflet valeur flux
         proxy <- addLabelOnlyMarkers(map = proxy,
                                      lng = pointe1[1], lat = pointe1[2], #grande fleche
@@ -1153,7 +1153,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                                                  )),
                                      group="leg"
         )
-        
+
         proxy <- addLabelOnlyMarkers(map = proxy,
                                      lng = pointe2[1], lat = pointe2[2], #petite fleche
                                      label = as.character(format(round(vmax/3,0),big.mark=" ",decimal.mark=",",nsmall=0)),
@@ -1164,7 +1164,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                                                  )),
                                      group="leg"
         )
-        
+
         #leaflet titre 1
         proxy <- addLabelOnlyMarkers(map = proxy,
                                      lng = st_bbox(flux_legWGS84)[1]-coeff/3, lat = st_bbox(flux_legWGS84)[4]+coeff/2,
@@ -1177,27 +1177,27 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                      group="leg"
         )
       }
-      
+
       # AJOUT DES ONGLETS SAUVEGARDE
-      
+
       observeEvent(input$save_carte_fj_id,{
-        
+
         showModal(modalDialog(HTML("<i class=\"fa fa-spinner fa-spin fa-2x fa-fw\"></i><font size=+1>Sauvegarde de la carte en cours...</font> "), size="m", footer=NULL, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-        
+
         insert_save$a <- insert_save$a + 1
         nb_save_carte <- insert_save$a-remove_carte$a
-        
+
         m_save <- m_save_fj$a
-        
+
         if(nb_save_carte>6)
         {
           insert_save$a <- insert_save$a - 1
           showModal(modalDialog(HTML("<font size=+1>Vous ne pouvez pas sauvegarger plus de 6 cartes. Veuillez en supprimer avant de continuer.</font> "), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
           return(NULL)
         }
-        
+
         output[[paste0("mymap_save_",insert_save$a,"_fj")]] <- renderLeaflet({
-          
+
           if(!is.null(fondSuppl))
           {
             if(input$ajout_territoire_fj_id)
@@ -1211,7 +1211,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
               )
             }
           }
-          
+
           if(input$ajout_reg_fj_id)
           {
             m_save <- addPolygons(map = m_save, data = fond_region_fj(),
@@ -1221,7 +1221,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                   fill = F
             )
           }
-          
+
           if(input$ajout_dep_fj_id)
           {
             m_save <- addPolygons(map = m_save, data = fond_departement_fj(),
@@ -1231,16 +1231,16 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                   fill = F
             )
           }
-          
+
           i <- 1 #pour gerer l'ordre des fonds dans le pane
-          
+
           for(fond in liste_fonds$a)
           {
             if(fond=="analyse")
             {
               analyse_WGS84 <- analyse_apres_filtre_fj()[[1]]
               donnees <- analyse_apres_filtre_fj()[[2]]
-              
+
               m_save <- addPolygons(map = m_save,
                                     data = analyse_WGS84,
                                     stroke = TRUE, color = "#303030",
@@ -1251,7 +1251,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                     fill = T, fillColor = "#CD853F", fillOpacity = 1
               )
             }
-            
+
             if(fond=="maille")
             {
               m_save <- addPolygons(map = m_save, data = fond_contour_maille_fj()[[2]], opacity = 1,
@@ -1261,7 +1261,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                     fill = T, fillColor = "white", fillOpacity = 0.001
               )
             }
-            
+
             if(fond=="contour")
             {
               m_save <- addPolygons(map = m_save, data = fond_contour_maille_fj()[[1]], opacity = 0.3,
@@ -1271,25 +1271,25 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                     fill = T, fillColor = "white", fillOpacity = 0.3
               )
             }
-            
+
             i <- i + 1
           }
-          
+
           zoom <- as.numeric(input$mymap_fj_zoom)
           coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-          
+
           vmax <- max(abs(data.frame(analyse_fj()[[2]])[,varFlux]))
-          
+
           coord_fleche_max <- st_coordinates(analyse_fj()[[2]][abs(data.frame(analyse_fj()[[2]])[,varFlux])==vmax,])
           large <- max(st_distance(st_sfc(st_point(c(coord_fleche_max[5,1],coord_fleche_max[5,2])),st_point(c(coord_fleche_max[6,1],coord_fleche_max[6,2])))))
-          
+
           long <- coeff*2
-          
+
           flux_legWGS84_j <- flux_legende_joignantes(lon_lat_fj()[[1]],lon_lat_fj()[[2]],long,large)
           flux_legWGS84 <- flux_legWGS84_j[[1]]
           pointe1 <- flux_legWGS84_j[[2]]
           pointe2 <- flux_legWGS84_j[[3]]
-          
+
           # leaflet du cadre blanc en 1er
           m_save <- addRectangles(map = m_save,
                                   lng1 = st_bbox(flux_legWGS84)[1]-coeff/2, lat1 = st_bbox(flux_legWGS84)[2]-coeff/2,
@@ -1300,7 +1300,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                   fillColor = "white",
                                   fillOpacity = 0.8
           )
-          
+
           suppressWarnings(m_save <- addPolygons(map = m_save,
                                                  data=flux_legWGS84,
                                                  stroke = TRUE,
@@ -1312,7 +1312,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                                  fillColor = "white",
                                                  fillOpacity = 1
           ))
-          
+
           # leaflet valeur flux
           m_save <- addLabelOnlyMarkers(map = m_save,
                                         lng = pointe1[1], lat = pointe1[2], #grande fleche
@@ -1323,7 +1323,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                                                       "font-size" = "12px"
                                                                     ))
           )
-          
+
           m_save <- addLabelOnlyMarkers(map = m_save,
                                         lng = pointe2[1], lat = pointe2[2], #petite fleche
                                         label = as.character(format(round(vmax/3,0),big.mark=" ",decimal.mark=",",nsmall=0)),
@@ -1333,7 +1333,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                                                       "font-size" = "12px"
                                                                     ))
           )
-          
+
           #leaflet titre 1
           m_save <- addLabelOnlyMarkers(map = m_save,
                                         lng = st_bbox(flux_legWGS84)[1]-coeff/3, lat = st_bbox(flux_legWGS84)[4]+coeff/2,
@@ -1344,12 +1344,12 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                                                       "font-size" = "14px"
                                                                     ))
           )
-          
+
           removeModal()
-          
+
           m_save
         })
-        
+
         output[[paste0("remove_carte_",nb_save_carte,"_fj")]] <- renderUI({
           actionButton(paste0("remove_carte_",nb_save_carte,"_fj_id"),label="X Supprimer la carte", style="color:#FFFFFF; border-color:#FFFFFF; background-color:#2B3E50")
         })
@@ -1359,7 +1359,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       observeEvent(input$remove_carte_1_fj_id,{
         remove_carte$a <- remove_carte$a + 1
         removeTab(inputId = "onglets_fj",
@@ -1367,7 +1367,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       observeEvent(input$remove_carte_2_fj_id,{
         remove_carte$a <- remove_carte$a + 1
         removeTab(inputId = "onglets_fj",
@@ -1375,7 +1375,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       observeEvent(input$remove_carte_3_fj_id,{
         remove_carte$a <- remove_carte$a + 1
         removeTab(inputId = "onglets_fj",
@@ -1383,7 +1383,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       observeEvent(input$remove_carte_4_fj_id,{
         remove_carte$a <- remove_carte$a + 1
         removeTab(inputId = "onglets_fj",
@@ -1391,7 +1391,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       observeEvent(input$remove_carte_5_fj_id,{
         remove_carte$a <- remove_carte$a + 1
         removeTab(inputId = "onglets_fj",
@@ -1399,7 +1399,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       observeEvent(input$remove_carte_6_fj_id,{
         remove_carte$a <- remove_carte$a + 1
         removeTab(inputId = "onglets_fj",
@@ -1407,34 +1407,34 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       # TABLEAUX DE DONNEES, MAILLE ET CONTOUR
-      
+
       output$mydonnees_fj <- DT::renderDataTable(DT::datatable({
         analyse_WGS84 <- analyse_apres_filtre_fj()[[1]]
         data <- as.data.frame(analyse_WGS84)
         tableau_donnees <- data[,c("CODE1","CODE2",varFlux)]
       },  style = 'bootstrap'
       ))
-      
+
       output$mymaille_fj <- DT::renderDataTable(DT::datatable({
         data <- as.data.frame(fondMaille)
         tableau_maille <- data[,c(1:2)]
       },  style = 'bootstrap'
       ))
-      
+
       output$mycontour_fj <- DT::renderDataTable(DT::datatable({
         data <- as.data.frame(fondContour)
         tableau_contour <- data[,c(1:2)]
       },  style = 'bootstrap'
       ))
-      
+
       # ENVOI DU LEAFLET A L'UI
-      
+
       output$mymap_fj <- renderLeaflet({
         react_fond_fj()
       })
     }
-    
+
     runApp(shinyApp(ui = ui, server = server), launch.browser = TRUE)
     }

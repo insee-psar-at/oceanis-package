@@ -1,3 +1,7 @@
+.Rbuildignore
+.Rproj.user
+.Rhistory
+oceanis.Rproj
 data/.Rhistory
 vignettes/oceanis_cache/
 vignettes/oceanis_files/

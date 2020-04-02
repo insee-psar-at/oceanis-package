@@ -277,6 +277,10 @@ Ci-dessous, un exemple de cheminement possible pour realiser une carte complete 
 ```{r leafletAnalyseClassesRonds, fig.height = 6, fig.width = 9}
 library(oceanis)
 library(leaflet)
+library(sf)
+library(classInt)
+library(leaflet.extras)
+library(stringr)
 
 # chargement des donnees
 donnees_monoloc <- rio::import(file = system.file("data/donnees_monoloc.rda",

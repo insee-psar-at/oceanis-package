@@ -2,10 +2,10 @@ shiny_typo <-
 function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM",fondEtranger=NULL)
   {
     options("stringsAsFactors"=FALSE)
-    
+
     # Verification des parametres
     msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16 <- NULL
-    
+
     if(any(class(data)!="data.frame")) msg_error1 <- "Les donnees doivent etre dans un data.frame / "
     if(any(!any(class(fondMaille) %in% "sf"),!any(class(fondMaille) %in% "data.frame"))) msg_error2 <- "Le fond de maille doit etre un objet sf / "
     if(any(!any(class(fondContour) %in% "sf"),!any(class(fondContour) %in% "data.frame"))) msg_error3 <- "Le fond de contour doit etre un objet sf / "
@@ -13,18 +13,18 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
     if(any(class(idData)!="character")) msg_error5 <- "Le nom de la variable doit etre de type caractere / "
     if(any(class(varTypo)!="character")) msg_error6 <- "Le nom de la variable doit etre de type caractere / "
     if(any(class(emprise)!="character")) msg_error7 <- "La valeur doit etre de type caractere ('FRM', '971', '972', '973', '974', '976' ou '999') / "
-    
+
     if(length(names(data))<2) msg_error8 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et la variable a representer / "
     if(length(names(fondMaille))<3) msg_error9 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
     if(length(names(fondContour))<3) msg_error10 <- "Le fond de contour n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
     if(!is.null(fondSuppl)) if(length(names(fondSuppl))<3) msg_error11 <- "Le fond supplementaire n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
-    
+
     if(!any(names(data) %in% idData))  msg_error12 <- "La variable identifiant les donnees n'existe pas dans la table des donnees / "
     if(!any(names(data) %in% varTypo))  msg_error13 <- "La variable a representer n'existe pas dans la table des donnees / "
     if(!emprise %in% c("FRM","971","972","973","974","976","999")) msg_error14 <- "La variable emprise doit etre 'FRM', '971', '972', '973', '974', '976' ou '999' / "
     if(!is.null(fondEtranger)) if(any(!any(class(fondEtranger) %in% "sf"),!any(class(fondEtranger) %in% "data.frame"))) msg_error15 <- "Le fond etranger doit etre un objet sf / "
     if(!is.null(fondEtranger)) if(length(names(fondEtranger))<3) msg_error16 <- "Le fond etranger n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
-    
+
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
            !is.null(msg_error10),!is.null(msg_error11),!is.null(msg_error12),!is.null(msg_error13),
@@ -33,7 +33,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
       stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6,msg_error7,msg_error8,
                               msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,msg_error16)))
     }
-    
+
     nb_up <- reactiveValues(a=0)
     nb_down <- reactiveValues(a=0)
     ordre_analyse <- reactiveValues(a=1,b=2)
@@ -41,48 +41,48 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
     remove_carte <- reactiveValues(a=0)
     liste_fonds_ty <- reactiveValues(a=c("analyse/maille","contour"))
     m_save_ty <- reactiveValues(a=0)
-    
+
     erreur_maille <- reactiveValues(a=FALSE)
-    
+
     legende <- reactiveValues(a=NULL)
-    
+
     sourc <- "Source : Insee"
-    
+
     names(data)[names(data)==idData] <- "CODE"
     names(fondMaille)[1] <- "CODE"
     names(fondMaille)[2] <- "LIBELLE"
     names(fondContour)[1] <- "CODE"
     names(fondContour)[2] <- "LIBELLE"
     epsg_etranger <- NULL
-    if(!is.null(fondEtranger)) 
+    if(!is.null(fondEtranger))
     {
       names(fondEtranger)[1] <- "CODE"
       names(fondEtranger)[2] <- "LIBGEO"
       fondEtranger$LIBGEO<-iconv(fondEtranger$LIBGEO,"latin1","utf8")
-      
+
       epsg_etranger <- st_crs(fondEtranger)$epsg
       if(is.na(epsg_etranger) | epsg_etranger=="4326")
       {
         epsg_etranger <- "3395" # Mercator
       }
     }
-    if(!is.null(fondSuppl)) 
+    if(!is.null(fondSuppl))
     {
       names(fondSuppl)[1] <- "CODE"
       names(fondSuppl)[2] <- "LIBELLE"
       fondSuppl$LIBELLE<-iconv(fondSuppl$LIBELLE,"latin1","utf8")
     }
-    
+
     fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","utf8")
     fondContour$LIBELLE<-iconv(fondContour$LIBELLE,"latin1","utf8")
-    
+
     ui <- navbarPage("OCEANIS", id="menu",
-                     
+
                      theme = shinytheme("superhero"),
-                     
+
                      tabPanel("Carte",value="carte",
                               sidebarLayout(
-                                
+
                                 sidebarPanel(width = 3,
                                              style = "overflow-y:scroll; min-height: 840px; max-height: 840px",
                                              h4(HTML("<b><font color=#95BAE2>VARIABLES</font></b>")),
@@ -137,7 +137,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                                                                )
                                                                        )
                                                                        )
-                                                              
+
                                              ),
                                              br(),
                                              uiOutput("aide_image_ty"),
@@ -161,25 +161,25 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
     )
     )
     )
-    
+
     server <- function(input, output, session) {
-      
+
       #################
       #Onglet Carte
       #################
-      
+
       #Charge les donnees et fonds en memoire et affiche les widgets adequats dans le sidePanel de l'onglet "Carte"
-      
+
       observe({
-        
+
         # VARIABLES
-        
+
         output$variable_typo_ty <- renderUI({
           selectInput("variable_typo_ty_id", label=h5("Variable typologique"), choices = varTypo, selected = varTypo)
         })
-        
+
         # FONDS
-        
+
         output$ordre_fonds_ty <- renderUI({
           selectInput("ordre_fonds_ty_id", label=h5("Modifier l'ordre des fonds"), choices = liste_fonds_ty$a, multiple=TRUE, selectize=FALSE, selected = "analyse")
         })
@@ -189,7 +189,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         output$descendre_fond_ty <- renderUI({
           actionButton("descendre_fond_ty_id", label="", icon=icon("arrow-down"))
         })
-        
+
         output$ajout_territoire_ty <- renderUI({
           checkboxInput("ajout_territoire_ty_id", label = "Afficher le fond des territoires",
                         value = if(is.null(fondSuppl)) FALSE else TRUE)
@@ -202,9 +202,9 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           checkboxInput("ajout_dep_ty_id", label = "Afficher le fond des d\u00e9partements",
                         value = FALSE)
         })
-        
+
         # TYPOLOGIE
-        
+
         observeEvent(list(input$affiche_carte_charge_ty_id,input$affiche_carte_liste_ty_id),{
           output$zone_modif_libelle_ty <- renderUI({
             lapply(1:(as.numeric(length(unique(analyse_ty()[[1]]$classe)))), function(i) {
@@ -213,46 +213,46 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
             })
           })
         })
-        
+
         # LEGENDE
-        
+
         output$titre_typo_legende_ty <- renderUI({
           textInput("titre_typo_legende_ty_id", label = h5("Titre de la l\u00e9gende de la typologie"), value = "")
         })
-        
+
         output$affiche_legende_ty <- renderUI({
           checkboxInput("affiche_legende_ty_id", label = "Activer le d\u00e9placement de la l\u00e9gende au clic",
                         value = TRUE)
         })
-        
+
         # SAUVEGARDE
-        
+
         output$save_carte_ty <- renderUI({
           actionButton("save_carte_ty_id", label=HTML("<font size=3>Sauvegarder la carte dans un onglet</font>"), style="color:#FFFFFF; background-color:#DF691A")
         })
-        
+
         output$entrees_qgis_ty <- renderUI({
           actionButton("entrees_qgis_ty_id", label="Exporter en projet Qgis")
         })
-        
+
         output$sortie_qgis_ty <- renderUI({
           tags$div(class="input-group",
                    HTML('<input type="text" id="sortie_qgis_ty_id" class="form-control" placeholder="Nom du projet" aria-describedby="sortie_qgis_ty_id">
                         <span class="input-group-addon" id="sortie_qgis_ty_id">.qgs</span>'))
         })
-        
+
         output$titre1_qgis_ty <- renderUI({
           textInput("titre1_qgis_ty_id", label = h5("Titre informatif"), value = "", placeholder= "Facultatif")
         })
-        
+
         output$titre2_qgis_ty <- renderUI({
           textInput("titre2_qgis_ty_id", label = h5("Titre descriptif"), value = "", placeholder= "Facultatif")
         })
-        
+
         output$source_qgis_ty <- renderUI({
           textInput("source_qgis_ty_id", label = h5("Source de la carte"), value = sourc)
         })
-        
+
         output$aide_image_ty <- renderUI({
           tags$div(class="dropup",
                    HTML(paste0('<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
@@ -289,10 +289,10 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                    )
         })
         })
-      
+
       # Pour modifier l'ordre des fonds
       observeEvent(list(input$monter_fond_ty_id,input$descendre_fond_ty_id),{
-        
+
         if(as.numeric(input$monter_fond_ty_id)==0 & as.numeric(input$descendre_fond_ty_id)==0) return(NULL)
         ordre <- c()
         if(as.numeric(input$monter_fond_ty_id)>nb_up$a)
@@ -305,48 +305,48 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           ordre <- 1
           nb_down$a <- nb_down$a+1
         }
-        
+
         if(is.null(input$ordre_fonds_ty_id)) pos_select <- 0 else pos_select <- which(liste_fonds_ty$a==input$ordre_fonds_ty_id)
-        
+
         if(pos_select>0)
         {
           if(pos_select==ordre) liste_fonds_ty$a <- liste_fonds_ty$a[c(2,1)]
-          
+
           updateSelectInput(session, "ordre_fonds_ty_id",
                             choices = liste_fonds_ty$a,
                             selected = input$ordre_fonds_ty_id
           )
         }
       },ignoreInit = TRUE)
-      
+
       # Pour exporter la carte en projet Qgis
-      
+
       output$export_qgis_ty <- renderUI({
         downloadButton("downloadProjetQgis_ty", label="Exporter")
       })
-      
+
       output$downloadProjetQgis_ty <- downloadHandler(contentType = "zip",
                                                       filename = function(){
                                                         paste0(input$sortie_qgis_ty_id,".zip")
                                                       },
                                                       content = function(file){
                                                         files <- EXPORT_PROJET_QGIS_TY(file)
-                                                        
+
                                                         zip(file,files, flags = "-j9X")
                                                       }
       )
-      
+
       # Pour exporter la carte en projet Qgis
       EXPORT_PROJET_QGIS_TY <- function(file)
       {
         showModal(modalDialog(HTML("<i class=\"fa fa-spinner fa-spin fa-2x fa-fw\"></i> <font size=+1>Export du projet Qgis en cours...</font> "), size="m", footer=NULL, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-        
+
         sortie <- input$sortie_qgis_ty_id
         rep_sortie <- dirname(file)
         files <- c(paste0(rep_sortie,"/",sortie,".qgs"))
-        
+
         nb_typo <- length(unique(analyse_ty()[[1]]$classe))
-        
+
         if(!is.null(lon_lat_ty()[[1]]))
         {
           suppressWarnings(test_affiche_leg <- try(table_typo <- data.frame(classe=c(nb_typo:1),label=unique(as.data.frame(analyse_ty()[[1]])[,varTypo]),couleurs=unique(palette_ty()$col), stringsAsFactors = F),silent=TRUE))
@@ -363,16 +363,16 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           showModal(modalDialog(HTML("<font size=+1><i class=\"fa fa-hand-pointer-o fa-fw\"></i><b>Double-cliquez</b> d'abord sur la carte pour afficher la l\u00e9gende.</font> "), size="m", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
           return(NULL)
         }
-        
+
         fond_typo <- st_sf(analyse_ty()[[1]])
-        
+
         fond_contour <- st_transform(fondContour,paste0("+init=epsg:",code_epsg_ty()))
         if(!is.null(fondSuppl) && input$ajout_territoire_ty_id) fond_territoire <- st_transform(fond_territoire_ty(),paste0("+init=epsg:",code_epsg_ty()))
         if(input$ajout_dep_ty_id) fond_departement <- st_transform(fond_departement_ty(),paste0("+init=epsg:",code_epsg_ty()))
         if(input$ajout_reg_ty_id) fond_region <- st_transform(fond_region_ty(),paste0("+init=epsg:",code_epsg_ty()))
         fond_france <- st_transform(fond_habillage_ty()[[1]],paste0("+init=epsg:",code_epsg_ty()))
         fond_pays <- st_transform(fond_habillage_ty()[[2]],paste0("+init=epsg:",code_epsg_ty()))
-        
+
         st_write(fond_typo, paste0(rep_sortie,"/fond_maille_typo_carte.shp"), delete_dsn = TRUE, quiet = TRUE)
         st_write(fond_contour,paste0(rep_sortie,"/fond_contour.shp"), delete_dsn = TRUE, quiet = TRUE)
         if(exists("fond_territoire")) if(!is.null(fond_territoire)) st_write(fond_territoire, paste0(rep_sortie,"/fond_territoire.shp"), delete_dsn = TRUE, quiet = TRUE)
@@ -380,7 +380,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         if(exists("fond_region")) if(!is.null(fond_region)) st_write(fond_region,paste0(rep_sortie,"/fond_region.shp"), delete_dsn = TRUE, quiet = TRUE)
         st_write(fond_france,paste0(rep_sortie,"/fond_france.shp"), delete_dsn = TRUE, quiet = TRUE)
         if(exists("fond_pays")) if(!is.null(fond_pays)) st_write(fond_pays,paste0(rep_sortie,"/fond_pays.shp"), delete_dsn = TRUE, quiet = TRUE)
-        
+
         files <- c(paste0(rep_sortie,"/fond_maille_typo_carte.shp"),paste0(rep_sortie,"/fond_maille_typo_carte.dbf"),paste0(rep_sortie,"/fond_maille_typo_carte.prj"),paste0(rep_sortie,"/fond_maille_typo_carte.shx"),files)
         files <- c(paste0(rep_sortie,"/fond_contour.shp"),paste0(rep_sortie,"/fond_contour.dbf"),paste0(rep_sortie,"/fond_contour.prj"),paste0(rep_sortie,"/fond_contour.shx"),files)
         if(exists("fond_territoire")) if(!is.null(fond_territoire)) files <- c(paste0(rep_sortie,"/fond_territoire.shp"),paste0(rep_sortie,"/fond_territoire.dbf"),paste0(rep_sortie,"/fond_territoire.prj"),paste0(rep_sortie,"/fond_territoire.shx"),files)
@@ -388,7 +388,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         if(exists("fond_region")) if(!is.null(fond_region)) files <- c(paste0(rep_sortie,"/fond_region.shp"),paste0(rep_sortie,"/fond_region.dbf"),paste0(rep_sortie,"/fond_region.prj"),paste0(rep_sortie,"/fond_region.shx"),files)
         files <- c(paste0(rep_sortie,"/fond_france.shp"),paste0(rep_sortie,"/fond_france.dbf"),paste0(rep_sortie,"/fond_france.prj"),paste0(rep_sortie,"/fond_france.shx"),files)
         if(exists("fond_pays")) if(!is.null(fond_pays)) files <- c(paste0(rep_sortie,"/fond_pays.shp"),paste0(rep_sortie,"/fond_pays.dbf"),paste0(rep_sortie,"/fond_pays.prj"),paste0(rep_sortie,"/fond_pays.shx"),files)
-        
+
         chemin_fonds <- rep_sortie
         titre1 <- paste0(input$titre1_qgis_ty_id,"\n")
         titre2 <- input$titre2_qgis_ty_id
@@ -396,29 +396,29 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         annee <- format(Sys.time(), format = "%Y")
         variable_a_representer <- varTypo
         titre_leg_typo <- input$titre_typo_legende_ty_id
-        
+
         l <- c()
         if(exists("fond_territoire")) l <- "fond_territoire"
         if(exists("fond_departement")) l <- c(l,"fond_departement")
         if(exists("fond_region")) l <- c(l,"fond_region")
-        
+
         l=c("fond_france",
             "fond_contour",
             l,
             "fond_maille_typo_carte"
         )
-        
+
         if(exists("fond_pays")) l <- c(l,"fond_pays")
-        
+
         export_projet_qgis_typo(l,rep_sortie,sortie,titre1,titre2,source,titre_leg_typo,table_typo,variable_a_representer,annee)
-        
+
         removeModal()
-        
+
         showModal(modalDialog(HTML(paste0("<font size=+1>Le projet Qgis a \u00e9t\u00e9 cr","\u00e9","ee.</font>")), size="m", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-        
+
         return(files)
       }
-      
+
       code_epsg_ty <- reactive({
         code_epsg <- switch(emprise,
                             "FRM"="2154",# Lambert 93
@@ -430,26 +430,26 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                             "999"=epsg_etranger)
         return(code_epsg)
       })
-      
+
       analyse_ty <- reactive({
-        
+
         analyse<-k_typo(fondMaille,names(fondMaille)[!sapply(fondMaille[-length(names(fondMaille))],is.numeric)][1],data,"CODE",varTypo)
-        
+
         if(is.null(analyse))
         {
           showModal(modalDialog(HTML(paste0("<font size=+1>La maille ne correspond pas au niveau g\u00e9ographique du fichier de donn","\u00e9","es.<br><br>Veuillez svp choisir une maille adapt","\u00e9","e ou modifier le fichier de donn","\u00e9","es.</font>")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
           erreur_maille$a <- TRUE
           return(NULL)
         }
-        
+
         analyse <- analyse[[1]]
         analyse[,"TXT1"] <- paste0("<b> <font color=#2B3E50>",format(as.data.frame(analyse)[,varTypo], big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
         analyse_WGS84 <- st_transform(analyse,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
         return(list(analyse,analyse_WGS84))
       })
-      
+
       fond_habillage_ty <- reactive({
-        
+
         if(emprise=="FRM")
         {
           fond_pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
@@ -486,15 +486,15 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           fond_france <- st_transform(fondEtranger,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
           fond_pays <- fond_france
         }else{}
-        
+
         return(list(fond_france,fond_pays))
       })
-      
+
       fond_contour_maille_ty <- reactive({
-        
+
         test_contour <- try(st_transform(fondContour,"+init=epsg:4326 +proj=longlat +ellps=WGS84"), silent = TRUE)
         test_maille <- try(st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84"), silent = TRUE)
-        
+
         if(any(list(class(test_contour),class(test_maille)) %in% "try-error"))
         {
           showModal(modalDialog(HTML(paste0("<font size=+1>Une erreur est survenue dans la cr","\u00e9","ation du territoire.<br><br>Veuillez svp v\u00e9rifier vos donn","\u00e9","es et les variables choisies.</font>")), size="m", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4"))
@@ -505,17 +505,17 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           contour_WGS84 <- st_transform(fondContour,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
           maille_WGS84 <- st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
         }
-        
+
         return(list(contour_WGS84,maille_WGS84))
       })
-      
+
       list_bbox_ty <- reactive({
         req(fond_contour_maille_ty())
-        
+
         list_bbox <- list(c(st_bbox(fond_contour_maille_ty()[[1]])[1],st_bbox(fond_contour_maille_ty()[[1]])[3]),c(st_bbox(fond_contour_maille_ty()[[1]])[2],st_bbox(fond_contour_maille_ty()[[1]])[4]))
         return(list_bbox)
       })
-      
+
       palette_ty <- reactive({
         nb_col <- length(unique(as.data.frame(analyse_ty()[[1]])[,"classe"]))
         pal_typo <- substr(rainbow(256)[nb_opposes(256)[1:nb_col]],1,7)
@@ -525,7 +525,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         analyse <- analyse[order(as.data.frame(analyse)[,varTypo]),]
         return(analyse)
       })
-      
+
       palette_init_ty <- reactive({
         nb_col <- length(unique(as.data.frame(analyse_ty()[[1]])[,"classe"]))
         pal_typo <- substr(rainbow(256)[nb_opposes(256)[1:nb_col]],1,7)
@@ -535,7 +535,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         analyse <- analyse[order(as.data.frame(analyse)[,varTypo]),]
         return(analyse)
       })
-      
+
       fond_territoire_ty <- reactive({
         if(!is.null(fondSuppl))
         {
@@ -546,63 +546,63 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           return(NULL)
         }
       })
-      
+
       fond_region_ty <- reactive({
         fond_region <- st_transform(sf_regm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
         return(fond_region)
       })
-      
+
       fond_departement_ty <- reactive({
         fond_departement <- st_transform(sf_depm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
         return(fond_departement)
       })
-      
+
       fond_select_donnees_ty <- reactive({
         req(analyse_ty())
-        
+
         fond_donnees <- analyse_ty()[[1]][input$mydonnees_ty_rows_selected,]
         fond_donnees <- st_transform(fond_donnees,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
         return(fond_donnees)
       })
-      
+
       fond_select_contour_ty <- reactive({
         req(fond_contour_maille_ty())
-        
+
         fond_contour <- fond_contour_maille_ty()[[1]][as.data.frame(fond_contour_maille_ty()[[1]])[,"CODE"] %in% as.data.frame(fondContour)[input$mycontour_ty_rows_selected,"CODE"],]
         return(fond_contour)
       })
-      
+
       # CONSTRUCTION DE LA MAP EN LEAFLET
-      
+
       react_fond_ty <- reactive({
-        
+
         if(input$menu=="carte")
         {
           showModal(modalDialog(HTML("<i class=\"fa fa-spinner fa-spin fa-2x fa-fw\"></i><font size=+1>\u00c9laboration de la carte...</font> "), size="m", footer=NULL, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-          
+
           # Construction de la map par defaut
-          
+
           m <- leaflet(padding = 0,
                        options = leafletOptions(
                          preferCanvas = TRUE,
                          transition = 2
                        )) %>%
-            
+
             setMapWidgetStyle(list(background = "#AFC9E0")) %>%
-            
+
             addTiles_insee(attribution = paste0("<a href=\"http://www.insee.fr\">OCEANIS - \u00A9 IGN - INSEE ",format(Sys.time(), format = "%Y"),"</a>")) %>%
-            
+
             fitBounds(lng1 = min(list_bbox_ty()[[1]]),
                       lat1 = min(list_bbox_ty()[[2]]),
                       lng2 = max(list_bbox_ty()[[1]]),
                       lat2 = max(list_bbox_ty()[[2]])
             ) %>%
-            
+
             # On ajoute une barre d'echelle
             addScaleBar(position = 'bottomright',
                         options = scaleBarOptions(metric = TRUE, imperial = FALSE)
             ) %>%
-            
+
             # Pour gerer l'ordre des calques
             addMapPane(name = "fond_pays", zIndex = 401) %>%
             addMapPane(name = "fond_france", zIndex = 402) %>%
@@ -613,11 +613,11 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
             addMapPane(name = "fond_duo2", zIndex = 407) %>%
             addMapPane(name = "fond_duo1", zIndex = 408) %>%
             addMapPane(name = "selection", zIndex = 409) %>%
-            
+
             addMapPane(name = "fond_legende", zIndex = 410)
-          
+
           # AFFICHAGE DES FONDS D'HABILLAGE
-          
+
           if(emprise %in% c("FRM","973"))
           {
             # fond des pays
@@ -628,7 +628,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                              fill = T, fillColor = "#CCCCCC", fillOpacity = 1
             )
           }
-          
+
           # fond de la France metro, DOM ou etranger
           m <- addPolygons(map = m, data = fond_habillage_ty()[[1]][,"LIBGEO"], opacity = 1,
                            stroke = TRUE, color = "black",
@@ -636,11 +636,11 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                            options = pathOptions(pane = "fond_france", clickable = F),
                            fill = T, fillColor = "white", fillOpacity = 1
           )
-          
+
           m_save_ty$a <- m
-          
+
           # AFFICHAGE DU FOND TERRITOIRE
-          
+
           if(!is.null(fondSuppl))
           {
             m <- addPolygons(map = m, data = fond_territoire_ty(),
@@ -660,9 +660,9 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                            fill = T, fillColor = "white", fillOpacity = 0.3,
                            group = "duo"
           )
-          
+
           # AFFICHAGE DE LA MAILLE ET DE L'ANALYSE
-          
+
           m <- addPolygons(map = m, data = analyse_ty()[[2]], opacity = 1,
                            stroke = TRUE, color = "white", weight = 1,
                            options = pathOptions(pane = "fond_duo1", clickable = T),
@@ -672,23 +672,23 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                            fillOpacity = 1,
                            group = "duo"
           )
-          
+
           removeModal()
-          
+
           showModal(modalDialog(HTML("<font size=+1>Veuillez patientez svp, la carte va s'afficher dans quelques secondes...<br><br><i class=\"fa fa-hand-pointer-o fa-fw\"></i><b>Double-cliquez</b> ensuite sur la carte pour afficher la l\u00e9gende.</font> "), size="m", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
-          
+
           return(m)
         }
       })
-      
+
       # MODIFICATION DES FONDS TERRITOIRE D'ETUDES, REGION ET DEPARTEMENT
-      
+
       observeEvent(input$ajout_territoire_ty_id,{
-        
+
         proxy <- leafletProxy("mymap_ty")
-        
+
         clearGroup(map = proxy, group = "territoire")
-        
+
         #fond du territoire d'etudes
         if(!is.null(fondSuppl))
         {
@@ -705,13 +705,13 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           }
         }
       },ignoreInit = TRUE)
-      
+
       observeEvent(input$ajout_reg_ty_id,{
-        
+
         proxy <- leafletProxy("mymap_ty")
-        
+
         clearGroup(map = proxy, group = "region")
-        
+
         if(emprise=="FRM")
         {
           if(input$ajout_reg_ty_id)
@@ -727,13 +727,13 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           }
         }
       },ignoreInit = TRUE)
-      
+
       observeEvent(input$ajout_dep_ty_id,{
-        
+
         proxy <- leafletProxy("mymap_ty")
-        
+
         clearGroup(map = proxy, group = "departement")
-        
+
         if(emprise=="FRM")
         {
           if(input$ajout_dep_ty_id)
@@ -749,20 +749,20 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           }
         }
       },ignoreInit = TRUE)
-      
+
       # MODIFICATION DE L'ORDRE DES CALQUES
-      
+
       observeEvent(list(input$monter_fond_ty_id,input$descendre_fond_ty_id),{
-        
+
         if(as.numeric(input$monter_fond_ty_id)==0 & as.numeric(input$descendre_fond_ty_id)==0) return(NULL)
-        
+
         proxy <- leafletProxy("mymap_ty")
-        
+
         clearGroup(map = proxy, group = "contour")
         clearGroup(map = proxy, group = "classe")
-        
+
         i <- 1 #pour gerer l'ordre des fonds dans le pane
-        
+
         for(fond in liste_fonds_ty$a)
         {
           if(fond=="analyse/maille")
@@ -776,10 +776,10 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                  fillOpacity = 1,
                                  group = "classe"
             )
-            
+
             ordre_analyse$a <- i
           }
-          
+
           if(fond=="contour")
           {
             proxy <- addPolygons(map = proxy, data = fond_contour_maille_ty()[[1]], opacity = 0.3,
@@ -790,21 +790,21 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                  group = "contour"
             )
           }
-          
+
           i <- i + 1
         }
       },ignoreInit = TRUE)
-      
+
       # MODIFICATION DE LA SELECTION DES OBJETS VIA LES TABLEAUX
-      
+
       observeEvent(input$onglets_ty,{
-        
+
         if(input$onglets_ty == "carte")
         {
           proxy <- leafletProxy("mymap_ty")
-          
+
           clearGroup(map = proxy, group = "select_donnees")
-          
+
           if(!is.null(input$mydonnees_ty_rows_selected))
           {
             proxy <- addPolygons(map = proxy, data = fond_select_donnees_ty(),
@@ -817,15 +817,15 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           }
         }
       },ignoreInit = TRUE)
-      
+
       observeEvent(input$onglets_ty,{
-        
+
         if(input$onglets_ty == "carte")
         {
           proxy <- leafletProxy("mymap_ty")
-          
+
           clearGroup(map = proxy, group = "select_contour")
-          
+
           if(!is.null(input$mycontour_ty_rows_selected))
           {
             proxy <- addPolygons(map = proxy, data = fond_select_contour_ty(),
@@ -838,40 +838,35 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           }
         }
       },ignoreInit = TRUE)
-      
+
       # CONSTRUCTION DE LA LEGENDE
-      
+
       lon_lat_ty <- reactive({
         click <- input$mymap_ty_click
         lon <- click$lng
         lat <- click$lat
         return(list(lon,lat))
       })
-      
+
       observeEvent(list(input$mymap_ty_zoom,input$mymap_ty_click,input$titre_typo_legende_ty_id),{
         if(is.null(input$affiche_legende_ty_id)) return(NULL)
-        
+
         if(input$affiche_legende_ty_id==FALSE) return(NULL)
-        
+
         if(is.null(lon_lat_ty()[[1]])) return(NULL)
-        
-        CONSTRUCTION_LEGENDE_TY()
-      })
-      
-      CONSTRUCTION_LEGENDE_TY <- function(lon,lat)
-      {
+
         proxy <- leafletProxy("mymap_ty")
         proxy <- clearGroup(map=proxy, group="leg")
         proxy <- clearMarkers(map=proxy)
-        
+
         zoom <- as.numeric(input$mymap_ty_zoom)
         coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-        
+
         position_leg <- t(data_frame(c(lon_lat_ty()[[1]],lon_lat_ty()[[2]])))
-        
+
         # On cree les rectangles
         nb_typo <- length(unique(analyse_ty()[[1]]$classe))
-        
+
         for(i in 1:nb_typo)
         {
           # Coordonnees du point haut/gauche des rectangles de la legende
@@ -885,10 +880,10 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           }
           assign(paste0("rectangle_",i),list(matrix(c(x_coord_rectangle,y_coord_rectangle,x_coord_rectangle+coeff*1,y_coord_rectangle,x_coord_rectangle+coeff*1,y_coord_rectangle+coeff*0.5,x_coord_rectangle,y_coord_rectangle+coeff*0.5,x_coord_rectangle,y_coord_rectangle),ncol=2, byrow=TRUE)))
         }
-        
+
         # On ajoute un cadre blanc autour de la legende
         y_coord_rectangle <- min(get(paste0("rectangle_",nb_typo))[[1]][,2])
-        
+
         # leaflet du cadre blanc en 1er
         proxy <- addRectangles(map = proxy,
                                lng1 = position_leg[1]-coeff*0.5, lat1 = position_leg[2]+coeff*0.5, #x_titre_1 et y_titre_2
@@ -907,9 +902,9 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                fillOpacity = 0.8,
                                group="leg"
                                )
-        
+
         palette <- unique(palette_ty()[order(palette_ty()$valeur),"col"])
-        
+
         for(i in 1: nb_typo)
         {
           if(is.null(input$lib_typo_1_ty_id))
@@ -919,7 +914,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           {
             typo_leg_texte <- input[[paste0("lib_typo_", i,"_ty_id")]]
           }
-          
+
           proxy <- addPolygons(map = proxy, data = st_polygon(get(paste0("rectangle_",i))),
                                stroke = FALSE,
                                options = pathOptions(pane = "fond_legende", clickable = F),
@@ -928,7 +923,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                fillOpacity = 1,
                                group="leg"
           )
-          
+
           proxy <- addLabelOnlyMarkers(map = proxy,
                                        lng = (max(get(paste0("rectangle_",i))[[1]][,1])+coeff*0.1), lat = mean(get(paste0("rectangle_",i))[[1]][,2]),
                                        label = typo_leg_texte,
@@ -940,11 +935,11 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                        group="leg"
           )
         }
-        
+
         # leaflet titre
         x_titre_2 <- min(st_coordinates(st_polygon(get("rectangle_1")))[,"X"])
         y_titre_2 <- max(st_coordinates(st_polygon(get("rectangle_1")))[,"Y"])+coeff*0.2
-        
+
         proxy <- addLabelOnlyMarkers(map = proxy,
                                      lng = x_titre_2, lat = y_titre_2,
                                      label = input$titre_typo_legende_ty_id,
@@ -955,28 +950,28 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                                                  )),
                                      group="leg"
         )
-      }
-      
+      })
+
       # AJOUT DES ONGLETS SAUVEGARDE
-      
+
       observeEvent(input$save_carte_ty_id,{
-        
+
         showModal(modalDialog(HTML("<i class=\"fa fa-spinner fa-spin fa-2x fa-fw\"></i><font size=+1>Sauvegarde de la carte en cours...</font> "), size="m", footer=NULL, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-        
+
         insert_save$a <- insert_save$a + 1
         nb_save_carte <- insert_save$a-remove_carte$a
-        
+
         m_save <- m_save_ty$a
-        
+
         if(nb_save_carte>6)
         {
           insert_save$a <- insert_save$a - 1
           showModal(modalDialog(HTML("<font size=+1>Vous ne pouvez pas sauvegarger plus de 6 cartes. Veuillez en supprimer avant de continuer.</font> "), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
           return(NULL)
         }
-        
+
         output[[paste0("mymap_save_",insert_save$a,"_ty")]] <- renderLeaflet({
-          
+
           if(!is.null(fondSuppl))
           {
             if(input$ajout_territoire_ty_id)
@@ -990,7 +985,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
               )
             }
           }
-          
+
           if(input$ajout_reg_ty_id)
           {
             m_save <- addPolygons(map = m_save, data = fond_region_ty(),
@@ -1000,7 +995,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                   fill = F
             )
           }
-          
+
           if(input$ajout_dep_ty_id)
           {
             m_save <- addPolygons(map = m_save, data = fond_departement_ty(),
@@ -1010,9 +1005,9 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                   fill = F
             )
           }
-          
+
           i <- 1 #pour gerer l'ordre des fonds dans le pane
-          
+
           for(fond in liste_fonds_ty$a)
           {
             if(fond=="analyse/maille")
@@ -1026,7 +1021,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                     fillOpacity = 1
               )
             }
-            
+
             if(fond=="contour")
             {
               m_save <- addPolygons(map = m_save, data = fond_select_contour_ty(),
@@ -1036,18 +1031,18 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                     fill = F
               )
             }
-            
+
             i <- i + 1
           }
-          
+
           zoom <- as.numeric(input$mymap_ty_zoom)
           coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-          
+
           position_leg <- t(data_frame(c(lon_lat_ty()[[1]],lon_lat_ty()[[2]])))
-          
+
           # On cree les rectangles
           nb_typo <- length(unique(analyse_ty()[[1]]$classe))
-          
+
           for(i in 1:nb_typo)
           {
             # Coordonnees du point haut/gauche des rectangles de la legende
@@ -1061,10 +1056,10 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
             }
             assign(paste0("rectangle_",i),list(matrix(c(x_coord_rectangle,y_coord_rectangle,x_coord_rectangle+coeff*1,y_coord_rectangle,x_coord_rectangle+coeff*1,y_coord_rectangle+coeff*0.5,x_coord_rectangle,y_coord_rectangle+coeff*0.5,x_coord_rectangle,y_coord_rectangle),ncol=2, byrow=TRUE)))
           }
-          
+
           # On ajoute un cadre blanc autour de la legende
           y_coord_rectangle <- min(get(paste0("rectangle_",nb_typo))[[1]][,2])
-          
+
           # leaflet du cadre blanc en 1er
           m_save <- addRectangles(map = m_save,
                                   lng1 = position_leg[1]-coeff*0.5, lat1 = position_leg[2]+coeff*0.5, #x_titre_1 et y_titre_2
@@ -1082,9 +1077,9 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                   fillColor = "white",
                                   fillOpacity = 0.8
                                   )
-          
+
           palette <- unique(palette_ty()[order(palette_ty()$valeur),"col"])
-          
+
           for(i in 1: nb_typo)
           {
             if(is.null(input$lib_typo_1_ty_id))
@@ -1094,7 +1089,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
             {
               typo_leg_texte <- input[[paste0("lib_typo_", i,"_ty_id")]]
             }
-            
+
             m_save <- addPolygons(map = m_save, data = st_polygon(get(paste0("rectangle_",i))),
                                   stroke = FALSE,
                                   options = pathOptions(pane = "fond_legende", clickable = F),
@@ -1102,7 +1097,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                   fillColor = palette[i],
                                   fillOpacity = 1
             )
-            
+
             m_save <- addLabelOnlyMarkers(map = m_save,
                                           lng = (max(get(paste0("rectangle_",i))[[1]][,1])+coeff*0.1), lat = mean(get(paste0("rectangle_",i))[[1]][,2]),
                                           label = typo_leg_texte,
@@ -1113,11 +1108,11 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                                                       ))
             )
           }
-          
+
           # leaflet titre
           x_titre_2 <- min(st_coordinates(st_polygon(get("rectangle_1")))[,"X"])
           y_titre_2 <- max(st_coordinates(st_polygon(get("rectangle_1")))[,"Y"])+coeff*0.2
-          
+
           m_save <- addLabelOnlyMarkers(map = m_save,
                                         lng = x_titre_2, lat = y_titre_2,
                                         label = input$titre_typo_legende_ty_id,
@@ -1127,12 +1122,12 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                                                       "font-size" = "14px"
                                                                     ))
           )
-          
+
           removeModal()
-          
+
           m_save
         })
-        
+
         output[[paste0("remove_carte_",nb_save_carte,"_ty")]] <- renderUI({
           actionButton(paste0("remove_carte_",nb_save_carte,"_ty_id"),label="X Supprimer la carte", style="color:#FFFFFF; border-color:#FFFFFF; background-color:#2B3E50")
         })
@@ -1142,7 +1137,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       observeEvent(input$remove_carte_1_ty_id,{
         remove_carte$a <- remove_carte$a + 1
         removeTab(inputId = "onglets_ty",
@@ -1150,7 +1145,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       observeEvent(input$remove_carte_2_ty_id,{
         remove_carte$a <- remove_carte$a + 1
         removeTab(inputId = "onglets_ty",
@@ -1158,7 +1153,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       observeEvent(input$remove_carte_3_ty_id,{
         remove_carte$a <- remove_carte$a + 1
         removeTab(inputId = "onglets_ty",
@@ -1166,7 +1161,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       observeEvent(input$remove_carte_4_ty_id,{
         remove_carte$a <- remove_carte$a + 1
         removeTab(inputId = "onglets_ty",
@@ -1174,7 +1169,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       observeEvent(input$remove_carte_5_ty_id,{
         remove_carte$a <- remove_carte$a + 1
         removeTab(inputId = "onglets_ty",
@@ -1182,7 +1177,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       observeEvent(input$remove_carte_6_ty_id,{
         remove_carte$a <- remove_carte$a + 1
         removeTab(inputId = "onglets_ty",
@@ -1190,28 +1185,28 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                   session = session
         )
       }, ignoreInit = TRUE)
-      
+
       # TABLEAUX DE DONNEES, MAILLE ET CONTOUR
-      
+
       output$mydonnees_ty <- DT::renderDataTable(DT::datatable({
         data <- as.data.frame(analyse_ty()[[1]])
         tableau_donnees <- data[,c("CODE","LIBELLE",varTypo)]
       },  style = 'bootstrap'
       ))
-      
+
       output$mycontour_ty <- DT::renderDataTable(DT::datatable({
         data <- as.data.frame(fondContour)
         tableau_contour <- data[,c(1:2)]
       },  style = 'bootstrap'
       ))
-      
+
       # ENVOI DU LEAFLET A L'UI
-      
+
       output$mymap_ty <- renderLeaflet({
         react_fond_ty()
       })
-      
+
     }
-    
+
     runApp(shinyApp(ui = ui, server = server), launch.browser = TRUE)
     }

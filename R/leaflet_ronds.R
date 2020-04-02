@@ -2,10 +2,10 @@ leaflet_ronds <-
 function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,rayonRond=NULL,rapportRond=NULL,emprise="FRM",fondEtranger=NULL,fondChx=NULL,colPos="#CD853F",colNeg="#6495ED",colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,opacityElargi=0.6,zoomMaille=NULL,map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
-    
+
     # Verification des parametres
     leafletVerifParamRonds(data,fondMaille,fondMailleElargi,fondSuppl,idData,varVolume,rayonRond,rapportRond,emprise,fondEtranger,fondChx,colPos,colNeg,colBorderPos,colBorderNeg,epaisseurBorder,opacityElargi,map_proxy)
-    
+
     if(!is.null(fondChx))
     {
       centroid <- "chx"
@@ -13,42 +13,42 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
     {
       centroid <- "centroid"
     }
-    
+
     names(data)[names(data)==idData] <- "CODE"
     names(fondMaille)[1] <- "CODE"
     names(fondMaille)[2] <- "LIBELLE"
-    if(!is.null(fondMailleElargi)) 
+    if(!is.null(fondMailleElargi))
     {
       names(fondMailleElargi)[1] <- "CODE"
       names(fondMailleElargi)[2] <- "LIBELLE"
       fondMailleElargi$LIBELLE<-iconv(fondMailleElargi$LIBELLE,"latin1","utf8")
     }
-    if(!is.null(fondSuppl)) 
+    if(!is.null(fondSuppl))
     {
       names(fondSuppl)[1] <- "CODE"
       names(fondSuppl)[2] <- "LIBELLE"
       fondSuppl$LIBELLE<-iconv(fondSuppl$LIBELLE,"latin1","utf8")
     }
     epsg_etranger <- NULL
-    if(!is.null(fondEtranger)) 
+    if(!is.null(fondEtranger))
     {
       names(fondEtranger)[1] <- "CODE"
       names(fondEtranger)[2] <- "LIBELLE"
       fondEtranger$LIBELLE<-iconv(fondEtranger$LIBELLE,"latin1","utf8")
-      
+
       epsg_etranger <- st_crs(fondEtranger)$epsg
       if(is.na(epsg_etranger) | epsg_etranger=="4326")
       {
         epsg_etranger <- "3395" # Mercator
       }
     }
-    if(!is.null(fondChx)) 
+    if(!is.null(fondChx))
     {
       names(fondChx)[1] <- "CODE"
     }
-    
+
     fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","utf8")
-    
+
     if(!is.null(map_proxy))
     {
       if(any(class(map_proxy) %in% "leaflet_proxy")) # Contexte shiny/proxy
@@ -57,7 +57,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
         clearGroup(map_proxy, group = "carte_ronds_elargi")
       }
     }
-    
+
     if(is.null(fondMailleElargi))
     {
       elargi <- FALSE
@@ -65,7 +65,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
     {
       elargi <- TRUE
     }
-    
+
     code_epsg <- switch(emprise,
                         "FRM"="2154",# Lambert 93
                         "971"="32620",# UTM 20 N
@@ -74,14 +74,14 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                         "974"="2975",# UTM 40 S
                         "976"="4471",# UTM 38 S
                         "999"=epsg_etranger)
-    
+
     # Calcul du rayon du rond max
-    
+
     #Aire totale du territoire d'etude
     aire_territoire <- as.numeric(sum(st_area(fondMaille[fondMaille$CODE %in% data[,"CODE"],]))) #Superficie du territoire
     #valeur max de la serie de donnees
     suppressWarnings(max_var <- max(abs(data[data[,"CODE"] %in% fondMaille$CODE,varVolume]), na.rm = TRUE))
-    
+
     serie <- data[data[,"CODE"] %in% fondMaille$CODE,varVolume]
     serie <- serie[!is.na(serie)]
     #on ramene la serie a un quotient fonction de la valeur max
@@ -117,21 +117,21 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
         rayonRond <- max_rayon_metres
       }
     }
-    
+
     if(is.null(rayonRond) & is.null(rapportRond))
     {
       rayonRond <- max_rayon_metres/1.25
     }
-    
+
     if(is.null(rayonRond) & !is.null(rapportRond)) #Calcul du rayon a partir du rapport
     {
       rayonRond <- round(sqrt((rapportRond*max_var)/pi),0)
     }
-    
+
     # Analyse
-    
+
     analyse <- k_ronds(fondMaille,fondMailleElargi,names(fondMaille)[1],data,"CODE",varVolume,elargi,centroid,fondChx)
-    
+
     if(is.null(analyse))
     {
       if(!is.null(map_proxy))
@@ -143,17 +143,17 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
         stop(simpleError("La maille ne correspond pas au niveau geographique du fichier de donnees. Veuillez svp choisir une maille adaptee ou modifier le fichier de donnees"))
       }
     }
-    
+
     analyse$donnees[,"TXT1"] <- paste0("<b> <font color=#2B3E50>",format(analyse$donnees$save, big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
     if(elargi)
     {
       analyse$donnees_elargi[,"TXT1"] <- paste0("<b> <font color=#2B3E50>",format(analyse$donnees_elargi$save, big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
     }
-    
+
     analyse_WGS84 <- st_transform(analyse$analyse_points,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-    
+
     # Fonds habillages
-    
+
     if(emprise=="FRM")
     {
       fond_pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
@@ -190,15 +190,15 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
       fond_etranger <- st_transform(fondEtranger,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
       fond_pays <- fond_etranger
     }else{}
-    
+
     maille_WGS84 <- st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-    
+
     if(elargi)
     {
       analyse_WGS84_elargi <- st_transform(analyse$analyse_points_elargi,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
       maille_WGS84_elargi <- st_transform(fondMailleElargi,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
     }
-    
+
     if(!is.null(zoomMaille))
     {
       zoom_maille_WGS84 <- maille_WGS84[maille_WGS84$CODE %in% zoomMaille,]
@@ -213,19 +213,19 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
     {
       list_bbox <- list(c(st_bbox(maille_WGS84)[1],st_bbox(maille_WGS84)[3]),c(st_bbox(maille_WGS84)[2],st_bbox(maille_WGS84)[4]))
     }
-    
+
     if(!is.null(fondSuppl))
     {
       fond_territoire <- st_transform(fondSuppl,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
     }
-    
+
     if(!is.null(fondMailleElargi))
     {
       fondMailleElargi <- st_transform(fondMailleElargi,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
     }
-    
+
     # CONSTRUCTION DE LA MAP EN LEAFLET
-    
+
     if(is.null(map_proxy) | (!is.null(map_proxy) & class(map_proxy)=="character"))
     {
       map <- leaflet(padding = 0,
@@ -233,17 +233,17 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                        preferCanvas = TRUE,
                        transition = 2
                      )) %>%
-        
+
         setMapWidgetStyle(list(background = "#AFC9E0")) %>%
-        
+
         addTiles_insee(attribution = paste0("<a href=\"http://www.insee.fr\">OCEANIS - \u00A9 IGN - INSEE ",format(Sys.time(), format = "%Y"),"</a>")) %>%
-        
+
         fitBounds(lng1 = min(list_bbox[[1]]),
                   lat1 = min(list_bbox[[2]]),
                   lng2 = max(list_bbox[[1]]),
                   lat2 = max(list_bbox[[2]])
         ) %>%
-        
+
         # Pour gerer l'ordre des calques
         addMapPane(name = "fond_pays", zIndex = 401) %>%
         addMapPane(name = "fond_etranger", zIndex = 402) %>%
@@ -254,14 +254,14 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
         addMapPane(name = "fond_ronds_elargi", zIndex = 407) %>%
         addMapPane(name = "fond_ronds", zIndex = 408) %>%
         addMapPane(name = "fond_legende", zIndex = 409) %>%
-        
+
         # On ajoute une barre d'echelle
         addScaleBar(position = 'bottomright',
                     options = scaleBarOptions(metric = TRUE, imperial = FALSE)
         )
-      
+
       # AFFICHAGE DES FONDS D'HABILLAGE
-      
+
       if(emprise %in% c("FRM","973")) # France metro ou Guyane
       {
         map <- addPolygons(map = map, data = fond_pays[,"LIBGEO"], opacity = 1,
@@ -273,7 +273,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                            group = "carte_ronds_init",
                            layerId = list(fond_pays=fond_pays,code_epsg=code_epsg,nom_fond="fond_pays")
         )
-        
+
         map <- addPolygons(map = map, data = fond_france[,"LIBGEO"], opacity = 1,
                            stroke = TRUE, color = "black",
                            weight = 1.5,
@@ -306,9 +306,9 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                            layerId = list(fond_etranger=fond_etranger,code_epsg=code_epsg,nom_fond="fond_etranger")
         )
       }
-      
+
       # AFFICHAGE DU FOND TERRITOIRE
-      
+
       if(!is.null(fondSuppl))
       {
         map <- addPolygons(map = map, data = fond_territoire,
@@ -321,9 +321,9 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                            layerId = list(fond_territoire=fond_territoire,code_epsg=code_epsg,nom_fond="fond_territoire")
         )
       }
-      
+
       # AFFICHAGE DE LA MAILLE
-      
+
       map <- addPolygons(map = map, data = maille_WGS84, opacity = 1, #maille_WGS84
                          stroke = TRUE, color = "grey", weight = 1,
                          options = pathOptions(pane = "fond_maille", clickable = T),
@@ -332,7 +332,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                          group = "carte_ronds_init",
                          layerId = list(maille_WGS84=maille_WGS84,code_epsg=code_epsg,nom_fond="fond_maille")
       )
-      
+
     }else # Contexte shiny/proxy
     {
       map <- map_proxy
@@ -350,11 +350,11 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                          layerId = list(maille_WGS84_elargi=maille_WGS84_elargi,code_epsg=code_epsg,nom_fond="fond_maille_elargi")
       )
     }
-    
+
     if(!is.null(fondMailleElargi))
     {
       # AFFICHAGE DE L'ANALYSE ELARGIE
-      
+
       map <- addCircles(map = map,
                         lng = st_coordinates(analyse_WGS84_elargi)[,1],
                         lat = st_coordinates(analyse_WGS84_elargi)[,2],
@@ -374,9 +374,9 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                                       max_var=max_var,var_volume=varVolume,colPos=colPos,colNeg=colNeg,colBorderPos=colBorderPos,colBorderNeg=colBorderNeg,epaisseurBorder=epaisseurBorder)
       )
     }
-    
+
     # AFFICHAGE DE L'ANALYSE
-    
+
     map <- addCircles(map = map,
                       lng = st_coordinates(analyse_WGS84)[,1],
                       lat = st_coordinates(analyse_WGS84)[,2],
@@ -395,6 +395,6 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                                                 if(min(analyse$donnees$save)<0){"fond_ronds_neg_carte"}else{" "}),
                                    max_var=max_var,var_volume=varVolume,colPos=colPos,colNeg=colNeg,colBorderPos=colBorderPos,colBorderNeg=colBorderNeg,epaisseurBorder=epaisseurBorder)
     )
-    
+
     return(map)
   }

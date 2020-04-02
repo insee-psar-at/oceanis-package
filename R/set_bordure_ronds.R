@@ -1,25 +1,86 @@
+#' @title Modify the circles' borders of 'leaflet' map's analysis
+#'
+#' @description Modify the circles' borders of 'leaflet' map's analysis.
+#'
+#' @details Permet de modifier l'apparence des bordures des ronds, c'est-a-dire leur
+#' couleur et leur epaisseur.
+#'
+#' Il est possible de distinguer les valeurs en volume positives des valeurs en
+#' volume negatives.
+#'
+#' Applicable pour les analyses en ronds proportionnels, en classes dans les
+#' ronds et en ronds sur les classes.
+#'
+#' @usage set_bordure_ronds(map, colBorderPos = "white", colBorderNeg =
+#' "white", epaisseurBorder = 1, map_leaflet = NULL)
+#'
+#' @param map objet leaflet.
+#' @param colBorderPos chaine de caracteres (character). Couleur nommee (par
+#' exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white".
+#' @param colBorderNeg chaine de caracteres (character). Couleur nommee (par
+#' exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white".
+#' @param epaisseurBorder chaine de caracteres (numeric). Epaisseur de la
+#' bordure des ronds. Par defaut a 1".
+#' @param map_leaflet objet leaflet. Pour l'integration des fonctions leaflet
+#' dans les applications shiny (cf vignette). Par defaut a NULL.
+#'
+#' @return Retourne un objet de type leaflet.
+#'
+#' @seealso \code{\link{recup_palette},}
+#'
+#' \code{\link{leaflet_ronds}, \link{leaflet_classes},
+#' \link{leaflet_ronds_classes}, \link{leaflet_classes_ronds},
+#' \link{leaflet_typo},}
+#'
+#' \code{\link{leaflet_oursins}, \link{leaflet_joignantes},
+#' \link{leaflet_saphirs}}
+#'
+#' @references Un convertisseur de couleurs pour visualiser une couleur a
+#' partir de son nom, son code hexadecimal ou RGB :
+#' http://www.proftnj.com/RGB3.htm
+#'
+#' @keywords documentation
+#'
+#' @examples
+#'
+#' data("depm")
+#'
+#' data("donnees_monoloc")
+#'
+#' # Ronds proportionnels sur une analyse en classes
+#' map <- leaflet_ronds(data = donnees_monoloc, fondMaille = depm, idData = "COD_DEP",
+#' varVolume = "POP_2015")
+#' map <- set_bordure_ronds(map = map, colBorderPos = "grey", epaisseurBorder = 3)
+#' \donttest{
+#'  map
+#' }
+#'
+#' @import leaflet sf grDevices
+#'
+#' @export set_bordure_ronds
+#'
 set_bordure_ronds <-
 function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_leaflet=NULL)
   {
     msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5 <- NULL
-    
+
     if(any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
     if(any(class(colBorderPos)!="character")) msg_error2 <- "La couleur de la bordure doit etre de type caractere (nommee ou hexadecimal) / "
     if(any(class(colBorderNeg)!="character")) msg_error3 <- "La couleur de la bordure doit etre de type caractere (nommee ou hexadecimal) / "
     if(any(class(epaisseurBorder)!="numeric")) msg_error4 <- "L'epaiseeur de la bordure doit etre de type numerique / "
     if(!is.null(map_leaflet)) if (any(!any(class(map_leaflet) %in% "leaflet"), !any(class(map_leaflet) %in% "htmlwidget"))) msg_error5 <- "La carte doit etre un objet leaflet / "
-    
+
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),!is.null(msg_error5)))
     {
       stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5)))
     }
-    
+
     if(!is.null(map_leaflet))
     {
       map_proxy <- map
       map <- map_leaflet
     }
-    
+
     idx_maille <- NULL
     idx_carte <- NULL
     classes <- F
@@ -56,37 +117,37 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
         }
       }
     }
-    
+
     if(is.null(map_leaflet)) # contexte leaflet
     {
       for(i in 1:length(idx_carte))
       {
         valeurs <- map$x$calls[[idx_carte[i]]]$args[[4]]$analyse$donnees$save
-        
+
         val_pos <- which(valeurs>=0)
-        
+
         if(length(val_pos)>0)
         {
           map$x$calls[[idx_carte[i]]]$args[[6]]$color[val_pos] <- colBorderPos
         }
-        
+
         val_neg <- which(valeurs<0)
-        
+
         if(length(val_neg)>0)
         {
           map$x$calls[[idx_carte[i]]]$args[[6]]$color[val_neg] <- colBorderNeg
         }
-        
+
         map$x$calls[[idx_carte[i]]]$args[[6]]$weight <- epaisseurBorder
       }
     }else # contexte shiny/proxy
     {
       map_leaflet <- map
       map <- map_proxy
-      
+
       clearGroup(map, group = "carte_ronds")
       clearGroup(map, group = "carte_ronds_elargi")
-      
+
       analyse_WGS84 <- map_leaflet$x$calls[[idx_carte[2]]]$args[[4]]$analyse_WGS84
       analyse <- map_leaflet$x$calls[[idx_carte[2]]]$args[[4]]$analyse
       code_epsg <- map_leaflet$x$calls[[idx_carte[2]]]$args[[4]]$code_epsg
@@ -94,7 +155,7 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
       max_var <- map_leaflet$x$calls[[idx_carte[2]]]$args[[4]]$max_var
       varVolume <- map_leaflet$x$calls[[idx_carte[2]]]$args[[4]]$var_volume
       rayonRond <- map_leaflet$x$calls[[idx_carte[2]]]$args[[4]]$rayonRond
-      
+
       if(!classes) # Analyse en ronds
       {
         if(any(map_leaflet$x$calls[[idx_carte[1]]]$args[[4]]$nom_fond %in% c("fond_ronds_pos_elargi_carte","fond_ronds_neg_elargi_carte"))) # analyse elargie
@@ -102,10 +163,10 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
           maille_WGS84_elargi <- map_leaflet$x$calls[[idx_maille[1]]]$args[[2]]$maille_WGS84_elargi
           analyse_WGS84_elargi <- map_leaflet$x$calls[[idx_carte[1]]]$args[[4]]$analyse_WGS84_elargi
           opacityElargi <- map_leaflet$x$calls[[idx_carte[1]]]$args[[6]]$fillOpacity
-          
+
           colorPos <- map_leaflet$x$calls[[idx_carte[2]]]$args[[4]]$colPos
           colorNeg <- map_leaflet$x$calls[[idx_carte[2]]]$args[[4]]$colNeg
-          
+
           map <- addPolygons(map = map, data = maille_WGS84_elargi,
                              stroke = TRUE, color = "grey", opacity = opacityElargi,
                              weight = 0.5,
@@ -115,7 +176,7 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
                              group = "carte_ronds_elargi",
                              layerId = list(maille_WGS84_elargi=maille_WGS84_elargi,code_epsg=code_epsg,nom_fond="fond_maille_elargi")
           )
-          
+
           map <- addCircles(map = map,
                             lng = st_coordinates(analyse_WGS84_elargi)[,1],
                             lat = st_coordinates(analyse_WGS84_elargi)[,2],
@@ -135,7 +196,7 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
                                            max_var=max_var,var_volume=varVolume,colPos=colorPos,colNeg=colorNeg,colBorderPos=colBorderPos,colBorderNeg=colBorderNeg,epaisseurBorder=epaisseurBorder)
           )
         }
-        
+
         map <- addCircles(map = map,
                           lng = st_coordinates(analyse_WGS84)[,1],
                           lat = st_coordinates(analyse_WGS84)[,2],
@@ -154,7 +215,7 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
                                                     if(min(analyse$donnees$save)<0){"fond_ronds_neg_carte"}else{" "}),
                                          max_var=max_var,var_volume=varVolume,colPos=colorPos,colNeg=colorNeg,colBorderPos=colBorderPos,colBorderNeg=colBorderNeg,epaisseurBorder=epaisseurBorder)
         )
-        
+
       }else if(classes_ronds) # Analyse classes_ronds
       {
         if(any(map_leaflet$x$calls[[idx_carte[1]]]$args[[4]]$nom_fond %in% "fond_classes_ronds_elargi_carte")) # analyse elargie
@@ -162,7 +223,7 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
           analyse_WGS84_elargi <- map_leaflet$x$calls[[idx_carte[1]]]$args[[4]]$analyse_WGS84_elargi
           analyse_maille_elargi <- map_leaflet$x$calls[[idx_carte[1]]]$args[[4]]$analyse_maille_elargi
           opacityElargi <- map_leaflet$x$calls[[idx_carte[1]]]$args[[6]]$fillOpacity
-          
+
           map <- addCircles(map = map,
                             lng = st_coordinates(analyse_WGS84_elargi)[,1],
                             lat = st_coordinates(analyse_WGS84_elargi)[,2],
@@ -177,9 +238,9 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
                             layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse=analyse,analyse_maille_elargi=analyse_maille_elargi,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_classes_ronds_elargi_carte",max_var=max_var,var_volume=varVolume,rayonRond=rayonRond,col_border_ronds_pos=colBorderPos,col_border_ronds_neg=colBorderNeg,epaisseurBorder=epaisseurBorder)
           )
         }
-        
+
         analyse_maille <- map_leaflet$x$calls[[idx_carte[1]]]$args[[4]]$analyse_maille
-        
+
         map <- addCircles(map = map,
                           lng = st_coordinates(analyse_WGS84)[,1],
                           lat = st_coordinates(analyse_WGS84)[,2],
@@ -200,14 +261,14 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
         precision <- map_leaflet$x$calls[[idx_carte[2]]]$args[[4]]$precision
         stylePalette <- map_leaflet$x$calls[[idx_carte[2]]]$args[[4]]$stylePalette
         pal_classes <- map_leaflet$x$calls[[idx_carte[2]]]$args[[4]]$pal_classes
-        
+
         if(any(map_leaflet$x$calls[[idx_carte[1]]]$args[[4]]$nom_fond %in% "fond_classes_ronds_elargi_carte")) # analyse elargie
         {
           analyse_WGS84_elargi <- map_leaflet$x$calls[[idx_carte[1]]]$args[[4]]$analyse_WGS84_elargi
           opacityElargi <- map_leaflet$x$calls[[idx_carte[1]]]$args[[6]]$fillOpacity
-          
+
           analyse_maille_classe_elargi <- analyse$donnees_elargi[rev(order(analyse$donnees_elargi[,varVolume])),varRatio]
-          
+
           map <- addCircles(map = map,
                             lng = st_coordinates(analyse_WGS84_elargi)[,1],
                             lat = st_coordinates(analyse_WGS84_elargi)[,2],
@@ -224,9 +285,9 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
                             layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse=analyse,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_ronds_classes_elargi_carte",bornes=bornes,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal_classes,col_border_ronds_pos=colBorderPos,col_border_ronds_neg=colBorderNeg,epaisseurBorder=epaisseurBorder)
           )
         }
-        
+
         analyse_maille_classe <- analyse$donnees[rev(order(analyse$donnees[,varVolume])),varRatio]
-        
+
         map <- addCircles(map = map,
                           lng = st_coordinates(analyse_WGS84)[,1],
                           lat = st_coordinates(analyse_WGS84)[,2],
@@ -247,6 +308,6 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
         stop(simpleWarning("L'apparence de la bordure des ronds ne s'applique que pour les analyses en ronds, en classes dans les ronds (ronds_classes) ou en ronds sur les classes (classes_ronds)"))
       }
     }
-    
+
     return(map)
   }

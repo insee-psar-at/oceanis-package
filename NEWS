@@ -1,4 +1,14 @@
-﻿Changes in version 1.0.6
+﻿Changes in version 1.0.8
+
+Changes in version 1.0.7
+
+BUG FIXES and IMPROVEMENTS
+
+- Adapatation du code pour la montee de version du package sf 0.9.0.
+- Mise a jour de la documentation realisee avec Roxygen2.
+
+
+Changes in version 1.0.6
 
 FEATURES
 
