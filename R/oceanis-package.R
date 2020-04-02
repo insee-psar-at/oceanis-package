@@ -347,7 +347,7 @@ NULL
 #'  ## End(Not run)
 #' }
 #'
-#' @import sf leaflet utils stringr
+#' @import leaflet sf utils stringr
 #'
 #' @export export_qgis_ronds
 #' @export export_qgis_classes
@@ -747,7 +747,8 @@ NULL
 #'  map
 #' }
 #'
-#' @import leaflet classInt sf leaflet.extras grDevices
+#' @import leaflet sf classInt leaflet.extras grDevices
+#' @importFrom lwgeom st_geod_length
 #' @rawNamespace import(shiny, except = runExample)
 #'
 #' @export leaflet_fonds_simples
@@ -1179,6 +1180,7 @@ NULL
 #' etiquettes = etiquettes)
 #'
 #' @import classInt sf grDevices dplyr graphics
+#' @importFrom lwgeom st_geod_length
 #'
 #' @export plot_ronds
 #' @export plot_classes
@@ -1584,7 +1586,8 @@ NULL
 #' varFlux = "MIGR", direction = "Ent")
 #' }
 #'
-#' @import shinythemes shinyjs shinyBS leaflet ggplot2 classInt sf leaflet.extras utils dplyr
+#' @import shinythemes shinyjs shinyBS leaflet sf ggplot2 classInt leaflet.extras utils dplyr
+#' @importFrom lwgeom st_geod_length
 #' @rawNamespace import(shiny, except = runExample)
 #'
 #' @export shiny_ronds

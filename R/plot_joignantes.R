@@ -182,7 +182,15 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
 
     long_pl <- large_pl*2
 
-    flux_leg <- flux_legende_joignantes_pl(fond_points_WGS84$lng,fond_points_WGS84$lat,long_pl,large_pl,st_crs(fondMaille)[1]$epsg)
+    if(substr(st_crs(fondMaille)[1]$input,1,5) == "EPSG:")
+    {
+      epsgFondMaille <- substr(st_crs(fondMaille)[1]$input,6,9)
+    }else
+    {
+      epsgFondMaille <- st_crs(fondMaille)[1]$input
+    }
+
+    flux_leg <- flux_legende_joignantes_pl(fond_points_WGS84$lng,fond_points_WGS84$lat,long_pl,large_pl,epsgFondMaille)
     flux_leg <- cbind(flux_leg,VALEUR=c(vmax,vmax/3))
 
     if(!is.null(etiquettes))

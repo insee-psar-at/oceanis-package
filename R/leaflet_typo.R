@@ -22,7 +22,14 @@ function(data,fondMaille,fondSuppl=NULL,idData,varTypo,emprise="FRM",fondEtrange
       names(fondEtranger)[2] <- "LIBELLE"
       fondEtranger$LIBELLE<-iconv(fondEtranger$LIBELLE,"latin1","utf8")
 
-      epsg_etranger <- st_crs(fondEtranger)$epsg
+      if(substr(st_crs(fondEtranger)[1]$input,1,5) == "EPSG:")
+      {
+        epsg_etranger <- substr(st_crs(fondEtranger)[1]$input,6,9)
+      }else
+      {
+        epsg_etranger <- st_crs(fondEtranger)[1]$input
+      }
+
       if(is.na(epsg_etranger) | epsg_etranger=="4326")
       {
         epsg_etranger <- "3395" # Mercator

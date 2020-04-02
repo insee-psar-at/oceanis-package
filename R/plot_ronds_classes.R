@@ -207,7 +207,15 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     fond_points_WGS84 <- data.frame(st_coordinates(fond_points_WGS84))
     names(fond_points_WGS84) <- c("lng","lat")
 
-    ronds_leg <- construction_ronds_legende(fond_points_WGS84$lng,fond_points_WGS84$lat,st_crs(fondMaille)[1]$epsg,rayonRond)
+    if(substr(st_crs(fondMaille)[1]$input,1,5) == "EPSG:")
+    {
+      epsgFondMaille <- substr(st_crs(fondMaille)[1]$input,6,9)
+    }else
+    {
+      epsgFondMaille <- st_crs(fondMaille)[1]$input
+    }
+
+    ronds_leg <- construction_ronds_legende(fond_points_WGS84$lng,fond_points_WGS84$lat,epsgFondMaille,rayonRond)
 
     ronds_pl_leg <- ronds_leg[[2]]
 
