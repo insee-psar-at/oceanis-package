@@ -108,12 +108,15 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varTypo
     x_marge <- (st_bbox(fondMaille)$xmax-st_bbox(fondMaille)$xmin)/20
     y_marge <- (st_bbox(fondMaille)$ymax-st_bbox(fondMaille)$ymin)/20
 
+    if(is.null(xlim)) xlim <- c(st_bbox(fondMaille)$xmin,st_bbox(fondMaille)$xmax+x_marge*3)
+    if(is.null(ylim)) ylim <- c(st_bbox(fondMaille)$ymin,st_bbox(fondMaille)$ymax+y_marge*3)
+
     if(is.null(xLeg) | is.null(yLeg))
     {
-      xLeg <- st_bbox(fondMaille)$xmax-(st_bbox(fondMaille)$xmax-st_bbox(fondMaille)$xmin)/10
-      yLeg <- st_bbox(fondMaille)$ymax-(st_bbox(fondMaille)$ymax-st_bbox(fondMaille)$ymin)/10
+      xLeg <- xlim[2]-(xlim[2]-xlim[1])/10
+      yLeg <- ylim[2]-(ylim[2]-ylim[1])/10
     }
-    x_large <- (st_bbox(fondMaille)$xmax-st_bbox(fondMaille)$xmin)/20
+    x_large <- (xlim[2]-xlim[1])/20
     y_large <- x_large/1.5
 
     rectangle <- matrix(c(xLeg-x_large,yLeg,xLeg,yLeg,xLeg,yLeg-y_large,xLeg-x_large,yLeg-y_large,xLeg-x_large,yLeg),ncol=2, byrow=TRUE)
@@ -131,13 +134,17 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varTypo
       label_rectangle <- c(label_rectangle,pal_typo[i,"varTypo"])
     }
 
+    xmin <- min(st_coordinates(fond_leg_typo)[,1]) - x_large
+    xmax <- max(st_coordinates(fond_leg_typo)[,1]) + (x_large*7)
+    ymin <- min(st_coordinates(fond_leg_typo)[,2]) - y_large
+    ymax <- max(st_coordinates(fond_leg_typo)[,2]) + (y_large*2)
+    bbox_leg_typo <- matrix(c(xmin,ymax, xmax,ymax, xmax,ymin, xmin,ymin, xmin,ymax),ncol=2, byrow=TRUE)
+    bbox_leg_typo <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_typo))),crs=st_crs(fondMaille))
+
     if(!is.null(etiquettes))
     {
       tableEtiquettes <- table_etiquettes(fondMaille,etiquettes)
     }
-
-    if(is.null(xlim)) xlim <- c(st_bbox(fondMaille)$xmin,st_bbox(fondMaille)$xmax+x_marge*3)
-    if(is.null(ylim)) ylim <- c(st_bbox(fondMaille)$ymin,st_bbox(fondMaille)$ymax+y_marge*3)
 
     par(mai=c(0,0,0,0))
     plot(st_geometry(fondMaille),xlim=xlim,ylim=ylim,border=colBorder)
@@ -161,24 +168,6 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varTypo
       suppressWarnings(plot(fond_typo[as.data.frame(fond_typo)[,"classe"]==i,],add=T,col=pal_typo$col[i],border=colBorder,lwd=1))
     }
 
-    if(is.null(labels))
-    {
-      for(i in 1:length(pal_typo$col))
-      {
-        suppressWarnings(plot(st_geometry(fond_leg_typo[i,]),add=T,col=pal_typo$col[i],border="black",lwd=1))
-        text(max(st_coordinates(fond_leg_typo[i,])[,1])+y_large/2,mean(st_coordinates(fond_leg_typo[i,])[,2]),labels=label_rectangle[i],cex=0.9,adj=0)
-      }
-    }else
-    {
-      for(i in 1:length(pal_typo$col))
-      {
-        suppressWarnings(plot(st_geometry(fond_leg_typo[i,]),add=T,col=pal_typo$col[i],border="black",lwd=1))
-        text(max(st_coordinates(fond_leg_typo[i,])[,1])+y_large/2,mean(st_coordinates(fond_leg_typo[i,])[,2]),labels=labels[i],cex=0.9,adj=0)
-      }
-    }
-
-    text(min(st_coordinates(fond_leg_typo[1,])[,1]),max(st_coordinates(fond_leg_typo[1,])[,2])+y_large,labels=titreLeg,cex=1,adj=0)
-
     if(!is.null(fondSurAnalyse))
     {
       for(i in 1:length(fondSurAnalyse))
@@ -198,6 +187,26 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varTypo
         text(tableEtiquettes[i,"X"],tableEtiquettes[i,"Y"],labels=tableEtiquettes[i,"LIBELLE"],cex=tableEtiquettes[i,"TAILLE"],col=tableEtiquettes[i,"COL"],font=tableEtiquettes[i,"FONT"])
       }
     }
+
+    suppressWarnings(plot(bbox_leg_typo,add=T,col="white",border="white",lwd=1))
+
+    if(is.null(labels))
+    {
+      for(i in 1:length(pal_typo$col))
+      {
+        suppressWarnings(plot(st_geometry(fond_leg_typo[i,]),add=T,col=pal_typo$col[i],border="black",lwd=1))
+        text(max(st_coordinates(fond_leg_typo[i,])[,1])+y_large/2,mean(st_coordinates(fond_leg_typo[i,])[,2]),labels=label_rectangle[i],cex=0.9,adj=0)
+      }
+    }else
+    {
+      for(i in 1:length(pal_typo$col))
+      {
+        suppressWarnings(plot(st_geometry(fond_leg_typo[i,]),add=T,col=pal_typo$col[i],border="black",lwd=1))
+        text(max(st_coordinates(fond_leg_typo[i,])[,1])+y_large/2,mean(st_coordinates(fond_leg_typo[i,])[,2]),labels=labels[i],cex=0.9,adj=0)
+      }
+    }
+
+    text(min(st_coordinates(fond_leg_typo[1,])[,1]),max(st_coordinates(fond_leg_typo[1,])[,2])+y_large,labels=titreLeg,cex=1,adj=0)
 
     if(titreCarte!="")
     {

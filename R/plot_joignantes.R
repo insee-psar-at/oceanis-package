@@ -193,6 +193,16 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
     if(is.null(xlim)) xlim <- c(st_bbox(fondMaille)$xmin,st_bbox(fondMaille)$xmax+x_marge*3)
     if(is.null(ylim)) ylim <- c(st_bbox(fondMaille)$ymin,st_bbox(fondMaille)$ymax+y_marge*3)
 
+    x_large <- (xlim[2]-xlim[1])/20
+    y_large <- x_large/1.5
+
+    xmin <- min(st_coordinates(flux_leg)[,1]) - x_large
+    xmax <- max(st_coordinates(flux_leg)[,1]) + (x_large*3)
+    ymin <- min(st_coordinates(flux_leg)[,2]) - y_large
+    ymax <- max(st_coordinates(flux_leg)[,2]) + (y_large*3)
+    bbox_leg_joignantes <- matrix(c(xmin,ymax, xmax,ymax, xmax,ymin, xmin,ymin, xmin,ymax),ncol=2, byrow=TRUE)
+    bbox_leg_joignantes <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_joignantes))),crs=st_crs(fondMaille))
+
     par(mai=c(0,0,0,0))
     plot(st_geometry(fondMaille),xlim=xlim,ylim=ylim,border=colBorderMaille)
 
@@ -211,12 +221,6 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
     plot(st_geometry(fondMaille),col="transparent",border=colBorderMaille,add=T)
 
     plot(st_geometry(fond_joignantes),border=colBorder,col=colFleche,add=T)
-
-    plot(st_geometry(flux_leg),col=colFleche,border=colBorder,add=T)
-    text(max(st_coordinates(flux_leg)[st_coordinates(flux_leg)[,4]==1,1])+1000,st_coordinates(flux_leg)[st_coordinates(flux_leg)[,4]==1,2][3],labels=round(vmax,precisionLegFleches),cex=0.9,adj=0)
-    text(max(st_coordinates(flux_leg)[st_coordinates(flux_leg)[,4]==2,1])+1000,st_coordinates(flux_leg)[st_coordinates(flux_leg)[,4]==2,2][3],labels=round(vmax/3,precisionLegFleches),cex=0.9,adj=0)
-
-    text(min(st_coordinates(flux_leg[1,])[,1]),max(st_coordinates(flux_leg[1,])[,2])+(st_bbox(fondMaille)$ymax-st_bbox(fondMaille)$ymin)/20,labels=titreLeg,cex=1,adj=0)
 
     if(!is.null(fondSurAnalyse))
     {
@@ -237,6 +241,14 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
         text(tableEtiquettes[i,"X"],tableEtiquettes[i,"Y"],labels=tableEtiquettes[i,"LIBELLE"],cex=tableEtiquettes[i,"TAILLE"],col=tableEtiquettes[i,"COL"],font=tableEtiquettes[i,"FONT"])
       }
     }
+
+    suppressWarnings(plot(bbox_leg_joignantes,add=T,col="white",border="white",lwd=1))
+
+    plot(st_geometry(flux_leg),col=colFleche,border=colBorder,add=T)
+    text(max(st_coordinates(flux_leg)[st_coordinates(flux_leg)[,4]==1,1])+1000,st_coordinates(flux_leg)[st_coordinates(flux_leg)[,4]==1,2][3],labels=round(vmax,precisionLegFleches),cex=0.9,adj=0)
+    text(max(st_coordinates(flux_leg)[st_coordinates(flux_leg)[,4]==2,1])+1000,st_coordinates(flux_leg)[st_coordinates(flux_leg)[,4]==2,2][3],labels=round(vmax/3,precisionLegFleches),cex=0.9,adj=0)
+
+    text(min(st_coordinates(flux_leg[1,])[,1]),max(st_coordinates(flux_leg[1,])[,2])+(st_bbox(fondMaille)$ymax-st_bbox(fondMaille)$ymin)/20,labels=titreLeg,cex=1,adj=0)
 
     if(titreCarte!="")
     {

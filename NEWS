@@ -1,5 +1,20 @@
 ﻿Changes in version 1.0.8
 
+
+Changes in version 1.7.2
+
+FEATURES
+
+- Pour les fonctions plot_, ajout d'un cadre blanc autour des legendes.
+
+
+Changes in version 1.7.1
+
+BUG FIXES and IMPROVEMENTS
+- Nouvelle numerotation du package. 1er et 2eme chiffre = versions. 3eme chiffre = release.
+- Pour les fonctions plot_classes, plot_ronds_classes, plot_classes_ronds et plot_typo, reduction de la taille de la legende des classes lorsque les paramètres xlim et ylim sont renseignés pour zoomer sur une maille.
+
+
 Changes in version 1.0.7
 
 BUG FIXES and IMPROVEMENTS

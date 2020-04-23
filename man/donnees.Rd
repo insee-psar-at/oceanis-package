@@ -12,7 +12,8 @@
 \alias{regm}
 \alias{fram}
 \title{Examples of data}
-\format{\code{com_dep_13_30_83_84} Un data frame de 792 observations et 3
+\format{
+\code{com_dep_13_30_83_84} Un data frame de 792 observations et 3
 variables.  \describe{ \item{list("CODE")}{vecteur caracteres}
 \item{list("LIBELLE")}{vecteur caracteres}
 \item{list("geometry")}{sfc_GEOMETRY} }
@@ -52,7 +53,8 @@ caracteres} \item{list("SURF")}{vecteur numerique}
 \code{fram} Un data frame de 1 observation et 4 variables.  \describe{
 \item{list("CODE")}{vecteur caracteres} \item{list("LIBELLE")}{vecteur
 caracteres} \item{list("SURF")}{vecteur numerique}
-\item{list("geometry")}{sfc_GEOMETRY} }}
+\item{list("geometry")}{sfc_GEOMETRY} }
+}
 \usage{
 data("com_dep_13_30_83_84")
 

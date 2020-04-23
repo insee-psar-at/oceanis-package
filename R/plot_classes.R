@@ -178,12 +178,15 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
     x_marge <- (st_bbox(fondMaille)$xmax-st_bbox(fondMaille)$xmin)/20
     y_marge <- (st_bbox(fondMaille)$ymax-st_bbox(fondMaille)$ymin)/20
 
+    if(is.null(xlim)) xlim <- c(st_bbox(fondMaille)$xmin,st_bbox(fondMaille)$xmax+x_marge*3)
+    if(is.null(ylim)) ylim <- c(st_bbox(fondMaille)$ymin,st_bbox(fondMaille)$ymax+y_marge*3)
+
     if(is.null(xLeg) | is.null(yLeg))
     {
-      xLeg <- st_bbox(fondMaille)$xmax-(st_bbox(fondMaille)$xmax-st_bbox(fondMaille)$xmin)/10
-      yLeg <- st_bbox(fondMaille)$ymax-(st_bbox(fondMaille)$ymax-st_bbox(fondMaille)$ymin)/10
+      xLeg <- xlim[2]-(xlim[2]-xlim[1])/10
+      yLeg <- ylim[2]-(ylim[2]-ylim[1])/10
     }
-    x_large <- (st_bbox(fondMaille)$xmax-st_bbox(fondMaille)$xmin)/20
+    x_large <- (xlim[2]-xlim[1])/20
     y_large <- x_large/1.5
 
     rectangle <- matrix(c(xLeg-x_large,yLeg,xLeg,yLeg,xLeg,yLeg-y_large,xLeg-x_large,yLeg-y_large,xLeg-x_large,yLeg),ncol=2, byrow=TRUE)
@@ -206,17 +209,21 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
         label_rectangle <- c(label_rectangle,paste0("Moins de ", format(round(bornes[i],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)))
       }else
       {
-        label_rectangle <- c(label_rectangle,paste0("De ", format(round(bornes[i+1],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)," a moins de ", format(round(bornes[i],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)))
+        label_rectangle <- c(label_rectangle,paste0("De ", format(round(bornes[i+1],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)," \u00e0 moins de ", format(round(bornes[i],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)))
       }
     }
+
+    xmin <- min(st_coordinates(fond_leg_classes)[,1]) - x_large
+    xmax <- max(st_coordinates(fond_leg_classes)[,1]) + (x_large*7)
+    ymin <- min(st_coordinates(fond_leg_classes)[,2]) - y_large
+    ymax <- max(st_coordinates(fond_leg_classes)[,2]) + (y_large*2)
+    bbox_leg_classes <- matrix(c(xmin,ymax, xmax,ymax, xmax,ymin, xmin,ymin, xmin,ymax),ncol=2, byrow=TRUE)
+    bbox_leg_classes <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_classes))),crs=st_crs(fondMaille))
 
     if(!is.null(etiquettes))
     {
       tableEtiquettes <- table_etiquettes(fondMaille,etiquettes)
     }
-
-    if(is.null(xlim)) xlim <- c(st_bbox(fondMaille)$xmin,st_bbox(fondMaille)$xmax+x_marge*3)
-    if(is.null(ylim)) ylim <- c(st_bbox(fondMaille)$ymin,st_bbox(fondMaille)$ymax+y_marge*3)
 
     par(mai=c(0,0,0,0))
     plot(st_geometry(fondMaille),xlim=xlim,ylim=ylim,border=colBorder)
@@ -240,14 +247,6 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
       suppressWarnings(plot(fond_classes[between(as.data.frame(fond_classes)[,varRatio],bornes[i+1],bornes[i]),],add=T,col=pal_classes[i],border=colBorder,lwd=1))
     }
 
-    for(i in 1:length(pal_classes))
-    {
-      suppressWarnings(plot(st_geometry(fond_leg_classes[i,]),add=T,col=pal_classes[i],border="black",lwd=1))
-      text(max(st_coordinates(fond_leg_classes[i,])[,1])+y_large/2,mean(st_coordinates(fond_leg_classes[i,])[,2]),labels=label_rectangle[i],cex=0.9,adj=0)
-    }
-
-    text(min(st_coordinates(fond_leg_classes[1,])[,1]),max(st_coordinates(fond_leg_classes[1,])[,2])+y_large,labels=titreLeg,cex=1,adj=0)
-
     if(!is.null(fondSurAnalyse))
     {
       for(i in 1:length(fondSurAnalyse))
@@ -267,6 +266,16 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
         text(tableEtiquettes[i,"X"],tableEtiquettes[i,"Y"],labels=tableEtiquettes[i,"LIBELLE"],cex=tableEtiquettes[i,"TAILLE"],col=tableEtiquettes[i,"COL"],font=tableEtiquettes[i,"FONT"])
       }
     }
+
+    suppressWarnings(plot(bbox_leg_classes,add=T,col="white",border="white",lwd=1))
+
+    for(i in 1:length(pal_classes))
+    {
+      suppressWarnings(plot(st_geometry(fond_leg_classes[i,]),add=T,col=pal_classes[i],border="black",lwd=1))
+      text(max(st_coordinates(fond_leg_classes[i,])[,1])+y_large/2,mean(st_coordinates(fond_leg_classes[i,])[,2]),labels=label_rectangle[i],cex=0.9,adj=0)
+    }
+
+    text(min(st_coordinates(fond_leg_classes[1,])[,1]),max(st_coordinates(fond_leg_classes[1,])[,2])+y_large,labels=titreLeg,cex=1,adj=0)
 
     if(titreCarte!="")
     {
