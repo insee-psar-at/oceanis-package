@@ -48,8 +48,8 @@ function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,va
 
     code_epsg <- switch(emprise,
                         "FRM"="2154",# Lambert 93
-                        "971"="32620",# UTM 20 N
-                        "972"="32620",# UTM 20 N
+                        "971"="5490",# UTM 20 N
+                        "972"="5490",# UTM 20 N
                         "973"="2972",# UTM 22 N
                         "974"="2975",# UTM 40 S
                         "976"="4471",# UTM 38 S
@@ -159,7 +159,7 @@ function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,va
 
     analyse_WGS84 <- st_as_sf(analyse_WGS84)
 
-    analyse_WGS84 <- analyse_WGS84[as.vector(st_length(analyse_WGS84)/2.2)<=filtreDist*1000,]
+    analyse_WGS84 <- analyse_WGS84[as.vector(st_length(analyse_WGS84))/2.2<=filtreDist*1000,]
 
     analyse_WGS84 <- analyse_WGS84[as.data.frame(analyse_WGS84)[,varFlux]>=filtreVol,]
 

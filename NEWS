@@ -7,6 +7,9 @@ FEATURES
 
 - Pour les fonctions plot_, ajout d'un cadre blanc autour des legendes.
 
+BUG FIXES and IMPROVEMENTS
+
+- Adaptation du CRS des fonds DOM et suite à la maj de RSpatial et sf.
 
 Changes in version 1.7.1
 

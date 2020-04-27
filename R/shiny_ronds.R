@@ -652,8 +652,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       code_epsg_rp <- reactive({
         code_epsg <- switch(emprise,
                             "FRM"="2154",# Lambert 93
-                            "971"="32620",# UTM 20 N
-                            "972"="32620",# UTM 20 N
+                            "971"="5490",# UTM 20 N
+                            "972"="5490",# UTM 20 N
                             "973"="2972",# UTM 22 N
                             "974"="2975",# UTM 40 S
                             "976"="4471",# UTM 38 S
