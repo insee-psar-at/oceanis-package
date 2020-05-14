@@ -69,6 +69,12 @@ function(fondPoints,listFonds,emprise="FRM",types=NULL,couleurs=NULL,tailles=NUL
 
     decalageLeg <- xMax/15
 
+    if(is.null(xLeg) | is.null(yLeg))
+    {
+      xLeg <- st_bbox(listFonds[[ixMax]])$xmax
+      yLeg <- st_bbox(listFonds[[iyMax]])$ymax
+    }
+
     for(i in 1:nrow(symbLeg))
     {
       if(i>1)
@@ -76,6 +82,7 @@ function(fondPoints,listFonds,emprise="FRM",types=NULL,couleurs=NULL,tailles=NUL
         yLeg <- c(yLeg,yLeg[length(yLeg)]-decalageLeg)
       }
     }
+
     xLeg <- c(xLeg,rep(xLeg,nrow(symbLeg)-1))
 
     pointsLeg <- data.frame(lng=xLeg,lat=yLeg,stringsAsFactors = FALSE)
