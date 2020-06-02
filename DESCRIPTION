@@ -1,8 +1,8 @@
 Package: oceanis
 Type: Package
 Title: Cartography for Statistical Analysis
-Version: 1.7.2
-Date: 2020-04-23
+Version: 1.7.3
+Date: 2020-06-02
 Description: Creating maps for statistical analysis such as proportional circles, chroropleth, typology and flows. Some functions use 'shiny' or 'leaflet' technologies for dynamism and interactivity.
 	The great features are :
 	- Create maps in a web environment where the parameters are modifiable on the fly ('shiny' and 'leaflet' technology).
@@ -12,8 +12,8 @@ License: GPL (>= 2.0) | file LICENSE
 LazyLoad: yes
 URL: https://github.com/insee-psar-at/oceanis-package/
 BugReports: https://github.com/insee-psar-at/oceanis-package/issues
-Depends: R (>= 3.5.0)
-Imports: shiny (>= 1.4.0.2),shinyBS (>= 0.61),utils (>= 3.5.0),shinyjs (>= 1.1),shinythemes (>= 1.1.2),DT (>= 0.12),sf (>= 0.9.0),stringr (>= 1.4.0),leaflet (>= 2.0.3),leaflet.extras (>= 1.0.0),classInt(>= 0.4.2),units (>= 0.6.5),grDevices (>= 3.5.0),ggplot2 (>= 3.2.1),dplyr (>= 0.8.4),graphics (>= 3.5.0),lwgeom (>= 0.2.1),mapview (>= 2.7.0)
+Depends: R (>= 3.3.0)
+Imports: shiny (>= 1.4.0.2),shinyBS (>= 0.61),utils (>= 3.3.3),shinyjs (>= 1.1),shinythemes (>= 1.1.2),DT (>= 0.12),sf (>= 0.9.0),stringr (>= 1.4.0),leaflet (>= 2.0.3),leaflet.extras (>= 1.0.0),classInt(>= 0.4.2),units (>= 0.6.5),grDevices (>= 3.3.3),ggplot2 (>= 3.2.0),dplyr (>= 0.8.4),graphics (>= 3.3.3),lwgeom (>= 0.2.1),mapview (>= 2.7.0)
 Suggests: knitr, rmarkdown, rio
 VignetteBuilder: knitr
 Encoding: UTF-8
