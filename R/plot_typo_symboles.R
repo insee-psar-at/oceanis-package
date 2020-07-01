@@ -112,7 +112,7 @@ plot_typo_symboles <-
 
     if(!is.null(etiquettes))
     {
-      tableEtiquettes <- table_etiquettes_maj(listFonds[[1]],etiquettes)
+      tableEtiquettes <- table_etiquettes(listFonds[[1]],etiquettes)
     }
 
     par(mai=c(0,0,0,0))

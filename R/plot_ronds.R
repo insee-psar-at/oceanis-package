@@ -154,7 +154,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     fond_points <- analyse[[1]]
     rayons_ronds <-  rayonRond*sqrt(analyse$donnees[,varVolume]/max_var)
     fond_ronds <- st_buffer(fond_points, rayons_ronds)
-    fond_ronds <- st_sf(CODE=analyse$donnees$CODE,LIBELLE=analyse$donnees$LIBELLE,VAR=analyse$donnees[,varVolume],geometry=st_sfc(st_geometry(fond_ronds),crs=st_crs(fondMaille)))
+    fond_ronds <- st_sf(CODE=analyse$donnees$CODE,LIBELLE=analyse$donnees$LIBELLE,VAR=analyse$donnees$save,geometry=st_sfc(st_geometry(fond_ronds),crs=st_crs(fondMaille)))
     names(fond_ronds) <- c("CODE","LIBELLE",varVolume,"geometry")
     fond_ronds_pos <- fond_ronds[as.data.frame(fond_ronds)[,varVolume]>=0,]
     fond_ronds_neg <- fond_ronds[as.data.frame(fond_ronds)[,varVolume]<0,]
