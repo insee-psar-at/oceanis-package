@@ -451,8 +451,6 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
 
       # AFFICHAGE DE L'ANALYSE ELARGIE
 
-      analyse_maille_classe_elargi <- analyse$donnees_elargi[rev(order(analyse$donnees_elargi[,varVolume])),varRatio]
-
       map <- addCircles(map = map,
                         lng = st_coordinates(analyse_WGS84_elargi)[,1],
                         lat = st_coordinates(analyse_WGS84_elargi)[,2],
@@ -463,7 +461,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
                         options = pathOptions(pane = "fond_ronds_elargi", clickable = T),
                         popup = paste0("<b> <font color=#2B3E50>",analyse$donnees_elargi$LIBELLE, "</font> </b><br><b> <font color=#2B3E50>",varVolume," : </font></b>",analyse$donnees_elargi$TXT1,"<br><b><font color=#2B3E50>",varRatio," : </font></b>",analyse$donnees_elargi$TXT2),
                         fill = T,
-                        fillColor = palette(analyse_maille_classe_elargi),
+                        fillColor = palette(analyse$donnees_elargi[,varRatio]),
                         fillOpacity = opacityElargi,
                         group = "carte_ronds_elargi",
                         layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse=analyse,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_ronds_classes_elargi_carte",bornes=bornes,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal_classes,col_border_ronds_pos=colBorderPos,col_border_ronds_neg=colBorderNeg,epaisseurBorder=epaisseurBorder)
@@ -471,8 +469,6 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
     }
 
     # AFFICHAGE DE L'ANALYSE
-
-    analyse_maille_classe <- analyse$donnees[rev(order(analyse$donnees[,varVolume])),varRatio]
 
     map <- addCircles(map = map,
                       lng = st_coordinates(analyse_WGS84)[,1],
@@ -484,7 +480,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
                       options = pathOptions(pane = "fond_ronds", clickable = T),
                       popup = paste0("<b> <font color=#2B3E50>",analyse$donnees$LIBELLE, "</font> </b><br><b> <font color=#2B3E50>",varVolume," : </font></b>",analyse$donnees$TXT1,"<br><b><font color=#2B3E50>",varRatio," : </font></b>",analyse$donnees$TXT2),
                       fill = T,
-                      fillColor = palette(analyse_maille_classe),
+                      fillColor = palette(analyse$donnees[,varRatio]),
                       fillOpacity = 1,
                       group = "carte_ronds",
                       layerId = list(analyse_WGS84=analyse_WGS84,analyse=analyse,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_ronds_classes_carte",bornes=bornes,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal_classes,col_border_ronds_pos=colBorderPos,col_border_ronds_neg=colBorderNeg,epaisseurBorder=epaisseurBorder)
