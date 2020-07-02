@@ -929,44 +929,52 @@ NULL
 #' @usage plot_ronds(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse =
 #' NULL, idData, varVolume, rayonRond = NULL, rapportRond = NULL, emprise =
 #' "FRM", fondChx = NULL, precisionLegRonds = 0, titreLeg = "", xLeg = NULL,
-#' yLeg = NULL, titreCarte = "", sourceCarte = "", etiquettes = NULL, colPos =
+#' yLeg = NULL, cadreLeg = FALSE, xLimCadreLeg = NULL, yLimCadreLeg = NULL,
+#' titreCarte = "", sourceCarte = "", etiquettes = NULL, colPos =
 #' "#CD853F", colNeg = "#6495ED", colBorder = "white", colBorderMaille =
 #' "black", xlim = NULL, ylim = NULL)
 #'
 #' plot_classes(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse =
 #' NULL, idData, varRatio, methode = "kmeans", nbClasses = 3, bornes = NULL,
-#' precisionLegClasses = 1, titreLeg = "", xLeg = NULL, yLeg = NULL, titreCarte
-#' = "", sourceCarte = "", etiquettes = NULL, stylePalette = "defaut",
-#' palettePos = NULL, paletteNeg = NULL, colBorder = "white", xlim = NULL, ylim
-#' = NULL)
+#' precisionLegClasses = 1, titreLeg = "", labels = NULL, xLeg = NULL,
+#' yLeg = NULL, cadreLeg = FALSE, xLimCadreLeg = NULL, yLimCadreLeg = NULL,
+#' titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "defaut",
+#' palettePos = NULL, paletteNeg = NULL, colBorder = "white", xlim = NULL,
+#' ylim = NULL)
 #'
 #' plot_ronds_classes(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse
 #' = NULL, idData, varVolume, varRatio, rayonRond = NULL, rapportRond = NULL,
 #' methode = "kmeans", nbClasses = 3, bornes = NULL, precisionLegRonds = 0,
 #' precisionLegClasses = 1, emprise = "FRM", fondChx = NULL, titreLegRonds =
-#' "", titreLegClasses = "", xLegRonds = NULL, yLegRonds = NULL, xLegClasses =
-#' NULL, yLegClasses = NULL, titreCarte = "", sourceCarte = "", etiquettes =
-#' NULL, stylePalette = "defaut", palettePos = NULL, paletteNeg = NULL,
-#' colBorder = "white", colBorderMaille = "black", xlim = NULL, ylim = NULL)
+#' "", titreLegClasses = "", labels = NULL, xLegRonds = NULL, yLegRonds = NULL,
+#' xLegClasses = NULL, yLegClasses = NULL, cadreLeg = FALSE, xLimCadreLegRonds = NULL,
+#' yLimCadreLegRonds = NULL, xLimCadreLegClasses = NULL, yLimCadreLegClasses = NULL,
+#' titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "defaut",
+#' palettePos = NULL, paletteNeg = NULL, colBorder = "white",
+#' colBorderMaille = "black", xlim = NULL, ylim = NULL)
 #'
 #' plot_classes_ronds(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse
 #' = NULL, idData, varVolume, varRatio, rayonRond = NULL, rapportRond = NULL,
 #' methode = "kmeans", nbClasses = 3, bornes = NULL, precisionLegRonds = 0,
-#' precisionLegClasses = 1, emprise = "FRM", fondChx = NULL, titreLegRonds =
-#' "", titreLegClasses = "", xLegRonds = NULL, yLegRonds = NULL, xLegClasses =
-#' NULL, yLegClasses = NULL, titreCarte = "", sourceCarte = "", etiquettes =
-#' NULL, stylePalette = "defaut", palettePos = NULL, paletteNeg = NULL,
-#' colBorder = "white", colBorderRonds = "#303030", xlim = NULL, ylim = NULL)
+#' precisionLegClasses = 1, emprise = "FRM", fondChx = NULL, titreLegRonds = "",
+#' titreLegClasses = "", labels = NULL, xLegRonds = NULL, yLegRonds = NULL,
+#' xLegClasses = NULL, yLegClasses = NULL, cadreLeg = FALSE, xLimCadreLegRonds = NULL,
+#' yLimCadreLegRonds = NULL, xLimCadreLegClasses = NULL, yLimCadreLegClasses = NULL,
+#' titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "defaut",
+#' palettePos = NULL, paletteNeg = NULL, colBorder = "white",
+#' colBorderRonds = "#303030", xlim = NULL, ylim = NULL)
 #'
 #' plot_typo(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse = NULL,
 #' idData, varTypo, titreLeg = "", xLeg = NULL, yLeg = NULL, titreCarte = "",
 #' sourceCarte = "", etiquettes = NULL, paletteTypo = NULL, labels = NULL,
-#' colBorder = "white", xlim = NULL, ylim = NULL)
+#' cadreLeg = FALSE, xLimCadreLeg = NULL, yLimCadreLeg = NULL, colBorder = "white",
+#' xlim = NULL, ylim = NULL)
 #'
 #' plot_typo_symboles(fondPoints, listFonds, emprise = "FRM", types = NULL,
 #' couleurs = NULL, tailles = NULL, epaisseurs = NULL, titreLeg = "", xLeg =
-#' NULL, yLeg = NULL, titreCarte = "", sourceCarte = "", etiquettes = NULL,
-#' labels = NULL, xlim = NULL, ylim = NULL)
+#' NULL, yLeg = NULL, cadreLeg = FALSE, xLimCadreLeg = NULL, yLimCadreLeg = NULL,
+#' titreCarte = "", sourceCarte = "", etiquettes = NULL, labels = NULL, xlim = NULL,
+#' ylim = NULL)
 #'
 #' plot_oursins(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse =
 #' NULL, idDataDepart, idDataArrivee, varFlux, filtreVol = 0, filtreDist = 100,
@@ -978,15 +986,17 @@ NULL
 #' NULL, typeMaille, idDataDepart, idDataArrivee, varFlux, largeurFlecheMax =
 #' NULL, filtreVol = 0, filtreDist = 100, filtreMajeurs = 10,
 #' decalageAllerRetour = 0, decalageCentroid = 0, emprise = "FRM",
-#' precisionLegFleches = 0, titreLeg = "", xLeg = NULL, yLeg = NULL, titreCarte
-#' = "", sourceCarte = "", etiquettes = NULL, colFleche = "#CD853F", colBorder
+#' precisionLegFleches = 0, titreLeg = "", xLeg = NULL, yLeg = NULL,
+#' cadreLeg = FALSE, xLimCadreLeg = NULL, yLimCadreLeg = NULL, titreCarte = "",
+#' sourceCarte = "", etiquettes = NULL, colFleche = "#CD853F", colBorder
 #' = "white", colBorderMaille = "black", xlim = NULL, ylim = NULL)
 #'
 #' plot_saphirs(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse =
 #' NULL, typeMaille, idDataDepart, idDataArrivee, varFlux, largeurFlecheMax =
 #' NULL, direction = "Ent", filtreVol = 0, emprise = "FRM", precisionLegFleches
-#' = 0, titreLeg = "", xLeg = NULL, yLeg = NULL, titreCarte = "", sourceCarte =
-#' "", etiquettes = NULL, colEntree = "#CD853F", colSortie = "#6495ED",
+#' = 0, titreLeg = "", xLeg = NULL, yLeg = NULL, cadreLeg = FALSE,
+#' xLimCadreLeg = NULL, yLimCadreLeg = NULL, titreCarte = "", sourceCarte = "",
+#' etiquettes = NULL, colEntree = "#CD853F", colSortie = "#6495ED",
 #' colBorder = "white", colBorderMaille = "black", xlim = NULL, ylim = NULL)
 #'
 #' @param data tableau de donnees (data.frame).
@@ -1069,10 +1079,25 @@ NULL
 #' @param epaisseurs vecteur de numeriques (numeric). Par defaut a NULL. Voir
 #' details.
 #' @param titreLeg chaine de caracteres (character). Titre de la legende.
+#' @param labels chaine de caracteres (character). Labels personnalises de la legende.
 #' @param xLeg valeur numerique (numeric). Coordonnees x de la legende dans le
 #' systeme de projection locale. Par defaut a NULL.
 #' @param yLeg valeur numerique (numeric). Coordonnees y de la legende dans le
 #' systeme de projection locale. Par defaut a NULL.
+#' @param cadreLeg booleen (logical). Affichage d'un cadre blanc autour de la legende.
+#' Par defaut FALSE.
+#' @param xLimCadreLeg vecteur numerique (numeric). Coordonnees xmin et xmax du cadre de
+#' la legende. Par defaut a NULL.
+#' @param yLimCadreLeg vecteur numerique (numeric). Coordonnees ymin et ymax du cadre de
+#' la legende. Par defaut a NULL.
+#' @param xLimCadreLegRonds vecteur numerique (numeric). Coordonnees xmin et xmax du cadre de
+#' la legende des ronds. Par defaut a NULL.
+#' @param yLimCadreLegRonds vecteur numerique (numeric). Coordonnees ymin et ymax du cadre de
+#' la legende des ronds. Par defaut a NULL.
+#' @param xLimCadreLegClasses vecteur numerique (numeric). Coordonnees xmin et xmax du cadre de
+#' la legende des classes. Par defaut a NULL.
+#' @param yLimCadreLegClasses vecteur numerique (numeric). Coordonnees ymin et ymax du cadre de
+#' la legende des classes. Par defaut a NULL.
 #' @param titreLegRonds chaine de caracteres (character). Titre de la legende
 #' des ronds.
 #' @param xLegRonds valeur numerique (numeric). Coordonnees x de la legende des
@@ -1128,9 +1153,9 @@ NULL
 #' @param colSortie chaine de caracteres (character). Couleur nommee (par
 #' exemple "blue") ou hexadecimal (par exemple "#0000FF"). Par defaut
 #' "#6495ED".
-#' @param xlim vecteur de numeriques (numeric). Coordonnees xmin et xmax de la
+#' @param xlim vecteur numerique (numeric). Coordonnees xmin et xmax de la
 #' carte. Par defaut a NULL.
-#' @param ylim vecteur de numerique (numeric). Coordonnees ymin et ymax de la
+#' @param ylim vecteur numerique (numeric). Coordonnees ymin et ymax de la
 #' carte. Par defaut a NULL.
 #'
 #' @return Retourne un objet sf. Il s'agit du fond des ronds (ronds

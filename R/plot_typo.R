@@ -1,11 +1,11 @@
 plot_typo <-
-function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varTypo,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,paletteTypo=NULL,labels=NULL,colBorder="white",xlim=NULL,ylim=NULL)
+function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varTypo,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,paletteTypo=NULL,labels=NULL,cadreLeg=FALSE,xLimCadreLeg=NULL,yLimCadreLeg=NULL,colBorder="white",xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
 
     # Verification des parametres
 
-    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20<-msg_error21 <- NULL
+    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20<-msg_error21<-msg_error22<-msg_error23<-msg_error24 <- NULL
 
     if(any(class(data)!="data.frame")) msg_error1 <- "Les donnees doivent etre dans un data.frame / "
     if(any(!any(class(fondMaille) %in% "sf"),!any(class(fondMaille) %in% "data.frame"))) msg_error2 <- "Le fond de maille doit etre un objet sf / "
@@ -16,29 +16,34 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varTypo
     if(any(class(titreLeg)!="character")) msg_error7 <- "Le titre de la legende doit etre de type caractere / "
     if(!is.null(xLeg)) if(any(class(xLeg)!="numeric")) msg_error8 <- "La variable xLeg doit etre de type numerique / "
     if(!is.null(yLeg)) if(any(class(yLeg)!="numeric")) msg_error9 <- "La variable yLeg doit etre de type numerique / "
-    if(any(class(titreCarte)!="character")) msg_error10 <- "Le titre de la carte doit etre de type caractere / "
-    if(any(class(sourceCarte)!="character")) msg_error11 <- "La source de la carte doit etre de type caractere / "
-    if(!is.null(etiquettes)) if(!any(class(etiquettes) %in% "character" | class(etiquettes) %in% "data.frame")) msg_error12 <- "La table des etiquettes peut etre soit un vecteur caractere soit un data.frame (voir aide) / "
-    if(!is.null(paletteTypo)) if(any(class(paletteTypo)!="character")) msg_error13 <- "La palette de la typologie doit etre un vecteur de type caractere / "
-    if(!is.null(labels)) if(any(class(labels)!="character")) msg_error14 <- "Les labels doivent etre un vecteur de type caractere / "
-    if(any(class(colBorder)!="character")) msg_error15 <- "La couleur de la bordure doit etre de type caractere (nommee ou hexadecimal) / "
-    if(!is.null(xlim)) if(any(class(xlim)!="numeric")) msg_error16 <- "La variable xlim doit etre de type numerique / "
-    if(!is.null(ylim)) if(any(class(ylim)!="numeric")) msg_error17 <- "La variable yim doit etre de type numerique / "
+    if(any(class(cadreLeg)!="logical")) msg_error10 <- "La variable cadreLeg doit etre logique TRUE ou FALSE / "
+    if(!is.null(xLimCadreLeg)) if(any(class(xLimCadreLeg)!="numeric")) msg_error11 <- "La variable xLimCadreLeg doit etre de type numerique / "
+    if(!is.null(yLimCadreLeg)) if(any(class(yLimCadreLeg)!="numeric")) msg_error12 <- "La variable yLimCadreLeg doit etre de type numerique / "
+    if(any(class(titreCarte)!="character")) msg_error13 <- "Le titre de la carte doit etre de type caractere / "
+    if(any(class(sourceCarte)!="character")) msg_error14 <- "La source de la carte doit etre de type caractere / "
+    if(!is.null(etiquettes)) if(!any(class(etiquettes) %in% "character" | class(etiquettes) %in% "data.frame")) msg_error15 <- "La table des etiquettes peut etre soit un vecteur caractere soit un data.frame (voir aide) / "
+    if(!is.null(paletteTypo)) if(any(class(paletteTypo)!="character")) msg_error16 <- "La palette de la typologie doit etre un vecteur de type caractere / "
+    if(!is.null(labels)) if(any(class(labels)!="character")) msg_error17 <- "Les labels doivent etre un vecteur de type caractere / "
+    if(any(class(colBorder)!="character")) msg_error18 <- "La couleur de la bordure doit etre de type caractere (nommee ou hexadecimal) / "
+    if(!is.null(xlim)) if(any(class(xlim)!="numeric")) msg_error19 <- "La variable xlim doit etre de type numerique / "
+    if(!is.null(ylim)) if(any(class(ylim)!="numeric")) msg_error20 <- "La variable yim doit etre de type numerique / "
 
-    if(length(names(data))<2) msg_error18 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et la variable a representer / "
-    if(length(names(fondMaille))<3) msg_error19 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
+    if(length(names(data))<2) msg_error21 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et la variable a representer / "
+    if(length(names(fondMaille))<3) msg_error22 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
 
-    if(!any(names(data) %in% idData))  msg_error20 <- "La variable identifiant les donnees n'existe pas dans la table des donnees / "
-    if(!any(names(data) %in% varTypo))  msg_error21 <- "La variable a representer n'existe pas dans la table des donnees / "
+    if(!any(names(data) %in% idData))  msg_error23 <- "La variable identifiant les donnees n'existe pas dans la table des donnees / "
+    if(!any(names(data) %in% varTypo))  msg_error24 <- "La variable a representer n'existe pas dans la table des donnees / "
 
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
            !is.null(msg_error9),!is.null(msg_error10),!is.null(msg_error11),!is.null(msg_error12),
            !is.null(msg_error13),!is.null(msg_error14),!is.null(msg_error15),!is.null(msg_error16),
-           !is.null(msg_error17),!is.null(msg_error18),!is.null(msg_error19),!is.null(msg_error20),!is.null(msg_error21)))
+           !is.null(msg_error17),!is.null(msg_error18),!is.null(msg_error19),!is.null(msg_error20),
+           !is.null(msg_error21),!is.null(msg_error22),!is.null(msg_error23),!is.null(msg_error24)))
     {
       stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6,msg_error7,msg_error8,
-                              msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,msg_error16,msg_error17,msg_error18,msg_error19,msg_error20,msg_error21)))
+                              msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,
+                              msg_error16,msg_error17,msg_error18,msg_error19,msg_error20,msg_error21,msg_error22,msg_error23,msg_error24)))
     }
 
     names(data)[names(data)==idData] <- "CODE"
@@ -138,8 +143,19 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varTypo
     xmax <- max(st_coordinates(fond_leg_typo)[,1]) + (x_large*7)
     ymin <- min(st_coordinates(fond_leg_typo)[,2]) - y_large
     ymax <- max(st_coordinates(fond_leg_typo)[,2]) + (y_large*2)
-    bbox_leg_typo <- matrix(c(xmin,ymax, xmax,ymax, xmax,ymin, xmin,ymin, xmin,ymax),ncol=2, byrow=TRUE)
-    bbox_leg_typo <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_typo))),crs=st_crs(fondMaille))
+
+    if(cadreLeg)
+    {
+      if(is.null(xLimCadreLeg) | is.null(xLimCadreLeg))
+      {
+        bbox_leg_typo <- matrix(c(xmin,ymax, xmax,ymax, xmax,ymin, xmin,ymin, xmin,ymax),ncol=2, byrow=TRUE)
+        bbox_leg_typo <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_typo))),crs=st_crs(fondMaille))
+      }else
+      {
+        bbox_leg_typo <- matrix(c(xLimCadreLeg[1],yLimCadreLeg[2], xLimCadreLeg[2],yLimCadreLeg[2], xLimCadreLeg[2],yLimCadreLeg[1], xLimCadreLeg[1],yLimCadreLeg[1], xLimCadreLeg[1],yLimCadreLeg[2]),ncol=2, byrow=TRUE)
+        bbox_leg_typo <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_typo))),crs=st_crs(fondMaille))
+      }
+    }
 
     if(!is.null(etiquettes))
     {
@@ -188,7 +204,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varTypo
       }
     }
 
-    suppressWarnings(plot(bbox_leg_typo,add=T,col="white",border="white",lwd=1))
+    if(cadreLeg) suppressWarnings(plot(bbox_leg_typo,add=T,col="white",border="white",lwd=1))
 
     if(is.null(labels))
     {

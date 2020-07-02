@@ -1,11 +1,11 @@
 plot_ronds_classes <-
-function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,precisionLegRonds=0,precisionLegClasses=1,emprise="FRM",fondChx=NULL,titreLegRonds="",titreLegClasses="",xLegRonds=NULL,yLegRonds=NULL,xLegClasses=NULL,yLegClasses=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
+function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,precisionLegRonds=0,precisionLegClasses=1,emprise="FRM",fondChx=NULL,titreLegRonds="",titreLegClasses="",labels=NULL,xLegRonds=NULL,yLegRonds=NULL,xLegClasses=NULL,yLegClasses=NULL,cadreLeg=FALSE,xLimCadreLegRonds=NULL,yLimCadreLegRonds=NULL,xLimCadreLegClasses=NULL,yLimCadreLegClasses=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
 
     # Verification des parametres
 
-    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20<-msg_error21<-msg_error22<-msg_error23<-msg_error24<-msg_error25<-msg_error26<-msg_error27<-msg_error28<-msg_error29<-msg_error30<-msg_error31<-msg_error32<-msg_error33<-msg_error34<-msg_error35<-msg_error36<-msg_error37<-msg_error38<-msg_error39 <- NULL
+    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20<-msg_error21<-msg_error22<-msg_error23<-msg_error24<-msg_error25<-msg_error26<-msg_error27<-msg_error28<-msg_error29<-msg_error30<-msg_error31<-msg_error32<-msg_error33<-msg_error34<-msg_error35<-msg_error36<-msg_error37<-msg_error38<-msg_error39<-msg_error40<-msg_error41<-msg_error42<-msg_error43<-msg_error44 <- NULL
 
     if(any(class(data)!="data.frame")) msg_error1 <- "Les donnees doivent etre dans un data.frame / "
     if(any(!any(class(fondMaille) %in% "sf"),!any(class(fondMaille) %in% "data.frame"))) msg_error2 <- "Le fond de maille doit etre un objet sf / "
@@ -25,29 +25,35 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     if(!is.null(fondChx)) if(any(!any(class(fondChx) %in% "sf"),!any(class(fondChx) %in% "data.frame"))) msg_error16 <- "Le fond des chx doit etre un objet sf / "
     if(any(class(titreLegRonds)!="character")) msg_error17 <- "Le titre de la legende doit etre de type caractere / "
     if(any(class(titreLegClasses)!="character")) msg_error18 <- "Le titre de la legende doit etre de type caractere / "
-    if(!is.null(xLegRonds)) if(any(class(xLegRonds)!="numeric")) msg_error19 <- "La variable xLegRonds doit etre de type numerique / "
-    if(!is.null(yLegRonds)) if(any(class(yLegRonds)!="numeric")) msg_error20 <- "La variable yLegRonds doit etre de type numerique / "
-    if(!is.null(xLegClasses)) if(any(class(xLegClasses)!="numeric")) msg_error21 <- "La variable xLegClasses doit etre de type numerique / "
-    if(!is.null(yLegClasses)) if(any(class(yLegClasses)!="numeric")) msg_error22 <- "La variable yLegClasses doit etre de type numerique / "
-    if(any(class(titreCarte)!="character")) msg_error23 <- "Le titre de la carte doit etre de type caractere / "
-    if(any(class(sourceCarte)!="character")) msg_error24 <- "La source de la carte doit etre de type caractere / "
-    if(!is.null(etiquettes)) if(!any(class(etiquettes) %in% "character" | class(etiquettes) %in% "data.frame")) msg_error25 <- "La table des etiquettes peut etre soit un vecteur caractere soit un data.frame (voir aide) / "
-    if(any(class(stylePalette)!="character")) msg_error26 <- "Le style de la palette doit etre de type caractere ('InseeFlash', 'InseeAnalyse', 'InseeDossier', 'InseePremiere' ou 'defaut') / "
-    if(!is.null(palettePos)) if(any(class(palettePos)!="character")) msg_error27 <- "La palette des classes doit etre un vecteur de type caractere / "
-    if(!is.null(paletteNeg)) if(any(class(paletteNeg)!="character")) msg_error28 <- "La palette des classes doit etre un vecteur de type caractere / "
-    if(any(class(colBorder)!="character")) msg_error29 <- "La couleur de la bordure doit etre de type caractere (nommee ou hexadecimal) / "
-    if(any(class(colBorderMaille)!="character")) msg_error30 <- "La couleur de la bordure de la maille doit etre de type caractere (nommee ou hexadecimal) / "
-    if(!is.null(xlim)) if(any(class(xlim)!="numeric")) msg_error31 <- "La variable xlim doit etre de type numerique / "
-    if(!is.null(ylim)) if(any(class(ylim)!="numeric")) msg_error32 <- "La variable yim doit etre de type numerique / "
+    if(!is.null(labels)) if(any(class(labels)!="character")) msg_error19 <- "Les labels de la legende doivent etre de type caractere / "
+    if(!is.null(xLegRonds)) if(any(class(xLegRonds)!="numeric")) msg_error20 <- "La variable xLegRonds doit etre de type numerique / "
+    if(!is.null(yLegRonds)) if(any(class(yLegRonds)!="numeric")) msg_error21 <- "La variable yLegRonds doit etre de type numerique / "
+    if(!is.null(xLegClasses)) if(any(class(xLegClasses)!="numeric")) msg_error22 <- "La variable xLegClasses doit etre de type numerique / "
+    if(!is.null(yLegClasses)) if(any(class(yLegClasses)!="numeric")) msg_error23 <- "La variable yLegClasses doit etre de type numerique / "
+    if(any(class(cadreLeg)!="logical")) msg_error24 <- "La variable cadreLeg doit etre logique TRUE ou FALSE / "
+    if(!is.null(xLimCadreLegRonds)) if(any(class(xLimCadreLegRonds)!="numeric")) msg_error25 <- "La variable xLimCadreLegRonds doit etre de type numerique / "
+    if(!is.null(yLimCadreLegRonds)) if(any(class(yLimCadreLegRonds)!="numeric")) msg_error26 <- "La variable yLimCadreLegRonds doit etre de type numerique / "
+    if(!is.null(xLimCadreLegClasses)) if(any(class(xLimCadreLegClasses)!="numeric")) msg_error27 <- "La variable xLimCadreLegClasses doit etre de type numerique / "
+    if(!is.null(yLimCadreLegClasses)) if(any(class(yLimCadreLegClasses)!="numeric")) msg_error28 <- "La variable yLimCadreLegClasses doit etre de type numerique / "
+    if(any(class(titreCarte)!="character")) msg_error29 <- "Le titre de la carte doit etre de type caractere / "
+    if(any(class(sourceCarte)!="character")) msg_error30 <- "La source de la carte doit etre de type caractere / "
+    if(!is.null(etiquettes)) if(!any(class(etiquettes) %in% "character" | class(etiquettes) %in% "data.frame")) msg_error31 <- "La table des etiquettes peut etre soit un vecteur caractere soit un data.frame (voir aide) / "
+    if(any(class(stylePalette)!="character")) msg_error32 <- "Le style de la palette doit etre de type caractere ('InseeFlash', 'InseeAnalyse', 'InseeDossier', 'InseePremiere' ou 'defaut') / "
+    if(!is.null(palettePos)) if(any(class(palettePos)!="character")) msg_error33 <- "La palette des classes doit etre un vecteur de type caractere / "
+    if(!is.null(paletteNeg)) if(any(class(paletteNeg)!="character")) msg_error34 <- "La palette des classes doit etre un vecteur de type caractere / "
+    if(any(class(colBorder)!="character")) msg_error35 <- "La couleur de la bordure doit etre de type caractere (nommee ou hexadecimal) / "
+    if(any(class(colBorderMaille)!="character")) msg_error36 <- "La couleur de la bordure de la maille doit etre de type caractere (nommee ou hexadecimal) / "
+    if(!is.null(xlim)) if(any(class(xlim)!="numeric")) msg_error37 <- "La variable xlim doit etre de type numerique / "
+    if(!is.null(ylim)) if(any(class(ylim)!="numeric")) msg_error38 <- "La variable yim doit etre de type numerique / "
 
-    if(length(names(data))<2) msg_error33 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et la variable a representer / "
-    if(length(names(fondMaille))<3) msg_error34 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
+    if(length(names(data))<2) msg_error39 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et la variable a representer / "
+    if(length(names(fondMaille))<3) msg_error40 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
 
-    if(!any(names(data) %in% idData))  msg_error35 <- "La variable identifiant les donnees n'existe pas dans la table des donnees / "
-    if(!any(names(data) %in% varVolume))  msg_error36 <- "La variable a representer n'existe pas dans la table des donnees / "
-    if(!any(names(data) %in% varRatio))  msg_error37 <- "La variable a representer n'existe pas dans la table des donnees / "
-    if(!methode %in% c("kmeans","fisher","jenks","quantile")) msg_error38 <- "Le nom de la methode doit etre 'kmeans', 'fisher', 'jenks' ou 'quantile' / "
-    if(!emprise %in% c("FRM","971","972","973","974","976")) msg_error39 <- "La variable emprise doit etre 'FRM', '971', '972', '973', '974' ou '976' / "
+    if(!any(names(data) %in% idData))  msg_error41 <- "La variable identifiant les donnees n'existe pas dans la table des donnees / "
+    if(!any(names(data) %in% varVolume))  msg_error42 <- "La variable a representer n'existe pas dans la table des donnees / "
+    if(!any(names(data) %in% varRatio))  msg_error43 <- "La variable a representer n'existe pas dans la table des donnees / "
+    if(!methode %in% c("kmeans","fisher","jenks","quantile")) msg_error44 <- "Le nom de la methode doit etre 'kmeans', 'fisher', 'jenks' ou 'quantile' / "
+    if(!emprise %in% c("FRM","971","972","973","974","976")) msg_error45 <- "La variable emprise doit etre 'FRM', '971', '972', '973', '974' ou '976' / "
 
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
@@ -58,13 +64,15 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
            !is.null(msg_error25),!is.null(msg_error26),!is.null(msg_error27),!is.null(msg_error28),
            !is.null(msg_error29),!is.null(msg_error30),!is.null(msg_error31),!is.null(msg_error32),
            !is.null(msg_error33),!is.null(msg_error34),!is.null(msg_error35),!is.null(msg_error36),
-           !is.null(msg_error37),!is.null(msg_error38),!is.null(msg_error39)))
+           !is.null(msg_error37),!is.null(msg_error38),!is.null(msg_error39),!is.null(msg_error40),
+           !is.null(msg_error41),!is.null(msg_error42),!is.null(msg_error43),!is.null(msg_error44)))
     {
       stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6,msg_error7,msg_error8,
                               msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,msg_error16,
                               msg_error17,msg_error18,msg_error19,msg_error20,msg_error21,msg_error22,msg_error23,msg_error24,
                               msg_error25,msg_error26,msg_error27,msg_error28,msg_error29,msg_error30,msg_error31,msg_error32,
-                              msg_error33,msg_error34,msg_error35,msg_error36,msg_error37,msg_error38,msg_error39)))
+                              msg_error33,msg_error34,msg_error35,msg_error36,msg_error37,msg_error38,msg_error39,msg_error40,
+                              msg_error41,msg_error42,msg_error43,msg_error44)))
     }
 
     if(!is.null(fondChx))
@@ -112,6 +120,10 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     if(sourceCarte!="")
     {
       sourceCarte<-iconv(sourceCarte,"latin1","utf8")
+    }
+    if(!is.null(labels))
+    {
+      labels<-iconv(labels,"latin1","utf8")
     }
 
     code_epsg <- switch(emprise, #emprise
@@ -253,8 +265,19 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     xmax <- max(st_coordinates(fond_leg_ronds)[,1]) + (x_large*3)
     ymin <- min(st_coordinates(fond_leg_ronds)[,2]) - y_large
     ymax <- max(st_coordinates(fond_leg_ronds)[,2]) + (y_large*3)
-    bbox_leg_ronds <- matrix(c(xmin,ymax, xmax,ymax, xmax,ymin, xmin,ymin, xmin,ymax),ncol=2, byrow=TRUE)
-    bbox_leg_ronds <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_ronds))),crs=st_crs(fondMaille))
+
+    if(cadreLeg)
+    {
+      if(is.null(xLimCadreLegRonds) | is.null(xLimCadreLegRonds))
+      {
+        bbox_leg_ronds <- matrix(c(xmin,ymax, xmax,ymax, xmax,ymin, xmin,ymin, xmin,ymax),ncol=2, byrow=TRUE)
+        bbox_leg_ronds <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_ronds))),crs=st_crs(fondMaille))
+      }else
+      {
+        bbox_leg_ronds <- matrix(c(xLimCadreLegRonds[1],yLimCadreLegRonds[2], xLimCadreLegRonds[2],yLimCadreLegRonds[2], xLimCadreLegRonds[2],yLimCadreLegRonds[1], xLimCadreLegRonds[1],yLimCadreLegRonds[1], xLimCadreLegRonds[1],yLimCadreLegRonds[2]),ncol=2, byrow=TRUE)
+        bbox_leg_ronds <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_ronds))),crs=st_crs(fondMaille))
+      }
+    }
 
     # ANALYSE EN CLASSES
 
@@ -351,17 +374,27 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     }
 
     label_rectangle <- NULL
-    for(i in 1:length(pal_classes))
+    if(is.null(labels))
     {
-      if(i==1)
+      label_rectangle <- NULL
+      for(i in 1:length(pal_classes))
       {
-        label_rectangle <- c(label_rectangle,paste0(format(round(bornes[i+1],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)," et plus"))
-      }else if(i==length(pal_classes))
+        if(i==1)
+        {
+          label_rectangle <- c(label_rectangle,paste0(format(round(bornes[i+1],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)," et plus"))
+        }else if(i==length(pal_classes))
+        {
+          label_rectangle <- c(label_rectangle,paste0("Moins de ", format(round(bornes[i],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)))
+        }else
+        {
+          label_rectangle <- c(label_rectangle,paste0("De ", format(round(bornes[i+1],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)," \u00e0 moins de ", format(round(bornes[i],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)))
+        }
+      }
+    }else
+    {
+      for(i in 1:length(pal_classes))
       {
-        label_rectangle <- c(label_rectangle,paste0("Moins de ", format(round(bornes[i],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)))
-      }else
-      {
-        label_rectangle <- c(label_rectangle,paste0("De ", format(round(bornes[i+1],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)," \u00e0 moins de ", format(round(bornes[i],precisionLegClasses), big.mark=" ",decimal.mark=",",nsmall=0)))
+        label_rectangle <- c(label_rectangle,labels[i])
       }
     }
 
@@ -369,8 +402,19 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     xmax <- max(st_coordinates(fond_leg_classes)[,1]) + (x_large*7)
     ymin <- min(st_coordinates(fond_leg_classes)[,2]) - y_large
     ymax <- max(st_coordinates(fond_leg_classes)[,2]) + (y_large*2)
-    bbox_leg_classes <- matrix(c(xmin,ymax, xmax,ymax, xmax,ymin, xmin,ymin, xmin,ymax),ncol=2, byrow=TRUE)
-    bbox_leg_classes <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_classes))),crs=st_crs(fondMaille))
+
+    if(cadreLeg)
+    {
+      if(is.null(xLimCadreLegClasses) | is.null(xLimCadreLegClasses))
+      {
+        bbox_leg_classes <- matrix(c(xmin,ymax, xmax,ymax, xmax,ymin, xmin,ymin, xmin,ymax),ncol=2, byrow=TRUE)
+        bbox_leg_classes <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_classes))),crs=st_crs(fondMaille))
+      }else
+      {
+        bbox_leg_classes <- matrix(c(xLimCadreLegClasses[1],yLimCadreLegClasses[2], xLimCadreLegClasses[2],yLimCadreLegClasses[2], xLimCadreLegClasses[2],yLimCadreLegClasses[1], xLimCadreLegClasses[1],yLimCadreLegClasses[1], xLimCadreLegClasses[1],yLimCadreLegClasses[2]),ncol=2, byrow=TRUE)
+        bbox_leg_classes <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_classes))),crs=st_crs(fondMaille))
+      }
+    }
 
     if(!is.null(etiquettes))
     {
@@ -419,7 +463,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
       }
     }
 
-    suppressWarnings(plot(bbox_leg_ronds,add=T,col="white",border="white",lwd=1))
+    if(cadreLeg) suppressWarnings(plot(bbox_leg_ronds,add=T,col="white",border="white",lwd=1))
 
     plot(st_geometry(fond_leg_ronds),add=T,col="transparent",border="black")
     text(pts2_grand_pl[1]+1000,pts2_grand_pl[2],labels=round(max_var,precisionLegRonds),cex=0.9,adj=0)
@@ -427,7 +471,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
 
     text(min(st_coordinates(fond_leg_ronds[1,])[,1]),max(st_coordinates(fond_leg_ronds[1,])[,2])+(st_bbox(fondMaille)$xmax-st_bbox(fondMaille)$xmin)/20,labels=titreLegRonds,cex=1,adj=0)
 
-    suppressWarnings(plot(bbox_leg_classes,add=T,col="white",border="white",lwd=1))
+    if(cadreLeg) suppressWarnings(plot(bbox_leg_classes,add=T,col="white",border="white",lwd=1))
 
     for(i in 1:length(pal_classes))
     {

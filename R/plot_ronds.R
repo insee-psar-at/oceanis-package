@@ -1,11 +1,11 @@
 plot_ronds <-
-function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolume,rayonRond=NULL,rapportRond=NULL,emprise="FRM",fondChx=NULL,precisionLegRonds=0,titreLeg="",xLeg=NULL,yLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,colPos="#CD853F",colNeg="#6495ED",colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
+function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolume,rayonRond=NULL,rapportRond=NULL,emprise="FRM",fondChx=NULL,precisionLegRonds=0,titreLeg="",xLeg=NULL,yLeg=NULL,cadreLeg=FALSE,xLimCadreLeg=NULL,yLimCadreLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,colPos="#CD853F",colNeg="#6495ED",colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
 
     # Verification des parametres
 
-    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20<-msg_error21<-msg_error22<-msg_error23<-msg_error24<-msg_error25<-msg_error26<-msg_error27<-msg_error28 <- NULL
+    msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18<-msg_error19<-msg_error20<-msg_error21<-msg_error22<-msg_error23<-msg_error24<-msg_error25<-msg_error26<-msg_error27<-msg_error28<-msg_error29<-msg_error30<-msg_error31 <- NULL
 
     if(any(class(data)!="data.frame")) msg_error1 <- "Les donnees doivent etre dans un data.frame / "
     if(any(!any(class(fondMaille) %in% "sf"),!any(class(fondMaille) %in% "data.frame"))) msg_error2 <- "Le fond de maille doit etre un objet sf / "
@@ -21,22 +21,25 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     if(any(class(titreLeg)!="character")) msg_error12 <- "Le titre de la legende doit etre de type caractere / "
     if(!is.null(xLeg)) if(any(class(xLeg)!="numeric")) msg_error13 <- "La variable xLeg doit etre de type numerique / "
     if(!is.null(yLeg)) if(any(class(yLeg)!="numeric")) msg_error14 <- "La variable yLeg doit etre de type numerique / "
-    if(any(class(titreCarte)!="character")) msg_error15 <- "Le titre de la carte doit etre de type caractere / "
-    if(any(class(sourceCarte)!="character")) msg_error16 <- "La source de la carte doit etre de type caractere / "
-    if(!is.null(etiquettes)) if(!any(class(etiquettes) %in% "character" | class(etiquettes) %in% "data.frame")) msg_error17 <- "La table des etiquettes peut etre soit un vecteur caractere soit un data.frame (voir aide) / "
-    if(any(class(colPos)!="character")) msg_error18 <- "La couleur doit etre de type caractere (nommee ou hexadecimal) / "
-    if(any(class(colNeg)!="character")) msg_error19 <- "La couleur doit etre de type caractere (nommee ou hexadecimal) / "
-    if(any(class(colBorder)!="character")) msg_error20 <- "La couleur doit etre de type caractere (nommee ou hexadecimal) / "
-    if(any(class(colBorderMaille)!="character")) msg_error21 <- "La couleur doit etre de type caractere (nommee ou hexadecimal) / "
-    if(!is.null(xlim)) if(any(class(xlim)!="numeric")) msg_error22 <- "La variable xlim doit etre de type numerique / "
-    if(!is.null(ylim)) if(any(class(ylim)!="numeric")) msg_error23 <- "La variable yim doit etre de type numerique / "
+    if(any(class(cadreLeg)!="logical")) msg_error15 <- "La variable cadreLeg doit etre logique TRUE ou FALSE / "
+    if(!is.null(xLimCadreLeg)) if(any(class(xLimCadreLeg)!="numeric")) msg_error16 <- "La variable xLimCadreLeg doit etre de type numerique / "
+    if(!is.null(yLimCadreLeg)) if(any(class(yLimCadreLeg)!="numeric")) msg_error17 <- "La variable yLimCadreLeg doit etre de type numerique / "
+    if(any(class(titreCarte)!="character")) msg_error18 <- "Le titre de la carte doit etre de type caractere / "
+    if(any(class(sourceCarte)!="character")) msg_error19 <- "La source de la carte doit etre de type caractere / "
+    if(!is.null(etiquettes)) if(!any(class(etiquettes) %in% "character" | class(etiquettes) %in% "data.frame")) msg_error20 <- "La table des etiquettes peut etre soit un vecteur caractere soit un data.frame (voir aide) / "
+    if(any(class(colPos)!="character")) msg_error21 <- "La couleur doit etre de type caractere (nommee ou hexadecimal) / "
+    if(any(class(colNeg)!="character")) msg_error22 <- "La couleur doit etre de type caractere (nommee ou hexadecimal) / "
+    if(any(class(colBorder)!="character")) msg_error23 <- "La couleur doit etre de type caractere (nommee ou hexadecimal) / "
+    if(any(class(colBorderMaille)!="character")) msg_error24 <- "La couleur doit etre de type caractere (nommee ou hexadecimal) / "
+    if(!is.null(xlim)) if(any(class(xlim)!="numeric")) msg_error25 <- "La variable xlim doit etre de type numerique / "
+    if(!is.null(ylim)) if(any(class(ylim)!="numeric")) msg_error26 <- "La variable yim doit etre de type numerique / "
 
-    if(length(names(data))<2) msg_error24 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et la variable a representer / "
-    if(length(names(fondMaille))<3) msg_error25 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
+    if(length(names(data))<2) msg_error27 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et la variable a representer / "
+    if(length(names(fondMaille))<3) msg_error28 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
 
-    if(!any(names(data) %in% idData))  msg_error26 <- "La variable identifiant les donnees n'existe pas dans la table des donnees / "
-    if(!any(names(data) %in% varVolume))  msg_error27 <- "La variable a representer n'existe pas dans la table des donnees / "
-    if(!emprise %in% c("FRM","971","972","973","974","976")) msg_error28 <- "La variable emprise doit etre 'FRM', '971', '972', '973', '974' ou '976' / "
+    if(!any(names(data) %in% idData))  msg_error29 <- "La variable identifiant les donnees n'existe pas dans la table des donnees / "
+    if(!any(names(data) %in% varVolume))  msg_error30 <- "La variable a representer n'existe pas dans la table des donnees / "
+    if(!emprise %in% c("FRM","971","972","973","974","976")) msg_error31 <- "La variable emprise doit etre 'FRM', '971', '972', '973', '974' ou '976' / "
 
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),
            !is.null(msg_error5),!is.null(msg_error6),!is.null(msg_error7),!is.null(msg_error8),
@@ -44,12 +47,13 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
            !is.null(msg_error13),!is.null(msg_error14),!is.null(msg_error15),!is.null(msg_error16),
            !is.null(msg_error17),!is.null(msg_error18),!is.null(msg_error19),!is.null(msg_error20),
            !is.null(msg_error21),!is.null(msg_error22),!is.null(msg_error23),!is.null(msg_error24),
-           !is.null(msg_error25),!is.null(msg_error26),!is.null(msg_error27),!is.null(msg_error28)))
+           !is.null(msg_error25),!is.null(msg_error26),!is.null(msg_error27),!is.null(msg_error28),
+           !is.null(msg_error29),!is.null(msg_error30),!is.null(msg_error31)))
     {
       stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6,msg_error7,msg_error8,
                               msg_error9,msg_error10,msg_error11,msg_error12,msg_error13,msg_error14,msg_error15,
                               msg_error16,msg_error17,msg_error18,msg_error19,msg_error20,msg_error21,msg_error22,
-                              msg_error23,msg_error24,msg_error25,msg_error26,msg_error27,msg_error28)))
+                              msg_error23,msg_error24,msg_error25,msg_error26,msg_error27,msg_error28,msg_error29,msg_error30,msg_error31)))
     }
 
     if(!is.null(fondChx))
@@ -225,8 +229,19 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     xmax <- max(st_coordinates(fond_leg_ronds)[,1]) + (x_large*3)
     ymin <- min(st_coordinates(fond_leg_ronds)[,2]) - y_large
     ymax <- max(st_coordinates(fond_leg_ronds)[,2]) + (y_large*3)
-    bbox_leg_ronds <- matrix(c(xmin,ymax, xmax,ymax, xmax,ymin, xmin,ymin, xmin,ymax),ncol=2, byrow=TRUE)
-    bbox_leg_ronds <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_ronds))),crs=st_crs(fondMaille))
+
+    if(cadreLeg)
+    {
+      if(is.null(xLimCadreLeg) | is.null(xLimCadreLeg))
+      {
+        bbox_leg_ronds <- matrix(c(xmin,ymax, xmax,ymax, xmax,ymin, xmin,ymin, xmin,ymax),ncol=2, byrow=TRUE)
+        bbox_leg_ronds <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_ronds))),crs=st_crs(fondMaille))
+      }else
+      {
+        bbox_leg_ronds <- matrix(c(xLimCadreLeg[1],yLimCadreLeg[2], xLimCadreLeg[2],yLimCadreLeg[2], xLimCadreLeg[2],yLimCadreLeg[1], xLimCadreLeg[1],yLimCadreLeg[1], xLimCadreLeg[1],yLimCadreLeg[2]),ncol=2, byrow=TRUE)
+        bbox_leg_ronds <- st_sf(geometry=st_sfc(st_polygon(list(bbox_leg_ronds))),crs=st_crs(fondMaille))
+      }
+    }
 
     par(mai=c(0,0,0,0))
     plot(st_geometry(fondMaille),xlim=xlim,ylim=ylim,border=colBorderMaille)
@@ -268,7 +283,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
       }
     }
 
-    suppressWarnings(plot(bbox_leg_ronds,add=T,col="white",border="white",lwd=1))
+    if(cadreLeg) suppressWarnings(plot(bbox_leg_ronds,add=T,col="white",border="white",lwd=1))
 
     plot(st_geometry(fond_leg_ronds),add=T,col="transparent",border="black")
     text(pts2_grand_pl[1]+1000,pts2_grand_pl[2],labels=round(max_var,precisionLegRonds),cex=0.9,adj=0)
