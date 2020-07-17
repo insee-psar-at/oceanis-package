@@ -108,7 +108,7 @@ function(map,colRemplissageFonds=NULL,colBordureFonds=NULL,transparenceFonds=NUL
         unFond <- list()
         for(j in 1:length(unPoly))
         {
-          unFond[[j]] <- st_sf(geometry=st_sfc(st_multipolygon(lapply(1:length(unPoly[[j]]), function(x) unPoly[[j]][[x]]))),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          unFond[[j]] <- st_sf(geometry=st_sfc(st_multipolygon(lapply(1:length(unPoly[[j]]), function(x) unPoly[[j]][[x]]))),crs=4326)
         }
         unFond <- do.call(rbind,unFond)
 

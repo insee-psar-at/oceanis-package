@@ -7,7 +7,7 @@ function(map)
     idx_titre <- NULL
     idx_source <- NULL
     idx_legende_ronds <- NULL
-    
+
     for(i in 1:length(map$x$calls))
     {
       if(map$x$calls[[i]]$method %in% "addPolygons")
@@ -23,60 +23,60 @@ function(map)
       {
         if(map$x$calls[[i]]$args[[5]] %in% c("carte_ronds","carte_ronds_elargi")) idx_carte_ronds <- c(idx_carte_ronds,i)
       }
-      
+
       if(map$x$calls[[i]]$method %in% "addCircles")
       {
         if(map$x$calls[[i]]$args[[5]]=="legende_ronds") idx_legende_ronds <- c(idx_legende_ronds,i)
       }
-      
+
       if(!is.null(idx_legende_ronds)) # la legende existe
       {
         if(map$x$calls[[i]]$method %in% "addMarkers")
         {
           if(map$x$calls[[i]]$args[[5]]=="legende_ronds") idx_legende_ronds <- c(idx_legende_ronds,i)
         }
-        
+
         if(map$x$calls[[i]]$method %in% "addPolylines")
         {
           if(map$x$calls[[i]]$args[[3]]=="legende_ronds") idx_legende_ronds <- c(idx_legende_ronds,i)
         }
       }
     }
-    
+
     if(is.null(idx_legende_ronds))
     {
       return(NULL)
     }else
     {
       code_epsg <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[2]]$code_epsg
-      
+
       list_fonds <- list()
       nom_fonds <- c()
       l <- 1
-      
+
       for(i in 1:length(idx_carte))
       {
         fond <- map$x$calls[[idx_carte[i]]]$args[[2]][1][[1]]
-        
-        fond <- st_transform(fond,paste0("+init=epsg:",code_epsg))
-        
+
+        fond <- st_transform(fond,crs=as.numeric(code_epsg))
+
         list_fonds[[l]] <- fond
-        
+
         nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte[i]]]$args[[2]]$nom_fond)
-        
+
         l <- l+1
       }
-      
+
       for(i in 1:length(idx_carte_ronds))
       {
         emprise <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$emprise
-        
+
         centres_ronds <- data.frame(lng=map$x$calls[[idx_carte_ronds[i]]]$args[[2]],lat=map$x$calls[[idx_carte_ronds[i]]]$args[[1]])
-        aa <- apply(centres_ronds,1, function(x) st_sf(geometry=st_sfc(st_point(x),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84")))
+        aa <- apply(centres_ronds,1, function(x) st_sf(geometry=st_sfc(st_point(x),crs=4326)))
         bb <- do.call("rbind",aa)
-        cc <- st_transform(bb,paste0("+init=epsg:",map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$code_epsg))
+        cc <- st_transform(bb,crs=as.numeric(map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$code_epsg))
         ronds_pl <- st_buffer(cc, map$x$calls[[idx_carte_ronds[i]]]$args[[3]])
-        
+
         col_bor <- map$x$calls[[idx_carte_ronds[i]]]$args[[6]]$color
         ronds_pl <- cbind(COL_BOR=col_bor,ronds_pl)
         col <- map$x$calls[[idx_carte_ronds[i]]]$args[[6]]$fillColor
@@ -84,10 +84,10 @@ function(map)
         varVolume <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$var_volume
         val <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$analyse$donnees[,varVolume]
         ronds_pl <- cbind(VAL=val,ronds_pl)
-        
+
         fond_pos <- NULL
         fond_neg <- NULL
-        
+
         if(nrow(ronds_pl[ronds_pl$VAL>0,])>0)
         {
           fond_pos <- ronds_pl[ronds_pl$VAL>0,]
@@ -96,7 +96,7 @@ function(map)
         {
           fond_neg <- ronds_pl[ronds_pl$VAL<0,]
         }
-        
+
         if(!is.null(fond_pos))
         {
           list_fonds[[l]] <- fond_pos
@@ -110,26 +110,26 @@ function(map)
           l <- l+1
         }
       }
-      
+
       for(i in 1:length(idx_legende_ronds))
       {
         if(map$x$calls[[idx_legende_ronds[i]]]$method %in% "addCircles")
         {
           centres_ronds <- data.frame(lng=map$x$calls[[idx_legende_ronds[i]]]$args[[2]],lat=map$x$calls[[idx_legende_ronds[i]]]$args[[1]])
-          aa <- apply(centres_ronds,1, function(x) st_sf(geometry=st_sfc(st_point(x),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84")))
+          aa <- apply(centres_ronds,1, function(x) st_sf(geometry=st_sfc(st_point(x),crs=4326)))
           bb <- do.call("rbind",aa)
-          cc <- st_transform(bb,paste0("+init=epsg:",map$x$calls[[idx_legende_ronds[i]]]$args[[4]]$code_epsg))
+          cc <- st_transform(bb,crs=as.numeric(map$x$calls[[idx_legende_ronds[i]]]$args[[4]]$code_epsg))
           ronds_pl <- st_buffer(cc, map$x$calls[[idx_legende_ronds[i]]]$args[[3]])
-          
+
           ronds_pl_leg <- ronds_pl
           val <- c(map$x$calls[[idx_legende_ronds[i]]]$args[[7]][1],map$x$calls[[idx_legende_ronds[i]]]$args[[7]][2])
           ronds_pl_leg <- cbind(VAL=val,ronds_pl_leg)
-          
+
           list_fonds[[l]] <- ronds_pl_leg
           nom_fonds <- c(nom_fonds,map$x$calls[[idx_legende_ronds[i]]]$args[[4]]$nom_fond)
           l <- l+1
         }
-        
+
         if(map$x$calls[[idx_legende_ronds[i]]]$method %in% "addPolylines")
         {
           # Pour l'export Qgis en projection locale
@@ -140,7 +140,7 @@ function(map)
           y2_grand_pl <- max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"Y"])
           pts2_grand_pl <- c(x2_grand_pl,y2_grand_pl)
           ligne_grand_pl <- rbind(pts1_grand_pl,pts2_grand_pl)
-          
+
           x1_petit_pl <- x1_grand_pl
           y1_petit_pl <- max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==2),"Y"])
           pts1_petit_pl <- c(x1_petit_pl,y1_petit_pl)
@@ -148,16 +148,16 @@ function(map)
           y2_petit_pl <- max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==2),"Y"])
           pts2_petit_pl <- c(x2_petit_pl,y2_petit_pl)
           ligne_petit_pl <- rbind(pts1_petit_pl,pts2_petit_pl)
-          
+
           lignes_pl <- st_sf(st_geometry(st_multilinestring(list(ligne_grand_pl,ligne_petit_pl))))
-          lignes_pl <- st_set_crs(lignes_pl,paste0("+init=epsg:",map$x$calls[[idx_legende_ronds[i]]]$args[[2]]$code_epsg))
-          
+          lignes_pl <- st_set_crs(lignes_pl,as.numeric(map$x$calls[[idx_legende_ronds[i]]]$args[[2]]$code_epsg))
+
           list_fonds[[l]] <- lignes_pl
           nom_fonds <- c(nom_fonds,map$x$calls[[idx_legende_ronds[i]]]$args[[2]]$nom_fond)
           l <- l+1
         }
       }
     }
-    
+
     return(list(list_fonds,nom_fonds,emprise))
   }

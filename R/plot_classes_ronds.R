@@ -220,9 +220,9 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
 
     points_L93 <- data.frame(xLeg=xLegRonds,yLeg=yLegRonds,stringsAsFactors = FALSE)
 
-    list_points <- apply(points_L93,1, function(x) st_sf(geometry=st_sfc(st_point(x),crs=paste0("+init=epsg:",code_epsg))))
+    list_points <- apply(points_L93,1, function(x) st_sf(geometry=st_sfc(st_point(x),crs=as.numeric(code_epsg))))
     fond_points_L93 <- do.call("rbind",list_points)
-    fond_points_WGS84 <- st_transform(fond_points_L93,paste0("+init=epsg:4326 +proj=longlat +ellps=WGS84"))
+    fond_points_WGS84 <- st_transform(fond_points_L93,crs = 4326)
 
     fond_points_WGS84 <- data.frame(st_coordinates(fond_points_WGS84))
     names(fond_points_WGS84) <- c("lng","lat")

@@ -86,7 +86,7 @@ function(map,fondPoints,types=NULL,couleurs=NULL,tailles=NULL,epaisseurs=NULL)
     names(fondPoints)[2] <- "LIBELLE"
     fondPoints$LIBELLE<-iconv(fondPoints$LIBELLE,"latin1","utf8")
 
-    fondPoints <- st_transform(fondPoints,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+    fondPoints <- st_transform(fondPoints,crs=4326)
 
     lng_points <- st_coordinates(fondPoints)[,1]
     lat_points <- st_coordinates(fondPoints)[,2]

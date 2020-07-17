@@ -150,7 +150,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
 
     fond_joignantes <- st_as_sf(fond_joignantes)
 
-    fond_joignantes_WGS84 <- st_transform(fond_joignantes,paste0("+init=epsg:4326 +proj=longlat +ellps=WGS84"))
+    fond_joignantes_WGS84 <- st_transform(fond_joignantes, crs = 4326)
     fond_joignantes <- fond_joignantes[as.vector(st_length(fond_joignantes_WGS84)/2.2)<=filtreDist*1000,]
     rm(fond_joignantes_WGS84)
 
@@ -169,9 +169,9 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
 
     points_L93 <- data.frame(xLeg=xLeg,yLeg=yLeg,stringsAsFactors = FALSE)
 
-    list_points <- apply(points_L93,1, function(x) st_sf(geometry=st_sfc(st_point(x),crs=paste0("+init=epsg:",code_epsg))))
+    list_points <- apply(points_L93,1, function(x) st_sf(geometry=st_sfc(st_point(x),crs=as.numeric(code_epsg))))
     fond_points_L93 <- do.call("rbind",list_points)
-    fond_points_WGS84 <- st_transform(fond_points_L93,paste0("+init=epsg:4326 +proj=longlat +ellps=WGS84"))
+    fond_points_WGS84 <- st_transform(fond_points_L93, crs = 4326)
 
     fond_points_WGS84 <- data.frame(st_coordinates(fond_points_WGS84))
     names(fond_points_WGS84) <- c("lng","lat")

@@ -89,6 +89,9 @@ plot_typo_symboles <-
     ixMax <- which.max(x)
     iyMax <- which.max(y)
 
+    x_marge <- xMax/20
+    y_marge <- yMax/20
+
     if(is.null(xlim)) xlim <- c(sf::st_bbox(listFonds[[ixMax]])$xmin,sf::st_bbox(listFonds[[ixMax]])$xmax+x_marge*3)
     if(is.null(ylim)) ylim <- c(sf::st_bbox(listFonds[[iyMax]])$ymin,sf::st_bbox(listFonds[[iyMax]])$ymax+y_marge*3)
 
@@ -111,11 +114,8 @@ plot_typo_symboles <-
     xLeg <- c(xLeg,rep(xLeg,nrow(symbLeg)-1))
 
     pointsLeg <- data.frame(lng=xLeg,lat=yLeg,stringsAsFactors = FALSE)
-    listPointsLeg <- apply(pointsLeg,1, function(x) sf::st_sf(geometry=sf::st_sfc(sf::st_point(x),crs=paste0("+init=epsg:",code_epsg))))
+    listPointsLeg <- apply(pointsLeg,1, function(x) sf::st_sf(geometry=sf::st_sfc(sf::st_point(x),crs=as.numeric(code_epsg))))
     fondPointsLeg <- do.call("rbind",listPointsLeg)
-
-    x_marge <- xMax/20
-    y_marge <- yMax/20
 
     if(is.null(xLeg) | is.null(yLeg))
     {

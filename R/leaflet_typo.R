@@ -60,48 +60,48 @@ function(data,fondMaille,fondSuppl=NULL,idData,varTypo,emprise="FRM",fondEtrange
 
     analyse <- analyse[[1]]
     analyse[,"TXT1"] <- paste0("<b> <font color=#2B3E50>",format(as.data.frame(analyse)[,varTypo], big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
-    analyse_WGS84 <- st_transform(analyse,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+    analyse_WGS84 <- st_transform(analyse,crs=4326)
 
     # Fonds habillages
 
     if(emprise=="FRM")
     {
-      fond_pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-      fond_france <- st_transform(sf_fram(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+      fond_pays <- st_transform(sf_paysm(),crs=4326)
+      fond_france <- st_transform(sf_fram(),crs=4326)
     }else if(emprise!="999")
     {
       if(emprise=="971")
       {
-        fond_france <- st_transform(sf_reg01(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_france <- st_transform(sf_reg01(),crs=4326)
         fond_pays <- fond_france
       }
       if(emprise=="972")
       {
-        fond_france <- st_transform(sf_reg02(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_france <- st_transform(sf_reg02(),crs=4326)
         fond_pays <- fond_france
       }
       if(emprise=="973")
       {
-        fond_france <- st_transform(sf_reg03(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        fond_pays <- st_transform(sf_pays973(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_france <- st_transform(sf_reg03(),crs=4326)
+        fond_pays <- st_transform(sf_pays973(),crs=4326)
       }
       if(emprise=="974")
       {
-        fond_france <- st_transform(sf_reg04(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_france <- st_transform(sf_reg04(),crs=4326)
         fond_pays <- fond_france
       }
       if(emprise=="976")
       {
-        fond_france <- st_transform(sf_reg06(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_france <- st_transform(sf_reg06(),crs=4326)
         fond_pays <- fond_france
       }
     }else if(emprise=="999")
     {
-      fond_etranger <- st_transform(fondEtranger,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+      fond_etranger <- st_transform(fondEtranger,crs=4326)
       fond_pays <- fond_etranger
     }else{}
 
-    maille_WGS84 <- st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+    maille_WGS84 <- st_transform(fondMaille,crs=4326)
 
     if(!is.null(zoomMaille))
     {
@@ -120,7 +120,7 @@ function(data,fondMaille,fondSuppl=NULL,idData,varTypo,emprise="FRM",fondEtrange
 
     if(!is.null(fondSuppl))
     {
-      fond_territoire <- st_transform(fondSuppl,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+      fond_territoire <- st_transform(fondSuppl,crs=4326)
     }
 
     nb_col <- length(unique(as.data.frame(analyse)[,"classe"]))

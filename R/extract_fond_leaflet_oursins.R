@@ -6,7 +6,7 @@ function(map)
     idx_fleche <- NULL
     idx_titre <- NULL
     idx_source <- NULL
-    
+
     for(i in 1:length(map$x$calls))
     {
       if(map$x$calls[[i]]$method %in% "addPolygons")
@@ -23,43 +23,43 @@ function(map)
         if(map$x$calls[[i]]$args[4]=="map-source") idx_source <- i
       }
     }
-    
+
     var_flux <- map$x$calls[[idx_fleche]]$args[[2]]$var_flux
-    
+
     code_epsg <- map$x$calls[[idx_fleche]]$args[[2]]$code_epsg
     emprise <- map$x$calls[[idx_fleche]]$args[[2]]$emprise
-    
+
     list_fonds <- list()
     nom_fonds <- c()
     l <- 1
     for(i in 1:length(idx_carte))
     {
       fond <- map$x$calls[[idx_carte[i]]]$args[[2]][1][[1]]
-      
-      fond <- st_transform(fond,paste0("+init=epsg:",code_epsg))
-      
+
+      fond <- st_transform(fond,crs=as.numeric(code_epsg))
+
       list_fonds[[l]] <- fond
       rm(fond)
-      
+
       nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte[i]]]$args[[2]]$nom_fond)
-      
+
       l <- l+1
     }
-    
+
     if(!is.null(idx_fleche))
     {
       fond <- map$x$calls[[idx_fleche]]$args[[2]]$analyse_WGS84
-      
-      fond <- st_transform(fond,paste0("+init=epsg:",code_epsg))
-      
+
+      fond <- st_transform(fond,crs=as.numeric(code_epsg))
+
       list_fonds[[l]] <- fond
       rm(fond)
-      
+
       nom_fonds <- c(nom_fonds,map$x$calls[[idx_fleche]]$args[[2]]$nom_fond)
-      
+
       l <- l+1
     }
-    
+
     if(!is.null(idx_titre))
     {
       titre <- substr(map$x$calls[[idx_titre]]$args[1],505,nchar(map$x$calls[[idx_titre]]$args[1])-7)
@@ -67,7 +67,7 @@ function(map)
     {
       titre <- ""
     }
-    
+
     if(!is.null(idx_source))
     {
       source <- substr(map$x$calls[[idx_source]]$args[1],379,nchar(map$x$calls[[idx_source]]$args[1])-7)
@@ -75,9 +75,9 @@ function(map)
     {
       source <- ""
     }
-    
+
     epaisseur <- map$x$calls[[idx_fleche]]$args[4][[1]]$weight
     colTrait <- map$x$calls[[idx_fleche]]$args[4][[1]]$color
-    
+
     return(list(list_fonds,nom_fonds,titre,source,epaisseur,colTrait,emprise))
   }

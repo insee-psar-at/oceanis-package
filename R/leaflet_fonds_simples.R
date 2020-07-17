@@ -49,7 +49,7 @@ function(listFonds,popup=NULL,init=TRUE,map=NULL)
             clic <- F
           }
 
-          unFond <- st_transform(unFond,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          unFond <- st_transform(unFond,crs=4326)
 
           map <- addPolygons(map = map, data = unFond, opacity = i/length(listFonds),
                              stroke = TRUE, color = "black",
@@ -83,7 +83,7 @@ function(listFonds,popup=NULL,init=TRUE,map=NULL)
             clic <- F
           }
 
-          unFond <- st_transform(unFond,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          unFond <- st_transform(unFond,crs=4326)
 
           map <- addPolygons(map = map, data = unFond, opacity = i/length(listFonds),
                              stroke = TRUE, color = "black",

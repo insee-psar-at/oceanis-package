@@ -782,7 +782,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
           fond_elargi_classes <- analyse_maille_elargi
 
-          fond_maille_elargi <- st_transform(fondMailleElargi,paste0("+init=epsg:",code_epsg_ac_rp()))
+          fond_maille_elargi <- st_transform(fondMailleElargi, crs= as.numeric(code_epsg_ac_rp()))
 
           st_write(fond_elargi_ronds, paste0(rep_sortie,"/fond_elargi_ronds_carte.shp"), delete_dsn = TRUE, quiet = TRUE)
           st_write(fond_elargi_classes, paste0(rep_sortie,"/fond_maille_elargi_carte.shp"), delete_dsn = TRUE, quiet = TRUE)
@@ -818,13 +818,13 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         fond_ronds_leg <- construction_legende_ac_rp()[[1]][[2]]
         fond_lignes_leg <- construction_legende_ac_rp()[[2]][[7]]
 
-        fond_maille <- st_transform(fondMaille,paste0("+init=epsg:",code_epsg_ac_rp()))
-        fond_contour <- st_transform(fondContour,paste0("+init=epsg:",code_epsg_ac_rp()))
-        if(!is.null(fondSuppl) && input$ajout_territoire_ac_rp_id) fond_territoire <- st_transform(fond_territoire_ac_rp(),paste0("+init=epsg:",code_epsg_ac_rp()))
-        if(input$ajout_dep_ac_rp_id) fond_departement <- st_transform(fond_departement_ac_rp(),paste0("+init=epsg:",code_epsg_ac_rp()))
-        if(input$ajout_reg_ac_rp_id) fond_region <- st_transform(fond_region_ac_rp(),paste0("+init=epsg:",code_epsg_ac_rp()))
-        fond_france <- st_transform(fond_habillage_ac_rp()[[1]],paste0("+init=epsg:",code_epsg_ac_rp()))
-        fond_pays <- st_transform(fond_habillage_ac_rp()[[2]],paste0("+init=epsg:",code_epsg_ac_rp()))
+        fond_maille <- st_transform(fondMaille, crs= as.numeric(code_epsg_ac_rp()))
+        fond_contour <- st_transform(fondContour, crs= as.numeric(code_epsg_ac_rp()))
+        if(!is.null(fondSuppl) && input$ajout_territoire_ac_rp_id) fond_territoire <- st_transform(fond_territoire_ac_rp(), crs= as.numeric(code_epsg_ac_rp()))
+        if(input$ajout_dep_ac_rp_id) fond_departement <- st_transform(fond_departement_ac_rp(), crs= as.numeric(code_epsg_ac_rp()))
+        if(input$ajout_reg_ac_rp_id) fond_region <- st_transform(fond_region_ac_rp(), crs= as.numeric(code_epsg_ac_rp()))
+        fond_france <- st_transform(fond_habillage_ac_rp()[[1]], crs= as.numeric(code_epsg_ac_rp()))
+        fond_pays <- st_transform(fond_habillage_ac_rp()[[2]], crs= as.numeric(code_epsg_ac_rp()))
 
         st_write(fond_ronds, paste0(rep_sortie,"/fond_ronds_carte.shp"), delete_dsn = TRUE, quiet = TRUE)
         st_write(fond_classes, paste0(rep_sortie,"/fond_maille_carte.shp"), delete_dsn = TRUE, quiet = TRUE)
@@ -950,7 +950,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           analyse$donnees_elargi[,"TXT2"] <- paste0("<b> <font color=#2B3E50>",format(as.vector(analyse$donnees_elargi[,varRatio]), big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
         }
 
-        analyse_WGS84 <- st_transform(analyse$analyse_points,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        analyse_WGS84 <- st_transform(analyse$analyse_points,crs=4326)
 
         return(list(analyse,analyse_WGS84))
       })
@@ -966,38 +966,38 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
         if(emprise=="FRM")
         {
-          fond_pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-          fond_france <- st_transform(sf_fram(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          fond_pays <- st_transform(sf_paysm(),crs=4326)
+          fond_france <- st_transform(sf_fram(),crs=4326)
         }else if(emprise!="999")
         {
           if(emprise=="971")
           {
-            fond_france <- st_transform(sf_reg01(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_france <- st_transform(sf_reg01(),crs=4326)
             fond_pays <- fond_france
           }
           if(emprise=="972")
           {
-            fond_france <- st_transform(sf_reg02(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_france <- st_transform(sf_reg02(),crs=4326)
             fond_pays <- fond_france
           }
           if(emprise=="973")
           {
-            fond_france <- st_transform(sf_reg03(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-            fond_pays <- st_transform(sf_pays973(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_france <- st_transform(sf_reg03(),crs=4326)
+            fond_pays <- st_transform(sf_pays973(),crs=4326)
           }
           if(emprise=="974")
           {
-            fond_france <- st_transform(sf_reg04(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_france <- st_transform(sf_reg04(),crs=4326)
             fond_pays <- fond_france
           }
           if(emprise=="976")
           {
-            fond_france <- st_transform(sf_reg06(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_france <- st_transform(sf_reg06(),crs=4326)
             fond_pays <- fond_france
           }
         }else if(emprise=="999")
         {
-          fond_france <- st_transform(fondEtranger,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          fond_france <- st_transform(fondEtranger,crs=4326)
           fond_pays <- fond_france
         }else{}
 
@@ -1006,8 +1006,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
       fond_contour_maille_ac_rp <- reactive({
 
-        test_contour <- try(st_transform(fondContour,"+init=epsg:4326 +proj=longlat +ellps=WGS84"), silent = TRUE)
-        test_maille <- try(st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84"), silent = TRUE)
+        test_contour <- try(st_transform(fondContour,crs=4326), silent = TRUE)
+        test_maille <- try(st_transform(fondMaille,crs=4326), silent = TRUE)
 
         if(any(list(class(test_contour),class(test_maille)) %in% "try-error"))
         {
@@ -1016,8 +1016,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           return(NULL)
         }else
         {
-          contour_WGS84 <- st_transform(fondContour,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-          maille_WGS84 <- st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          contour_WGS84 <- st_transform(fondContour,crs=4326)
+          maille_WGS84 <- st_transform(fondMaille,crs=4326)
         }
 
         return(list(contour_WGS84,maille_WGS84))
@@ -1027,8 +1027,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         req(analyse_ac_rp())
         if(elargi_ac_rp())
         {
-          analyse_WGS84_elargi <- st_transform(analyse_ac_rp()[[1]]$analyse_points_elargi,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-          maille_WGS84_elargi <- st_transform(fondMailleElargi,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          analyse_WGS84_elargi <- st_transform(analyse_ac_rp()[[1]]$analyse_points_elargi,crs=4326)
+          maille_WGS84_elargi <- st_transform(fondMailleElargi,crs=4326)
           return(list(analyse_WGS84_elargi,maille_WGS84_elargi))
         }else
         {
@@ -1071,8 +1071,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           req(fond_elargi_ac_rp())
           centres <- rbind(st_coordinates(fond_elargi_ac_rp()[[1]]))
           row.names(centres) <- c(1:(nrow(analyse_ac_rp()[[1]]$donnees_elargi)))
-          ronds <- st_sf(geometry=st_sfc(lapply(c(1:nrow(centres)),function(x) st_point(centres[x,])),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84"))
-          ronds_pl_elargi <- st_buffer(st_transform(ronds,paste0("+init=epsg:",code_epsg_ac_rp())), calcul_rond_ac_rp()*sqrt(analyse_ac_rp()[[1]]$donnees_elargi[,varVolume]/calcul_max_rayon_metres_ac_rp()[[2]]))
+          ronds <- st_sf(geometry=st_sfc(lapply(c(1:nrow(centres)),function(x) st_point(centres[x,])),crs=4326))
+          ronds_pl_elargi <- st_buffer(st_transform(ronds, crs= as.numeric(code_epsg_ac_rp())), calcul_rond_ac_rp()*sqrt(analyse_ac_rp()[[1]]$donnees_elargi[,varVolume]/calcul_max_rayon_metres_ac_rp()[[2]]))
 
           # On cree les ronds
           dt_ronds_sf <- data.frame(ronds_pl_elargi,stringsAsFactors = F)
@@ -1084,8 +1084,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
         centres <- rbind(st_coordinates(analyse_ac_rp()[[2]]))
         row.names(centres) <- c(1:(nrow(analyse_ac_rp()[[1]]$donnees)))
-        ronds <- st_sf(geometry=st_sfc(lapply(c(1:nrow(centres)),function(x) st_point(centres[x,])),crs="+init=epsg:4326 +proj=longlat +ellps=WGS84"))
-        ronds_pl <- st_buffer(st_transform(ronds,paste0("+init=epsg:",code_epsg_ac_rp())), calcul_rond_ac_rp()*sqrt(analyse_ac_rp()[[1]]$donnees[,varVolume]/calcul_max_rayon_metres_ac_rp()[[2]]))
+        ronds <- st_sf(geometry=st_sfc(lapply(c(1:nrow(centres)),function(x) st_point(centres[x,])),crs=4326))
+        ronds_pl <- st_buffer(st_transform(ronds, crs= as.numeric(code_epsg_ac_rp())), calcul_rond_ac_rp()*sqrt(analyse_ac_rp()[[1]]$donnees[,varVolume]/calcul_max_rayon_metres_ac_rp()[[2]]))
         # On cree les ronds
         dt_ronds_sf <- data.frame(ronds_pl,stringsAsFactors = F)
         analyse_ronds_sf <- st_sf(cbind(analyse_ac_rp()[[1]]$donnees,dt_ronds_sf))
@@ -1133,7 +1133,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
         if(!is.null(fondSuppl))
         {
-          fond_territoire <- st_transform(fondSuppl,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          fond_territoire <- st_transform(fondSuppl,crs=4326)
           return(fond_territoire)
         }else
         {
@@ -1142,12 +1142,12 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       })
 
       fond_region_ac_rp <- reactive({
-        fond_region <- st_transform(sf_regm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_region <- st_transform(sf_regm(),crs=4326)
         return(fond_region)
       })
 
       fond_departement_ac_rp <- reactive({
-        fond_departement <- st_transform(sf_depm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_departement <- st_transform(sf_depm(),crs=4326)
         return(fond_departement)
       })
 
@@ -1157,7 +1157,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         if(elargi_ac_rp())
         {
           fond_donnees_elargi <- analyse_ronds_sf_ac_rp()[[2]][as.data.frame(analyse_ronds_sf_ac_rp()[[2]])[,"CODE"] %in% analyse_ac_rp()[[1]]$donnees_elargi[input$mydonnees_ac_rp_rows_selected,"CODE"],]
-          fond_donnees_elargi <- st_transform(fond_donnees_elargi,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          fond_donnees_elargi <- st_transform(fond_donnees_elargi,crs=4326)
           return(fond_donnees_elargi)
         }else
         {
@@ -1171,7 +1171,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         fond_donnees <- analyse_ronds_sf_ac_rp()[[1]][as.data.frame(analyse_ronds_sf_ac_rp()[[1]])[,"CODE"] %in% analyse_ac_rp()[[1]]$donnees[input$mydonnees_ac_rp_rows_selected,"CODE"],]
         if(nrow(fond_donnees)>0)
         {
-          fond_donnees <- st_transform(fond_donnees,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          fond_donnees <- st_transform(fond_donnees,crs=4326)
           return(fond_donnees)
         }else
         {
@@ -1303,7 +1303,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           analyse <- k_ronds(fondMaille,fondMailleElargi,names(fondMaille)[1],data,"CODE",varVolume,FALSE,"centroid",fondChx)
           analyse$donnees[,"TXT1"] <- paste0("<b> <font color=#2B3E50>",format(analyse$donnees$save, big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
           analyse$donnees[,"TXT2"] <- paste0("<b> <font color=#2B3E50>",format(analyse$donnees[,varRatio], big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
-          analyse_WGS84 <- st_transform(analyse$analyse_points,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          analyse_WGS84 <- st_transform(analyse$analyse_points,crs=4326)
 
           m <- addCircles(map = m,
                           lng = st_coordinates(analyse_WGS84)[,1],

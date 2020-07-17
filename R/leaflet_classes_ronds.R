@@ -158,7 +158,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
       analyse$donnees_elargi[,"TXT2"] <- paste0("<b> <font color=#2B3E50>",format(analyse$donnees_elargi[,varRatio], big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
     }
 
-    analyse_WGS84 <- st_transform(analyse$analyse_points,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+    analyse_WGS84 <- st_transform(analyse$analyse_points,crs=4326)
 
     max <- max(analyse$donnees[,varRatio])
     min <- min(analyse$donnees[,varRatio])
@@ -261,47 +261,47 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
 
     if(emprise=="FRM")
     {
-      fond_pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-      fond_france <- st_transform(sf_fram(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+      fond_pays <- st_transform(sf_paysm(),crs=4326)
+      fond_france <- st_transform(sf_fram(),crs=4326)
     }else if(emprise!="999")
     {
       if(emprise=="971")
       {
-        fond_france <- st_transform(sf_reg01(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_france <- st_transform(sf_reg01(),crs=4326)
         fond_pays <- fond_france
       }
       if(emprise=="972")
       {
-        fond_france <- st_transform(sf_reg02(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_france <- st_transform(sf_reg02(),crs=4326)
         fond_pays <- fond_france
       }
       if(emprise=="973")
       {
-        fond_france <- st_transform(sf_reg03(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-        fond_pays <- st_transform(sf_pays973(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_france <- st_transform(sf_reg03(),crs=4326)
+        fond_pays <- st_transform(sf_pays973(),crs=4326)
       }
       if(emprise=="974")
       {
-        fond_france <- st_transform(sf_reg04(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_france <- st_transform(sf_reg04(),crs=4326)
         fond_pays <- fond_france
       }
       if(emprise=="976")
       {
-        fond_france <- st_transform(sf_reg06(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_france <- st_transform(sf_reg06(),crs=4326)
         fond_pays <- fond_france
       }
     }else if(emprise=="999")
     {
-      fond_etranger <- st_transform(fondEtranger,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+      fond_etranger <- st_transform(fondEtranger,crs=4326)
       fond_pays <- fond_etranger
     }else{}
 
-    maille_WGS84 <- st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+    maille_WGS84 <- st_transform(fondMaille,crs=4326)
 
     if(elargi)
     {
-      analyse_WGS84_elargi <- st_transform(analyse$analyse_points_elargi,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-      maille_WGS84_elargi <- st_transform(fondMailleElargi,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+      analyse_WGS84_elargi <- st_transform(analyse$analyse_points_elargi,crs=4326)
+      maille_WGS84_elargi <- st_transform(fondMailleElargi,crs=4326)
     }
 
     if(!is.null(zoomMaille))
@@ -321,7 +321,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
 
     if(!is.null(fondSuppl))
     {
-      fond_territoire <- st_transform(fondSuppl,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+      fond_territoire <- st_transform(fondSuppl,crs=4326)
     }
 
     # Construction de la map par defaut

@@ -6,7 +6,7 @@ function(map)
     idx_titre <- NULL
     idx_source <- NULL
     idx_legende <- NULL
-    
+
     for(i in 1:length(map$x$calls))
     {
       if(map$x$calls[[i]]$method %in% "addPolygons")
@@ -18,7 +18,7 @@ function(map)
         if(map$x$calls[[i]]$args[4]=="map-title") idx_titre <- i
         if(map$x$calls[[i]]$args[4]=="map-source") idx_source <- i
       }
-      
+
       if(map$x$calls[[i]]$method %in% "addRectangles")
       {
         if(map$x$calls[[i]]$args[[6]]=="legende_typo") idx_legende <- c(idx_legende,i)
@@ -35,34 +35,34 @@ function(map)
         }
       }
     }
-    
+
     if(is.null(idx_legende))
     {
       return(NULL)
     }else
     {
       var_typo <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[2]]$var_typo
-      
+
       code_epsg <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[2]]$code_epsg
       emprise <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[2]]$emprise
-      
+
       list_fonds <- list()
       nom_fonds <- c()
       l <- 1
-      
+
       for(i in 1:length(idx_carte))
       {
         fond <- map$x$calls[[idx_carte[i]]]$args[[2]][1][[1]]
-        
-        fond <- st_transform(fond,paste0("+init=epsg:",code_epsg))
-        
+
+        fond <- st_transform(fond,crs=as.numeric(code_epsg))
+
         list_fonds[[l]] <- fond
-        
+
         nom_fonds <- c(nom_fonds,map$x$calls[[idx_carte[i]]]$args[[2]]$nom_fond)
-        
+
         l <- l+1
       }
-      
+
       if(!is.null(idx_titre))
       {
         titre <- substr(map$x$calls[[idx_titre]]$args[1],505,nchar(map$x$calls[[idx_titre]]$args[1])-7)
@@ -70,7 +70,7 @@ function(map)
       {
         titre <- ""
       }
-      
+
       if(!is.null(idx_source))
       {
         source <- substr(map$x$calls[[idx_source]]$args[1],379,nchar(map$x$calls[[idx_source]]$args[1])-7)
@@ -78,7 +78,7 @@ function(map)
       {
         source <- ""
       }
-      
+
       if(!is.null(idx_legende))
       {
         label <- NULL
@@ -102,7 +102,7 @@ function(map)
         }
         table_classe <- data.frame(classe=c(length(label):1),label=label,couleurs=palette, stringsAsFactors = F)
       }
-      
+
       return(list(list_fonds,nom_fonds,titre,source,table_classe,titre_leg,var_typo,emprise))
     }
   }

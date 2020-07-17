@@ -422,15 +422,15 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         flux_leg <- cbind(flux_leg,VALEUR=c(max(data[,varFlux]),max(data[,varFlux])/3))
         fond_flux_leg <- flux_leg
 
-        fond_flux <- st_transform(fond_flux,paste0("+init=epsg:",code_epsg_fj()))
+        fond_flux <- st_transform(fond_flux, crs= as.numeric(code_epsg_fj()))
 
-        fond_maille <- st_transform(fondMaille,paste0("+init=epsg:",code_epsg_fj()))
-        fond_contour <- st_transform(fondContour,paste0("+init=epsg:",code_epsg_fj()))
-        if(!is.null(fondSuppl) && input$ajout_territoire_fj_id) fond_territoire <- st_transform(fond_territoire_fj(),paste0("+init=epsg:",code_epsg_fj()))
-        if(input$ajout_dep_fj_id) fond_departement <- st_transform(fond_departement_fj(),paste0("+init=epsg:",code_epsg_fj()))
-        if(input$ajout_reg_fj_id) fond_region <- st_transform(fond_region_fj(),paste0("+init=epsg:",code_epsg_fj()))
-        fond_france <- st_transform(fond_habillage_fj()[[1]],paste0("+init=epsg:",code_epsg_fj()))
-        fond_pays <- st_transform(fond_habillage_fj()[[2]],paste0("+init=epsg:",code_epsg_fj()))
+        fond_maille <- st_transform(fondMaille, crs= as.numeric(code_epsg_fj()))
+        fond_contour <- st_transform(fondContour, crs= as.numeric(code_epsg_fj()))
+        if(!is.null(fondSuppl) && input$ajout_territoire_fj_id) fond_territoire <- st_transform(fond_territoire_fj(), crs= as.numeric(code_epsg_fj()))
+        if(input$ajout_dep_fj_id) fond_departement <- st_transform(fond_departement_fj(), crs= as.numeric(code_epsg_fj()))
+        if(input$ajout_reg_fj_id) fond_region <- st_transform(fond_region_fj(), crs= as.numeric(code_epsg_fj()))
+        fond_france <- st_transform(fond_habillage_fj()[[1]], crs= as.numeric(code_epsg_fj()))
+        fond_pays <- st_transform(fond_habillage_fj()[[2]], crs= as.numeric(code_epsg_fj()))
 
         st_write(fond_flux, paste0(rep_sortie,"/fond_flux.shp"), delete_dsn = TRUE, quiet = TRUE)
         st_write(fond_flux_leg, paste0(rep_sortie,"/fond_flux_leg.shp"), delete_dsn = TRUE, quiet = TRUE)
@@ -541,7 +541,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           return(NULL)
         }
 
-        analyse_WGS84 <- st_transform(analyse[[1]],"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        analyse_WGS84 <- st_transform(analyse[[1]],crs=4326)
         return(list(analyse[[1]],analyse_WGS84))
       })
 
@@ -549,38 +549,38 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
 
         if(emprise=="FRM")
         {
-          fond_pays <- st_transform(sf_paysm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-          fond_france <- st_transform(sf_fram(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          fond_pays <- st_transform(sf_paysm(),crs=4326)
+          fond_france <- st_transform(sf_fram(),crs=4326)
         }else if(emprise!="999")
         {
           if(emprise=="971")
           {
-            fond_france <- st_transform(sf_reg01(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_france <- st_transform(sf_reg01(),crs=4326)
             fond_pays <- fond_france
           }
           if(emprise=="972")
           {
-            fond_france <- st_transform(sf_reg02(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_france <- st_transform(sf_reg02(),crs=4326)
             fond_pays <- fond_france
           }
           if(emprise=="973")
           {
-            fond_france <- st_transform(sf_reg03(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-            fond_pays <- st_transform(sf_pays973(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_france <- st_transform(sf_reg03(),crs=4326)
+            fond_pays <- st_transform(sf_pays973(),crs=4326)
           }
           if(emprise=="974")
           {
-            fond_france <- st_transform(sf_reg04(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_france <- st_transform(sf_reg04(),crs=4326)
             fond_pays <- fond_france
           }
           if(emprise=="976")
           {
-            fond_france <- st_transform(sf_reg06(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+            fond_france <- st_transform(sf_reg06(),crs=4326)
             fond_pays <- fond_france
           }
         }else if(emprise=="999")
         {
-          fond_france <- st_transform(fondEtranger,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          fond_france <- st_transform(fondEtranger,crs=4326)
           fond_pays <- fond_france
         }else{}
 
@@ -589,8 +589,8 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
 
       fond_contour_maille_fj <- reactive({
 
-        test_contour <- try(st_transform(fondContour,"+init=epsg:4326 +proj=longlat +ellps=WGS84"), silent = TRUE)
-        test_maille <- try(st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84"), silent = TRUE)
+        test_contour <- try(st_transform(fondContour,crs=4326), silent = TRUE)
+        test_maille <- try(st_transform(fondMaille,crs=4326), silent = TRUE)
 
         if(any(list(class(test_contour),class(test_maille)) %in% "try-error"))
         {
@@ -599,8 +599,8 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
           return(NULL)
         }else
         {
-          contour_WGS84 <- st_transform(fondContour,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
-          maille_WGS84 <- st_transform(fondMaille,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          contour_WGS84 <- st_transform(fondContour,crs=4326)
+          maille_WGS84 <- st_transform(fondMaille,crs=4326)
         }
 
         return(list(contour_WGS84,maille_WGS84))
@@ -616,7 +616,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
       fond_territoire_fj <- reactive({
         if(!is.null(fondSuppl))
         {
-          fond_territoire <- st_transform(fondSuppl,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+          fond_territoire <- st_transform(fondSuppl,crs=4326)
           return(fond_territoire)
         }else
         {
@@ -625,12 +625,12 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
       })
 
       fond_region_fj <- reactive({
-        fond_region <- st_transform(sf_regm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_region <- st_transform(sf_regm(),crs=4326)
         return(fond_region)
       })
 
       fond_departement_fj <- reactive({
-        fond_departement <- st_transform(sf_depm(),"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_departement <- st_transform(sf_depm(),crs=4326)
         return(fond_departement)
       })
 
@@ -638,7 +638,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         req(analyse_apres_filtre_fj())
 
         fond_donnees <- analyse_apres_filtre_fj()[[1]][input$mydonnees_fj_rows_selected,]
-        fond_donnees <- st_transform(fond_donnees,"+init=epsg:4326 +proj=longlat +ellps=WGS84")
+        fond_donnees <- st_transform(fond_donnees,crs=4326)
         return(fond_donnees)
       })
 

@@ -1,11 +1,19 @@
 Changes in version 1.8.0
 
+Changes in version 1.7.5
+
+BUG FIXES and IMPROVEMENTS
+
+- Meilleure position de la source lors de l'appel de la fonction add_source.
+- Suppression de la syntaxe +init=epsg:XXXX (deprecated) au profit de la valeur numerique du code EPSG.
+- Suppression d'un bug pour plot_typo_symboles quand xlim et ylim sont NULL.
+
 Changes in version 1.7.4
 
 BUG FIXES and IMPROVEMENTS
 
 - Pour la fonction plot_ronds, correction d'un bug qui empechait de visualiser les ronds de volume négatif (autre couleur).
-- Pour les fonctions xxx_ronds_classes, correction d'un bug qui inversait les valeurs des classes si des volumes correspondant étaient identiques.
+- Pour la fonction leaflet_ronds_classes, correction d'un bug qui inversait les valeurs des classes si des volumes correspondant étaient identiques.
 
 FEATURES
 
