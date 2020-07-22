@@ -4,16 +4,16 @@
 \alias{set_pop_up}
 \title{Modify the pop_up of 'leaflet' map's analysis}
 \usage{
-set_pop_up(map, popupRonds = NULL, popupClasses = NULL)
+set_pop_up(map, popup = NULL, popupRonds = NULL)
 }
 \arguments{
 \item{map}{objet leaflet.}
 
-\item{popupRonds}{vecteur de caracteres (character). Peut etre du HTML pour
+\item{popup}{vecteur de caracteres (character). Peut etre du HTML pour
 mettre en forme le texte. Par defaut a NULL.}
 
-\item{popupClasses}{vecteur de caracteres (character). Peut etre du HTML
-pour mettre en forme le texte. Par defaut a NULL.}
+\item{popupRonds}{vecteur de caracteres (character). Peut etre du HTML pour
+mettre en forme le texte. Par defaut a NULL.}
 }
 \value{
 Retourne un objet de type leaflet.
@@ -27,6 +27,8 @@ Le nouveau texte pour le pop-up peut etre du contenu HTML.  Par exemple :
 color=#2B3E50>PART : </font></b><b> <font color=#2B3E50>21,2</font></b>"
 Attention : conserver le meme ordre des pop-up dans le vecteur que celui des
 donnees pour que les valeurs correspondent bien a l'analyse.
+
+Ne fonctionne que pour les ronds proportionnels, les analyses en classes et les typologies.
 
 Pour supprimer les pop-up, laisser le parametre a NULL.
 }
@@ -69,9 +71,6 @@ map <- set_pop_up(map = map, popupRonds = new_popup)
 \seealso{
 \code{\link{leaflet_ronds}, \link{leaflet_classes},
 \link{leaflet_ronds_classes}, \link{leaflet_classes_ronds},
-\link{leaflet_typo},}
-
-\code{\link{leaflet_oursins}, \link{leaflet_joignantes},
-\link{leaflet_saphirs}}
+\link{leaflet_typo}}
 }
 \keyword{documentation}

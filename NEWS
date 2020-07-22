@@ -8,6 +8,11 @@ BUG FIXES and IMPROVEMENTS
 - Suppression de la syntaxe +init=epsg:XXXX (deprecated) au profit de la valeur numerique du code EPSG.
 - Suppression d'un bug pour plot_typo_symboles quand xlim et ylim sont NULL.
 
+FEATURES
+
+- Pour la fonction leaflet_typo, possibilite de modifier les pop-up pour les cartes en typologie en passant par set_pop_up.
+- Fusion des parametres popupRonds et popupClasses en un seul parametre popup.
+
 Changes in version 1.7.4
 
 BUG FIXES and IMPROVEMENTS

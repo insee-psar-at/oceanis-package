@@ -127,8 +127,10 @@ function(data,fondMaille,fondSuppl=NULL,idData,varTypo,emprise="FRM",fondEtrange
     pal_typo <- substr(rainbow(256)[nb_opposes(256)[1:nb_col]],1,7)
     pal_typo <- data.frame(cbind(pal_typo,unique(as.data.frame(analyse)[,"classe"])))
     names(pal_typo) <- c("col","classe")
+    analyse$idx_oceanis <- 1:nrow(analyse)
     analyse <- merge(as.data.frame(analyse),pal_typo,by="classe")
-    analyse <- analyse[order(as.data.frame(analyse)[,varTypo]),]
+    analyse <- analyse[order(as.data.frame(analyse)[,"idx_oceanis"]),]
+    analyse <- analyse[,-which(names(analyse) %in% "idx_oceanis")]
 
     # Construction de la map par defaut
 
