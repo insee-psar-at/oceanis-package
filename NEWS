@@ -7,11 +7,11 @@ BUG FIXES and IMPROVEMENTS
 - Meilleure position de la source lors de l'appel de la fonction add_source.
 - Suppression de la syntaxe +init=epsg:XXXX (deprecated) au profit de la valeur numerique du code EPSG.
 - Suppression d'un bug pour plot_typo_symboles quand xlim et ylim sont NULL.
+- Pour les fonctions plot_xxx, correction d'un bug sur l'affichage des bordures de l'analyse lorsque des fonds sont ajoutes en-dessous ou au-dessus de l'analyse.
 
 FEATURES
 
-- Pour la fonction leaflet_typo, possibilite de modifier les pop-up pour les cartes en typologie en passant par set_pop_up.
-- Fusion des parametres popupRonds et popupClasses en un seul parametre popup.
+- Pour la fonction leaflet_typo, possibilite de modifier les pop-up pour les cartes en typologie en passant par set_pop_up (l'argument popupClasses devient popup).
 
 Changes in version 1.7.4
 
