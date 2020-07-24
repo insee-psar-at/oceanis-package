@@ -285,7 +285,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
 
     if(cadreLeg) suppressWarnings(plot(bbox_leg_ronds,add=T,col="white",border="white",lwd=1))
 
-    plot(st_geometry(fond_leg_ronds),add=T,col="transparent",border="black")
+    plot(st_geometry(fond_leg_ronds),add=T,col="transparent",border=colBorder)
     text(pts2_grand_pl[1]+1000,pts2_grand_pl[2],labels=round(max_var,precisionLegRonds),cex=0.9,adj=0)
     text(pts2_petit_pl[1]+1000,pts2_petit_pl[2],labels=round(max_var/3,precisionLegRonds),cex=0.9,adj=0)
 

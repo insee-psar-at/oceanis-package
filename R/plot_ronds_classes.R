@@ -465,7 +465,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
 
     if(cadreLeg) suppressWarnings(plot(bbox_leg_ronds,add=T,col="white",border="white",lwd=1))
 
-    plot(st_geometry(fond_leg_ronds),add=T,col="transparent",border="black")
+    plot(st_geometry(fond_leg_ronds),add=T,col="transparent",border=colBorder)
     text(pts2_grand_pl[1]+1000,pts2_grand_pl[2],labels=round(max_var,precisionLegRonds),cex=0.9,adj=0)
     text(pts2_petit_pl[1]+1000,pts2_petit_pl[2],labels=round(max_var/3,precisionLegRonds),cex=0.9,adj=0)
 
@@ -475,7 +475,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
 
     for(i in 1:length(pal_classes))
     {
-      suppressWarnings(plot(st_geometry(fond_leg_classes[i,]),add=T,col=pal_classes[i],border="black",lwd=1))
+      suppressWarnings(plot(st_geometry(fond_leg_classes[i,]),add=T,col=pal_classes[i],border=colBorder,lwd=1))
       text(max(st_coordinates(fond_leg_classes[i,])[,1])+y_large/2,mean(st_coordinates(fond_leg_classes[i,])[,2]),labels=label_rectangle[i],cex=0.9,adj=0)
     }
 

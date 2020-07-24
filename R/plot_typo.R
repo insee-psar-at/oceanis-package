@@ -177,7 +177,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varTypo
       }
     }
 
-    plot(st_geometry(fondMaille),col="transparent",border=colBorder2,add=T)
+    plot(st_geometry(fondMaille),col="transparent",border=colBorder,add=T)
 
     for(i in 1:length(pal_typo$col))
     {
@@ -210,14 +210,14 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varTypo
     {
       for(i in 1:length(pal_typo$col))
       {
-        suppressWarnings(plot(st_geometry(fond_leg_typo[i,]),add=T,col=pal_typo$col[i],border="black",lwd=1))
+        suppressWarnings(plot(st_geometry(fond_leg_typo[i,]),add=T,col=pal_typo$col[i],border=colBorder,lwd=1))
         text(max(st_coordinates(fond_leg_typo[i,])[,1])+y_large/2,mean(st_coordinates(fond_leg_typo[i,])[,2]),labels=label_rectangle[i],cex=0.9,adj=0)
       }
     }else
     {
       for(i in 1:length(pal_typo$col))
       {
-        suppressWarnings(plot(st_geometry(fond_leg_typo[i,]),add=T,col=pal_typo$col[i],border="black",lwd=1))
+        suppressWarnings(plot(st_geometry(fond_leg_typo[i,]),add=T,col=pal_typo$col[i],border=colBorder,lwd=1))
         text(max(st_coordinates(fond_leg_typo[i,])[,1])+y_large/2,mean(st_coordinates(fond_leg_typo[i,])[,2]),labels=labels[i],cex=0.9,adj=0)
       }
     }
