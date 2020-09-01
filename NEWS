@@ -8,6 +8,7 @@ BUG FIXES and IMPROVEMENTS
 - Suppression de la syntaxe +init=epsg:XXXX (deprecated) au profit de la valeur numerique du code EPSG.
 - Suppression d'un bug pour plot_typo_symboles quand xlim et ylim sont NULL.
 - Pour les fonctions plot_xxx, correction d'un bug sur l'affichage des bordures de l'analyse lorsque des fonds sont ajoutes en-dessous ou au-dessus de l'analyse.
+- Pour les fonctions plot_xxx, couleur de bordure de legende identique a celle de la carte.
 
 FEATURES
 

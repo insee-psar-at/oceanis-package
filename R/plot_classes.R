@@ -274,7 +274,23 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
 
     for(i in 1:(length(bornes)-1))
     {
-      suppressWarnings(plot(fond_classes[between(as.data.frame(fond_classes)[,varRatio],bornes[i+1],bornes[i]),],add=T,col=pal_classes[i],border=colBorder,lwd=1))
+      if(i == 1)
+      {
+        suppressWarnings(plot(fond_classes[as.data.frame(fond_classes)[,varRatio] <= bornes[1] &
+                                           as.data.frame(fond_classes)[,varRatio] >= bornes[2],],
+                              add=T,
+                              col=pal_classes[i],
+                              border=colBorder,
+                              lwd=1))
+      }else
+      {
+        suppressWarnings(plot(fond_classes[as.data.frame(fond_classes)[,varRatio] < bornes[i] &
+                                             as.data.frame(fond_classes)[,varRatio] >= bornes[i+1],],
+                              add=T,
+                              col=pal_classes[i],
+                              border=colBorder,
+                              lwd=1))
+      }
     }
 
     if(!is.null(fondSurAnalyse))
