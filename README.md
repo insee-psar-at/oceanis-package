@@ -1,5 +1,5 @@
 
-# oceanis-package (version 1.7.5)
+# oceanis-package (version 1.7.5.1)
 [![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](http://www.awesomeofficialstatistics.org)
 [![](https://cranlogs.r-pkg.org/badges/oceanis?color=brightgreen)](https://cran.r-project.org/package=oceanis)
 
