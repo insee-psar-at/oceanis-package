@@ -1,5 +1,11 @@
 Changes in version 1.8.0
 
+Changes in version 1.7.5.1
+
+BUG FIXES and IMPROVEMENTS
+
+- Correction d'un bug dans les analyses en classes lorsque les donnees toutes negatives.
+
 Changes in version 1.7.5
 
 BUG FIXES and IMPROVEMENTS
