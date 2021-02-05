@@ -224,7 +224,7 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
     
     if(max(bornes_analyse$brks)<0) # Si -
     {
-      bornes <- c(bornes_analyse$brks[bornes<0])
+      bornes <- c(bornes_analyse$brks[bornes_analyse$brks<0])
       bornes <- sort(bornes, decreasing = TRUE)
       
       if(!is.null(stylePalette))
