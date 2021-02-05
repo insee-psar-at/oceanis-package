@@ -1,6 +1,6 @@
 
 # oceanis-package (version 1.7.5.1)
-[![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](http://www.awesomeofficialstatistics.org)
+[![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](https://github.com/SNStatComp/awesome-official-statistics-software)
 [![](https://cranlogs.r-pkg.org/badges/oceanis?color=brightgreen)](https://cran.r-project.org/package=oceanis)
 
 Le package _oceanis_ permet de réaliser des cartes d'analyses. Il propose plusieurs représentations cartographiques possibles :
