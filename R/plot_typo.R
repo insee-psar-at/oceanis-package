@@ -105,6 +105,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varTypo
     }
     pal_typo <- data.frame(cbind(pal_typo,table_typo))
     names(pal_typo) <- c("col","classe","varTypo")
+    pal_typo <- pal_typo[order(as.numeric(pal_typo$classe)),]
     analyse <- merge(pal_typo,as.data.frame(analyse),by="classe")
     analyse <- analyse[order(as.data.frame(analyse)[,varTypo]),-3]
 
