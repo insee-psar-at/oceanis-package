@@ -1,5 +1,11 @@
 Changes in version 1.8.0
 
+Changes in version 1.7.5.2
+
+BUG FIXES and IMPROVEMENTS
+
+- Correction d'un bug dans plot_typo. Les couleurs de la carte étaient inversées par rapport à celles de la légende.
+
 Changes in version 1.7.5.1
 
 BUG FIXES and IMPROVEMENTS
