@@ -160,12 +160,12 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
 
     analyse_WGS84 <- st_transform(analyse$analyse_points,crs=4326)
 
-    max <- max(analyse$donnees[,varRatio])
-    min <- min(analyse$donnees[,varRatio])
+    max <- max(analyse$donnees[,varRatio], na.rm = TRUE)
+    min <- min(analyse$donnees[,varRatio], na.rm = TRUE)
     if(elargi)
     {
-      max <- max(analyse$donnees_elargi[,varRatio])
-      min <- min(analyse$donnees_elargi[,varRatio])
+      max <- max(analyse$donnees_elargi[,varRatio], na.rm = TRUE)
+      min <- min(analyse$donnees_elargi[,varRatio], na.rm = TRUE)
     }
 
     if(is.null(bornes))
@@ -205,7 +205,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
       }
 
       bornes <- carac_bornes[[1]]
-      bornes[1] <- max(as.numeric(analyse$donnees[,varRatio]))
+      bornes[1] <- max(as.numeric(analyse$donnees[,varRatio]), na.rm = TRUE)
       bornes_sansext <- bornes[-1]
       bornes_sansext <- bornes_sansext[-length(bornes_sansext)]
       bornes_sansext <- sort(bornes_sansext, decreasing = TRUE)

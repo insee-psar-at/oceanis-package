@@ -14,7 +14,7 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,variable_jointure
       fond_carto_k <- merge(fond_carto_k, donnees_k[,c(variable_jointure_donnees_k,variable_a_representer_k,"idx_oceanis")], by.x = variable_jointure_fond_carto_k, by.y = variable_jointure_donnees_k)
 
       fond_carto_k$valeur <- as.data.frame(fond_carto_k)[,variable_a_representer_k]
-      valeurs <- data.frame(var=as.character(sort(unique(donnees_k[,variable_a_representer_k]))), classe=seq(1,length(unique(donnees_k[,variable_a_representer_k])),1))
+      valeurs <- cbind(var=as.character(sort(unique(donnees_k[,variable_a_representer_k]))), classe=seq(1,length(unique(donnees_k[,variable_a_representer_k])),1))
       fond_carto_k <- merge(fond_carto_k,valeurs,by.x=variable_a_representer_k,by.y="var")
 
       fond_carto_k <- fond_carto_k[order(as.data.frame(fond_carto_k)[,"idx_oceanis"]),]
@@ -28,7 +28,7 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,variable_jointure
       donnees_k[is.na(donnees_k)] <- "Non classe"
 
       donnees_k <- donnees_k[match(as.data.frame(fond_carto_k)[,variable_jointure_fond_carto_k],donnees_k[,variable_jointure_donnees_k]),]
-      valeurs <- data.frame(var=as.character(sort(unique(donnees_k[,variable_a_representer_k]))), classe=seq(1,length(unique(donnees_k[,variable_a_representer_k])),1))
+      valeurs <- cbind(var=as.character(sort(unique(donnees_k[,variable_a_representer_k]))), classe=seq(1,length(unique(donnees_k[,variable_a_representer_k])),1))
       donnees_k <- merge(donnees_k,valeurs,by.x=variable_a_representer_k,by.y="var")
 
       if(any(names(fond_carto_k) %in% variable_a_representer_k))fond_carto_k <- fond_carto_k[,-which(names(fond_carto_k) %in% variable_a_representer_k)]

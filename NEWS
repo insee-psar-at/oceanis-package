@@ -5,6 +5,7 @@ Changes in version 1.7.5.2
 BUG FIXES and IMPROVEMENTS
 
 - Correction d'un bug dans plot_typo. Les couleurs de la carte étaient inversées par rapport à celles de la légende.
+- Prise en compte des valeurs manquantes NA dans les analyses en classes par une représentation grise.
 
 Changes in version 1.7.5.1
 

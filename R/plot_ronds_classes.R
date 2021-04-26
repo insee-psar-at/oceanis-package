@@ -286,8 +286,8 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     analyse_classes <- merge(fondMaille[,c("CODE","geometry")],data,by="CODE")
     analyse_classes <- merge(as.data.frame(analyse_classes)[,c("CODE",varRatio)],fond_ronds,by="CODE")
 
-    max <- max(as.data.frame(analyse_classes)[,varRatio])
-    min <- min(as.data.frame(analyse_classes)[,varRatio])
+    max <- max(as.data.frame(analyse_classes)[,varRatio], na.rm = TRUE)
+    min <- min(as.data.frame(analyse_classes)[,varRatio], na.rm = TRUE)
 
     if(is.null(bornes))
     {
@@ -302,7 +302,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
       }
 
       bornes <- carac_bornes[[1]]
-      bornes[1] <- max(as.numeric(as.data.frame(analyse_classes)[,varRatio]))
+      bornes[1] <- max(as.numeric(as.data.frame(analyse_classes)[,varRatio]), na.rm = TRUE)
       bornes_sansext <- bornes[-1]
       bornes_sansext <- bornes_sansext[-length(bornes_sansext)]
       bornes_sansext <- sort(bornes_sansext, decreasing = TRUE)

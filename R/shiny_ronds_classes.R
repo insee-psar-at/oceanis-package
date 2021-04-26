@@ -343,8 +343,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           output$distribution_rp_ac <- renderPlot({
             dt_donnees <- data.frame(VAR=as.numeric(analyse_rp_ac()[[1]]$donnees[,varRatio]))
             ggplot(dt_donnees, aes(x=dt_donnees$VAR)) +
-              stat_bin(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_rp_ac(),max(dt_donnees$VAR)))), closed = "left", fill="#5182B6", col="white") +
-              scale_x_continuous(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_rp_ac(),max(dt_donnees$VAR)))), labels = round(unique(sort(c(min(dt_donnees$VAR),new_bornes_rp_ac(),max(dt_donnees$VAR)))),2)) +
+              stat_bin(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_rp_ac(),max(dt_donnees$VAR, na.rm = TRUE)))), closed = "left", fill="#5182B6", col="white") +
+              scale_x_continuous(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_rp_ac(),max(dt_donnees$VAR, na.rm = TRUE)))), labels = round(unique(sort(c(min(dt_donnees$VAR),new_bornes_rp_ac(),max(dt_donnees$VAR, na.rm = TRUE)))),2)) +
               ggtitle(label=paste0("Distribution de la variable  : ",varRatio)) +
               xlab(label = varRatio)
           })
@@ -352,7 +352,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           output$slider_bornes_rp_ac <- renderUI({
             lapply(1:(as.numeric(input$nb_classes_rp_ac_id)-1)+1, function(i) {
               sliderInput(inputId = paste0("slider_bornes_", i,"_rp_ac_id"), label = NULL,
-                          value = rev(react_bornes_rp_ac()[[1]])[i], min = min(react_bornes_rp_ac()[[1]]), max = max(react_bornes_rp_ac()[[1]]), step = 0.001) #min = rev(react_bornes_rp_ac()[[1]])[i-1], max = rev(react_bornes_rp_ac()[[1]])[i+1]
+                          value = rev(react_bornes_rp_ac()[[1]])[i], min = min(react_bornes_rp_ac()[[1]]), max = max(react_bornes_rp_ac()[[1]], na.rm = TRUE), step = 0.001) #min = rev(react_bornes_rp_ac()[[1]])[i-1], max = rev(react_bornes_rp_ac()[[1]])[i+1]
             })
           })
 
@@ -683,7 +683,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         }
 
         suppressWarnings(
-          if(min(donnees)<0 & max(donnees)>0) # Si + et -
+          if(min(donnees, na.rm = TRUE)<0 & max(donnees, na.rm = TRUE)>0) # Si + et -
           {
             if(length(donnees)>3 & length(donnees)<9)
             {
@@ -1075,11 +1075,11 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         if(elargi_rp_ac()) # On redefini le min et le max de la serie pour eviter les valeurs en NA
         {
           bornes[length(bornes)] <- min(as.numeric(analyse_rp_ac()[[1]]$donnees_elargi[,varRatio]))
-          bornes[1] <- max(as.numeric(analyse_rp_ac()[[1]]$donnees_elargi[,varRatio]))
+          bornes[1] <- max(as.numeric(analyse_rp_ac()[[1]]$donnees_elargi[,varRatio]), na.rm = TRUE)
         }else
         {
           bornes[length(bornes)] <- min(as.numeric(analyse_rp_ac()[[1]]$donnees[,varRatio]))
-          bornes[1] <- max(as.numeric(analyse_rp_ac()[[1]]$donnees[,varRatio]))
+          bornes[1] <- max(as.numeric(analyse_rp_ac()[[1]]$donnees[,varRatio]), na.rm = TRUE)
         }
 
         if(length(unique(bornes)) != length(bornes))
@@ -1296,7 +1296,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
           bornes <- react_bornes_init_rp_ac()[[1]]
           suppressWarnings(bornes[length(bornes)] <- min(as.numeric(analyse$donnees[,varRatio])))
-          suppressWarnings(bornes[1] <- max(as.numeric(analyse$donnees[,varRatio])))
+          suppressWarnings(bornes[1] <- max(as.numeric(analyse$donnees[,varRatio]), na.rm = TRUE))
 
           pal_classes <- react_bornes_init_rp_ac()[[2]]
           pal_classes[is.na(pal_classes)] <- "grey"
@@ -2012,7 +2012,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
         ronds_leg <- construction_ronds_legende(lon_lat_rp_ac()[[1]],lon_lat_rp_ac()[[2]],code_epsg_rp_ac(),input$taille_rond_rp_ac_id)
         lignes <- construction_lignes_legende(ronds_leg,coeff,code_epsg_rp_ac())
-        ronds_leg[[2]] <- cbind(ronds_leg[[2]],VALEUR=c(max(data[,varVolume]),max(data[,varVolume])/3))
+        ronds_leg[[2]] <- cbind(ronds_leg[[2]],VALEUR=c(max(data[,varVolume], na.rm = TRUE),max(data[,varVolume], na.rm = TRUE)/3))
 
         return(list(ronds_leg,lignes,coeff))
       })

@@ -342,8 +342,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           output$distribution_ac_rp <- renderPlot({
             dt_donnees <- data.frame(VAR=as.numeric(analyse_ac_rp()[[1]]$donnees[,varRatio]))
             ggplot(dt_donnees, aes(x=dt_donnees$VAR)) +
-              stat_bin(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac_rp(),max(dt_donnees$VAR)))), closed = "left", fill="#5182B6", col="white") +
-              scale_x_continuous(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac_rp(),max(dt_donnees$VAR)))), labels = round(unique(sort(c(min(dt_donnees$VAR),new_bornes_ac_rp(),max(dt_donnees$VAR)))),2)) +
+              stat_bin(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac_rp(),max(dt_donnees$VAR, na.rm = TRUE)))), closed = "left", fill="#5182B6", col="white") +
+              scale_x_continuous(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac_rp(),max(dt_donnees$VAR, na.rm = TRUE)))), labels = round(unique(sort(c(min(dt_donnees$VAR),new_bornes_ac_rp(),max(dt_donnees$VAR, na.rm = TRUE)))),2)) +
               ggtitle(label=paste0("Distribution de la variable  : ",varRatio)) +
               xlab(label = varRatio)
           })
@@ -351,7 +351,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           output$slider_bornes_ac_rp <- renderUI({
             lapply(1:(as.numeric(input$nb_classes_ac_rp_id)-1)+1, function(i) {
               sliderInput(inputId = paste0("slider_bornes_", i,"_ac_rp_id"), label = NULL,
-                          value = rev(react_bornes_ac_rp()[[1]])[i], min = min(react_bornes_ac_rp()[[1]]), max = max(react_bornes_ac_rp()[[1]]), step = 0.001) #min = rev(react_bornes_ac_rp()[[1]])[i-1], max = rev(react_bornes_ac_rp()[[1]])[i+1]
+                          value = rev(react_bornes_ac_rp()[[1]])[i], min = min(react_bornes_ac_rp()[[1]]), max = max(react_bornes_ac_rp()[[1]], na.rm = TRUE), step = 0.001) #min = rev(react_bornes_ac_rp()[[1]])[i-1], max = rev(react_bornes_ac_rp()[[1]])[i+1]
             })
           })
 
@@ -681,7 +681,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         }
 
         suppressWarnings(
-          if(min(donnees)<0 & max(donnees)>0) # Si + et -
+          if(min(donnees, na.rm = TRUE)<0 & max(donnees, na.rm = TRUE)>0) # Si + et -
           {
             if(length(donnees)>3 & length(donnees)<9)
             {
@@ -1102,11 +1102,11 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         if(elargi_ac_rp()) # On redefini le min et le max de la serie pour eviter les valeurs en NA
         {
           bornes[length(bornes)] <- min(as.numeric(analyse_ac_rp()[[1]]$donnees_elargi[,varRatio]))
-          bornes[1] <- max(as.numeric(analyse_ac_rp()[[1]]$donnees_elargi[,varRatio]))
+          bornes[1] <- max(as.numeric(analyse_ac_rp()[[1]]$donnees_elargi[,varRatio]), na.rm = TRUE)
         }else
         {
           bornes[length(bornes)] <- min(as.numeric(analyse_ac_rp()[[1]]$donnees[,varRatio]))
-          bornes[1] <- max(as.numeric(analyse_ac_rp()[[1]]$donnees[,varRatio]))
+          bornes[1] <- max(as.numeric(analyse_ac_rp()[[1]]$donnees[,varRatio]), na.rm = TRUE)
         }
 
         if(length(unique(bornes)) != length(bornes))
@@ -1330,7 +1330,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           bornes <- react_bornes_init_ac_rp()[[1]]
 
           bornes[length(bornes)] <- min(as.numeric(analyse$donnees[,varRatio]))
-          bornes[1] <- max(as.numeric(analyse$donnees[,varRatio]))
+          bornes[1] <- max(as.numeric(analyse$donnees[,varRatio]), na.rm = TRUE)
 
           pal_classes <- react_bornes_init_ac_rp()[[2]]
 
@@ -2074,7 +2074,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
         ronds_leg <- construction_ronds_legende(lon_lat_ac_rp()[[1]],lon_lat_ac_rp()[[2]],code_epsg_ac_rp(),input$taille_rond_ac_rp_id)
         lignes <- construction_lignes_legende(ronds_leg,coeff,code_epsg_ac_rp())
-        ronds_leg[[2]] <- cbind(ronds_leg[[2]],VALEUR=c(max(data[,varVolume]),max(data[,varVolume])/3))
+        ronds_leg[[2]] <- cbind(ronds_leg[[2]],VALEUR=c(max(data[,varVolume], na.rm = TRUE),max(data[,varVolume], na.rm = TRUE)/3))
         return(list(ronds_leg,lignes,coeff))
       })
 

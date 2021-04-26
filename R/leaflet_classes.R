@@ -90,12 +90,12 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
       analyse$donnees_elargi[,"TXT1"] <- paste0("<b> <font color=#2B3E50>",format(round(analyse$donnees_elargi[,varRatio],3), big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
     }
 
-    max <- max(analyse$donnees[,varRatio])
-    min <- min(analyse$donnees[,varRatio])
+    max <- max(analyse$donnees[,varRatio], na.rm = TRUE)
+    min <- min(analyse$donnees[,varRatio], na.rm = TRUE)
     if(elargi)
     {
-      max <- max(analyse$donnees_elargi[,varRatio])
-      min <- min(analyse$donnees_elargi[,varRatio])
+      max <- max(analyse$donnees_elargi[,varRatio], na.rm = TRUE)
+      min <- min(analyse$donnees_elargi[,varRatio], na.rm = TRUE)
     }
 
     if(is.null(bornes))
@@ -135,7 +135,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varRatio,me
       }
 
       bornes <- carac_bornes[[1]]
-      bornes[1] <- max(as.numeric(analyse$donnees[,varRatio]))
+      bornes[1] <- max(as.numeric(analyse$donnees[,varRatio]), na.rm = TRUE)
       bornes_sansext <- bornes[-1]
       bornes_sansext <- bornes_sansext[-length(bornes_sansext)]
       bornes_sansext <- sort(bornes_sansext, decreasing = TRUE)

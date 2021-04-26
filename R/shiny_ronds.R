@@ -1364,7 +1364,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
         ronds_leg <- construction_ronds_legende(lon_lat_rp()[[1]],lon_lat_rp()[[2]],code_epsg_rp(),input$taille_rond_rp_id)
         lignes <- construction_lignes_legende(ronds_leg,coeff,code_epsg_rp())
-        ronds_leg[[2]] <- cbind(ronds_leg[[2]],VALEUR=c(max(data[,varVolume]),max(data[,varVolume])/3))
+        ronds_leg[[2]] <- cbind(ronds_leg[[2]],VALEUR=c(max(data[,varVolume], na.rm = TRUE),max(data[,varVolume], na.rm = TRUE)/3))
         return(list(ronds_leg,lignes,coeff))
       })
 

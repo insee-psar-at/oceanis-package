@@ -282,8 +282,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           output$distribution_ac <- renderPlot({
             dt_donnees <- data.frame(VAR=as.numeric(analyse_ac()$donnees[,varRatio]))
             ggplot(dt_donnees, aes(x=dt_donnees$VAR)) +
-              stat_bin(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR)))), closed = "left", fill="#5182B6", col="white") +
-              scale_x_continuous(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR)))), labels = round(unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR)))),2)) +
+              stat_bin(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR, na.rm = TRUE)))), closed = "left", fill="#5182B6", col="white") +
+              scale_x_continuous(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR, na.rm = TRUE)))), labels = round(unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR, na.rm = TRUE)))),2)) +
               ggtitle(label=paste0("Distribution de la variable  : ",varRatio)) +
               xlab(label = varRatio)
           })
@@ -291,7 +291,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           output$slider_bornes_ac <- renderUI({
             lapply(1:(as.numeric(input$nb_classes_ac_id)-1)+1, function(i) {
               sliderInput(inputId = paste0("slider_bornes_", i,"_ac_id"), label = NULL,
-                          value = rev(react_bornes_ac()[[1]])[i], min = min(react_bornes_ac()[[1]]), max = max(react_bornes_ac()[[1]]), step = 0.001) #min = rev(react_bornes_ac()[[1]])[i-1], max = rev(react_bornes_ac()[[1]])[i+1]
+                          value = rev(react_bornes_ac()[[1]])[i], min = min(react_bornes_ac()[[1]]), max = max(react_bornes_ac()[[1]], na.rm = TRUE), step = 0.001) #min = rev(react_bornes_ac()[[1]])[i-1], max = rev(react_bornes_ac()[[1]])[i+1]
             })
           })
 
@@ -562,7 +562,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         }
 
         suppressWarnings(
-          if(min(donnees)<0 & max(donnees)>0) # Si + et -
+          if(min(donnees, na.rm = TRUE)<0 & max(donnees, na.rm = TRUE)>0) # Si + et -
           {
             if(length(donnees)>3 & length(donnees)<9)
             {
@@ -900,11 +900,11 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         if(elargi_ac()) # On redefini le min et le max de la serie pour eviter les valeurs en NA
         {
           bornes[length(bornes)] <- min(as.numeric(analyse_ac()$donnees_elargi[,varRatio]))
-          bornes[1] <- max(as.numeric(analyse_ac()$donnees_elargi[,varRatio]))
+          bornes[1] <- max(as.numeric(analyse_ac()$donnees_elargi[,varRatio]), na.rm = TRUE)
         }else
         {
           bornes[length(bornes)] <- min(as.numeric(analyse_ac()$donnees[,varRatio]))
-          bornes[1] <- max(as.numeric(analyse_ac()$donnees[,varRatio]))
+          bornes[1] <- max(as.numeric(analyse_ac()$donnees[,varRatio]), na.rm = TRUE)
         }
 
         if(length(unique(bornes)) != length(bornes))
@@ -940,7 +940,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           return(NULL)
         }else
         {
-          bornes[1] <- max(as.numeric(analyse_ac()$donnees[,varRatio]))
+          bornes[1] <- max(as.numeric(analyse_ac()$donnees[,varRatio]), na.rm = TRUE)
         }
 
         pal_classes <- react_bornes_init_ac()[[2]]

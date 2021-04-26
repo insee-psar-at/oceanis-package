@@ -23,7 +23,9 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
       
       # On separe les donnees en 2, positives ou nulles d'un cote et negatives de l'autre
       donnees_pos <- donnees[donnees[,variable_classe]>=0,variable_classe]
+      donnees_pos <- donnees_pos[!is.na(donnees_pos)]
       donnees_neg <- donnees[donnees[,variable_classe]<0,variable_classe]
+      donnees_neg <- donnees_neg[!is.na(donnees_neg)]
       
       # On determine les bornes + et - les plus proches de zero
       borne_pos <- min(bornes[bornes>0])
