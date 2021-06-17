@@ -9,7 +9,7 @@
 [![](https://cranlogs.r-pkg.org/badges/grand-total/oceanis?color=brightgreen)](https://cran.r-project.org/package=oceanis)
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![R build status](https://github.com/insee-psar-at/oceanis-package/workflows/R-CMD-check/badge.svg)](https://github.com/insee-psar-at/oceanis-package/actions)
-[![License](http://img.shields.io/badge/license-GPL%20%28%3E=%202%29-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-2.0.h
+[![License](http://img.shields.io/badge/license-GPL%20%28%3E=%202%29-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-2.0.html)
 <!-- badges: end -->
 
 Le package _oceanis_ permet de réaliser des cartes d'analyses. Il propose plusieurs représentations cartographiques possibles :
