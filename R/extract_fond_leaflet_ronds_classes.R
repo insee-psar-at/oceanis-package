@@ -113,18 +113,17 @@ function(map)
         fond <- cbind(COL_BOR=col_bor,fond)
         col <- map$x$calls[[idx_carte_ronds[i]]]$args[[6]]$fillColor
         fond <- cbind(classe=col,fond)
+        aa <- lapply(1:length(unique(fond$classe)), function(x) fond[fond$classe %in% rev(unique(fond$classe))[x],"classe"] <<- x)
+        rm(aa)
         ronds_pl <- fond[,c("CODE","LIBELLE",var_ronds,var_classes,"COL_BOR","classe","geometry")]
-
+        
         nb_classes <- length(unique(map$x$calls[[idx_carte_ronds[i]]]$args[[6]]$fillColor))
         pal_classes <- unique(map$x$calls[[idx_carte_ronds[i]]]$args[[6]]$fillColor)
 
-        palette <- recup_palette(stylePalette=map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$style)
-        pal_classes_pos <- palette[[1]]
-        pal_classes_neg <- palette[[2]]
-
-        pal_classes_pos <- pal_classes_pos[pal_classes_pos %in% pal_classes]
-        pal_classes_neg <- pal_classes_neg[pal_classes_neg %in% pal_classes]
-        pal_classes <- c(pal_classes_pos,pal_classes_neg)
+        pal_classes <- recup_palette(stylePalette = map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$style,
+                                     nbNeg = map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$nb_pal_neg,
+                                     nbPos = map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$nb_pal_pos)
+        pal_classes <- rev(pal_classes)
 
         gg <- lapply(1:length(pal_classes), function(x) ronds_pl[ronds_pl$classe %in% rev(pal_classes)[x],"classe"] <<- x)
         rm(gg)

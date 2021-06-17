@@ -2,41 +2,30 @@
 #'
 #' @description Returns a palette of the graphic chart of INSEE.
 #'
-#' @details Les palettes proposees sont celles utilisees dans les publications Insee.
-#' Seule la palette par defaut propose des couleurs supplementaires par rapport
-#' a la palette utilisee dans la publication InsesFlash.
+#' @details Les palettes de couleurs disponibles sont celles de la Charte Graphique
+#' INSEE. En exécutant la fonction affiche_palette(nomPalette), il est possible de
+#' visualiser les couleurs de chaque palette disponible. Les modalités pour
+#' l'argument 'nomPalette' sont "Bleu_Jaune", "Bleu_Rouge", "Bleu", "Jaune",
+#' "Gris", "Turquoise", "Vert" et "Violet".
 #'
-#' La fonction renvoie une liste de deux vecteurs. Le premier element de la
-#' liste correspond aux couleurs des valeurs positives et le deuxieme aux
-#' couleurs des valeurs negatives.
+#' La fonction renvoie une liste d'un vecteur composé du nom de la palette au format
+#' nomPalette_xN_yP et des valeurs hexadécimales de la palette.
 #'
-#' Les couleurs sont classees du plus fonce au plus clair pour les palettes des
-#' valeurs positives et du plus clair au plus fonce pour les palettes des
-#' valeurs negatives.
+#' La liste des valeurs hexadécimales de toutes les palettes est disponible en
+#' chargeant les données suivantes : data("palettes_insee").
+#' 
+#' Il est obligatoire de spécifier un nombre de classes négatives ou positives
+#' supérieur à 0.
 #'
-#' Le code des couleurs est le code hexadecimal.
-#'
-#' \itemize{ \item InseeFlash positives : "#9B231C", "#B24B1D", "#D47130",
-#' "#E4A75A", "#F2CE93" \item InseeFlash negatives :
-#' "#ECF1FA","#C9DAF0","#95BAE2","#5182B6","#005289" \item InseeAnalyse
-#' positives : "#5E2057","#853567","#8E5981","#BA97B2","#D7C0CC" \item
-#' InseeAnalyse negatives : "#ECF1FA","#C9DAF0","#95BAE2","#5182B6","#005289"
-#' \item InseeDossier positives :
-#' "#4F185E","#65317B","#9475A5","#BFA5C6","#E7D1E5" \item InseeDossier
-#' negatives : "#ECF1FA","#C9DAF0","#95BAE2","#5182B6","#005289" \item
-#' InseePremiere positives : "#7F0029","#CC1543","#DE635B","#F79C85","#FDE3DE"
-#' \item InseePremiere negatives :
-#' "#ECF4D8","#CDD78C","#91B778","#549534","#005941" \item defaut positives :
-#' "#5A0A14","#82141B","#9B231C","#B24B1D","#D47130","#E4A75A","#F2CE93" \item
-#' defaut negatives :
-#' "#C9DAF0","#95BAE2","#5182B6","#005289","#003269","#001E5A","#000050" }
-#'
-#' @usage recup_palette(stylePalette)
+#' @usage recup_palette(stylePalette, nbNeg = 0, nbPos = 0)
 #'
 #' @param stylePalette chaine de caracteres (character). A choisir parmi
-#' "InseeFlash", "InseeAnalyse", "InseeDossier", "InseePremiere" ou "defaut".
+#' "Bleu_Jaune", "Bleu_Rouge", "Bleu", "Jaune", "Gris", "Turquoise", "Vert"
+#' ou "Violet".
+#' @param nbNeg numeric. Nombre de classes negatives. Par defaut 0.
+#' @param nbPos numeric. Nombre de classes positives. Par defaut 0.
 #'
-#' @return Retourne une liste de deux vecteurs caracteres.
+#' @return Retourne une liste d'un vecteur caracteres.
 #'
 #' @seealso \code{\link{set_couleur_classes}}
 #'
@@ -48,55 +37,31 @@
 #'
 #' @examples
 #'
-#' recup_palette("InseeFlash")
+#' recup_palette(stylePalette = "Bleu_Jaune", nbNeg = 3, nbPos = 3)
 #'
-#' #[[1]]
-#' #[1] "#9B231C" "#B24B1D" "#D47130" "#E4A75A" "#F2CE93"
-#' #[[2]]
-#' #[1] "#ECF1FA" "#C9DAF0" "#95BAE2" "#5182B6" "#005289"
+#' # $Bleu_Jaune_3N3P
+#' # [1] "#0F417A" "#286AC7" "#8DB0E1" "#FBD616" "#FFC300" "#E89E0B"
 #'
 #' @export recup_palette
 #'
 recup_palette <-
-function(stylePalette)
+function(stylePalette, nbNeg = 0, nbPos = 0)
+{
+  msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6 <- NULL
+  
+  if(!is.null(stylePalette)) if(any(class(stylePalette)!="character")) msg_error1 <- "Le style de palette est a choisir parmi 'Bleu_Jaune', 'Bleu_Rouge', 'Bleu', 'Jaune', 'Gris', 'Turquoise', 'Vert' ou 'Violet' / "
+  if(nbNeg < 0) msg_error2 <- "Le nombre de classes negative doit etre superieur ou egal a zero / "
+  if(nbPos < 0) msg_error3 <- "Le nombre de classes positive doit etre superieur ou egal a zero / "
+  if(nbNeg == 0 & nbPos == 0) msg_error4 <- "Le nombre de classes positive ou negative doit etre superieur a zero / "
+  if(nbNeg > 6 | nbPos > 6) msg_error5 <- "Le nombre de classes positive ou negative doit etre inferieur ou egal a 6 / "
+  if(!is.null(stylePalette)) if(!stylePalette %in% c("Bleu_Jaune", "Bleu_Rouge", "Bleu", "Jaune", "Gris", "Turquoise", "Vert", "Violet")) msg_error6 <- "Le style de palette est a choisir parmi 'Bleu_Jaune', 'Bleu_Rouge', 'Bleu', 'Jaune', 'Gris', 'Turquoise', 'Vert' ou 'Violet' / "
+  
+  if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),!is.null(msg_error5),!is.null(msg_error6)))
   {
-    # Palettes
-    inseeDefautPos <- c("#5A0A14","#82141B","#9B231C","#B24B1D","#D47130","#E4A75A","#F2CE93") # Rouge du +fonce au + clair
-    inseeDefautNeg <- c("#C9DAF0","#95BAE2","#5182B6","#005289","#003269","#001E5A","#000050") # Bleu du + clair au + fonce
-    inseeFlashPos <- c("#9B231C","#B24B1D","#D47130","#E4A75A","#F2CE93")
-    inseeFlashNeg <- c("#ECF1FA","#C9DAF0","#95BAE2","#5182B6","#005289")
-    inseeAnalysePos <- c("#5E2057","#853567","#8E5981","#BA97B2","#D7C0CC")
-    inseeAnalyseNeg <- c("#ECF1FA","#C9DAF0","#95BAE2","#5182B6","#005289")
-    inseeDossierPos <- c("#4F185E","#65317B","#9475A5","#BFA5C6","#E7D1E5")
-    inseeDossierNeg <- c("#ECF1FA","#C9DAF0","#95BAE2","#5182B6","#005289")
-    inseePremierePos <- c("#7F0029","#CC1543","#DE635B","#F79C85","#FDE3DE")
-    inseePremiereNeg <- c("#ECF4D8","#CDD78C","#91B778","#549534","#005941")
-
-    if(stylePalette=="InseeFlash")
-    {
-      inseePos <- inseeFlashPos
-      inseeNeg <- inseeFlashNeg
-    }
-    if(stylePalette=="InseeAnalyse")
-    {
-      inseePos <- inseeAnalysePos
-      inseeNeg <- inseeAnalyseNeg
-    }
-    if(stylePalette=="InseeDossier")
-    {
-      inseePos <- inseeDossierPos
-      inseeNeg <- inseeDossierNeg
-    }
-    if(stylePalette=="InseePremiere")
-    {
-      inseePos <- inseePremierePos
-      inseeNeg <- inseePremiereNeg
-    }
-    if(stylePalette=="defaut")
-    {
-      inseePos <- inseeDefautPos
-      inseeNeg <- inseeDefautNeg
-    }
-
-    return(list(inseePos,inseeNeg))
+    stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6)))
   }
+  
+  col_palette <- palettes_insee[which(names(palettes_insee) == paste0(stylePalette,"_",nbNeg,"N",nbPos,"P"))]
+
+  return(col_palette)
+}

@@ -1,5 +1,5 @@
 leaflet_ronds <-
-function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,rayonRond=NULL,rapportRond=NULL,emprise="FRM",fondEtranger=NULL,fondChx=NULL,colPos="#CD853F",colNeg="#6495ED",colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,opacityElargi=0.6,zoomMaille=NULL,map_proxy=NULL)
+function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,rayonRond=NULL,rapportRond=NULL,emprise="FRM",fondEtranger=NULL,fondChx=NULL,colPos="#FFC300",colNeg="#286AC7",colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,opacityElargi=0.6,zoomMaille=NULL,map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
 

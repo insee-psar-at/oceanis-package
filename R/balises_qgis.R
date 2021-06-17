@@ -1,7 +1,7 @@
 balises_qgis <-
 function(){
   canevas <- data.frame(V1=c('<!DOCTYPE qgis PUBLIC "http://mrcc.com/qgis.dtd" "SYSTEM">',
-                                  '<qgis projectname="" version="2.8.5-Wien">',
+                                  paste0('<qgis projectname="" version="3.10.12-A Coru','\u00F1','a">'),
                                   '<title></title>',
                                   '<mapcanvas>',
                                   '<units>meters</units>',

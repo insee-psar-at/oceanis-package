@@ -1,5 +1,5 @@
 leaflet_saphirs <-
-function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,largeurFlecheMax=NULL,direction="Ent",filtreVol=0,colEntree="#CD853F",colSortie="#6495ED",colBorder="#303030",emprise="FRM",fondEtranger=NULL,zoomMaille=NULL,map_proxy=NULL)
+function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,largeurFlecheMax=NULL,direction="Ent",filtreVol=0,colEntree="#FFC300",colSortie="#286AC7",colBorder="#303030",emprise="FRM",fondEtranger=NULL,zoomMaille=NULL,map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
 

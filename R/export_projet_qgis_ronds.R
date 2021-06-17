@@ -61,6 +61,7 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,annee)
       #param idcouche, chemincouche, nomcouche
       nomcouche=l[i]
       chemincouche=paste0(chemin_fonds,nomcouche,".shp")
+      chemincoucherelatif=paste0("./",nomcouche,".shp")
       
       BLOCCATEGORIES=data.frame()      
       #cas ou le fond selectionne est l'analyse en ronds ou les ronds de la legende
@@ -103,7 +104,7 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,annee)
         remplissagefond="solid"
         BLOCSYMBOLS=modif_blocsymbolsPolygon(couleurfond,couleurbordure,remplissagefond,stylebordure,epaisseurbordure,name)
         
-        toto=modif_blocprojectlayers(geometrie,idcouche,chemincouche,nomcouche,projcouche,attr,typeanalyse)
+        toto=modif_blocprojectlayers(geometrie,idcouche,chemincoucherelatif,nomcouche,projcouche,attr,typeanalyse)
         toto=rbind(data.frame(V1=toto[1:13,]),BLOCCATEGORIES,data.frame(V1=toto[15,]),BLOCSYMBOLS,data.frame(V1=toto[17:23,]))
         BLOCPROJECT=rbind(BLOCPROJECT,toto)
       }else
@@ -172,7 +173,7 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,annee)
         bloclayeritem=data.frame(V1=c(bloclayeritem[1,],blocvector[,1],bloclayeritem[3,]))
         BLOCLAYERITEM=rbind(BLOCLAYERITEM,bloclayeritem)
         
-        toto=modif_blocprojectlayers(geometrie,idcouche,chemincouche,nomcouche,projcouche,attr,typeanalyse)
+        toto=modif_blocprojectlayers(geometrie,idcouche,chemincoucherelatif,nomcouche,projcouche,attr,typeanalyse)
         toto=rbind(data.frame(V1=toto[1:13,]),BLOCCATEGORIES,data.frame(V1=toto[15,]),BLOCSYMBOLS,data.frame(V1=toto[17:23,]))
         BLOCPROJECT=rbind(BLOCPROJECT,toto)
       }

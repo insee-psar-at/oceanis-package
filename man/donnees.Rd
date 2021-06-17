@@ -11,49 +11,53 @@
 \alias{depm}
 \alias{regm}
 \alias{fram}
+\alias{palettes_insee}
 \title{Examples of data}
 \format{
 \code{com_dep_13_30_83_84} Un data frame de 792 observations et 3
-variables.  \describe{ \item{list("CODE")}{vecteur caracteres}
-\item{list("LIBELLE")}{vecteur caracteres}
-\item{list("geometry")}{sfc_GEOMETRY} }
+variables.  \describe{ \item{"CODE"}{vecteur caracteres}
+\item{"LIBELLE"}{vecteur caracteres}
+\item{"geometry"}{sfc_GEOMETRY} }
 
 Un data frame de 281 observations et 3 variables.  \describe{
-\item{list("DEPCOM")}{vecteur caracteres} \item{list("ZE2010")}{vecteur
-caracteres} \item{list("LIB_ZE2010")}{vecteur caracteres} }
+\item{"DEPCOM"}{vecteur caracteres} \item{"ZE2010"}{vecteur
+caracteres} \item{"LIB_ZE2010"}{vecteur caracteres} }
 
 \code{donnees_monoloc} Un data frame de 96 observations et 6 variables.
-\describe{ \item{list("COD_DEP")}{vecteur caracteres}
-\item{list("LIB_DEP")}{vecteur caracteres} \item{list("POP_2010")}{vecteur
-numerique} \item{list("POP_2015")}{vecteur numerique}
-\item{list("VAR_AN_MOY")}{vecteur numerique} \item{list("REG")}{vecteur
+\describe{ \item{"COD_DEP"}{vecteur caracteres}
+\item{"LIB_DEP"}{vecteur caracteres} \item{"POP_2010"}{vecteur
+numerique} \item{"POP_2015"}{vecteur numerique}
+\item{"VAR_AN_MOY"}{vecteur numerique} \item{"REG"}{vecteur
 caracteres} }
 
 \code{donnees_biloc} Un data frame de 378 observations et 3 variables.
-\describe{ \item{list("REG_DEPART")}{vecteur caracteres}
-\item{list("REG_ARRIVEE")}{vecteur caracteres} \item{list("MIGR")}{vecteur
+\describe{ \item{"REG_DEPART"}{vecteur caracteres}
+\item{"REG_ARRIVEE"}{vecteur caracteres} \item{"MIGR"}{vecteur
 numerique} }
 
 \code{donnees_biloc_saphirs} Un data frame de 21 observations et 3
-variables.  \describe{ \item{list("REG_DEPART")}{vecteur caracteres}
-\item{list("REG_ARRIVEE")}{vecteur caracteres} \item{list("MIGR")}{vecteur
+variables.  \describe{ \item{"REG_DEPART"}{vecteur caracteres}
+\item{"REG_ARRIVEE"}{vecteur caracteres} \item{"MIGR"}{vecteur
 numerique} }
 
 \code{depm} Un data frame de 96 observations et 5 variables.  \describe{
-\item{list("CODE")}{vecteur caracteres} \item{list("LIBELLE")}{vecteur
-caracteres} \item{list("REG")}{vecteur caracteres}
-\item{list("SURF")}{vecteur numerique} \item{list("geometry")}{sfc_GEOMETRY}
+\item{"CODE"}{vecteur caracteres} \item{"LIBELLE"}{vecteur
+caracteres} \item{"REG"}{vecteur caracteres}
+\item{"SURF"}{vecteur numerique} \item{"geometry"}{sfc_GEOMETRY}
 }
 
 \code{regm} Un data frame de 13 observations et 4 variables.  \describe{
-\item{list("CODE")}{vecteur caracteres} \item{list("LIBELLE")}{vecteur
-caracteres} \item{list("SURF")}{vecteur numerique}
-\item{list("geometry")}{sfc_GEOMETRY} }
+\item{"CODE"}{vecteur caracteres} \item{"LIBELLE"}{vecteur
+caracteres} \item{"SURF"}{vecteur numerique}
+\item{"geometry"}{sfc_GEOMETRY} }
 
 \code{fram} Un data frame de 1 observation et 4 variables.  \describe{
-\item{list("CODE")}{vecteur caracteres} \item{list("LIBELLE")}{vecteur
-caracteres} \item{list("SURF")}{vecteur numerique}
-\item{list("geometry")}{sfc_GEOMETRY} }
+\item{"CODE"}{vecteur caracteres} \item{"LIBELLE"}{vecteur
+caracteres} \item{"SURF"}{vecteur numerique}
+\item{"geometry"}{sfc_GEOMETRY} }
+
+\code{palettes_insee} Une liste de vecteurs caracteres.  \describe{
+\item{"nomPalette"}{vecteur caracteres de codes hexadecimaux} }
 }
 \usage{
 data("com_dep_13_30_83_84")
@@ -71,6 +75,8 @@ data("depm")
 data("regm")
 
 data("fram")
+
+data("palettes_insee")
 }
 \description{
 Data tables for examples.
@@ -86,6 +92,8 @@ Data tables for examples.
 - \code{donnees_biloc_saphirs} for sapphire arrows
 
 - \code{depm, regm, fram} for the meshes and contours of the maps
+
+- \code{palettes_insee} for palette of the graphic chart of INSEE
 }
 \examples{
 
@@ -97,6 +105,7 @@ data(donnees_biloc_saphirs)
 data(depm)
 data(regm)
 data(fram)
+data(palettes_insee)
 
 }
 \keyword{datasets}

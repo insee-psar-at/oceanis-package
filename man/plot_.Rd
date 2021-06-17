@@ -18,14 +18,14 @@ NULL, idData, varVolume, rayonRond = NULL, rapportRond = NULL, emprise =
 "FRM", fondChx = NULL, precisionLegRonds = 0, titreLeg = "", xLeg = NULL,
 yLeg = NULL, cadreLeg = FALSE, xLimCadreLeg = NULL, yLimCadreLeg = NULL,
 titreCarte = "", sourceCarte = "", etiquettes = NULL, colPos =
-"#CD853F", colNeg = "#6495ED", colBorder = "white", colBorderMaille =
+"#FFC300", colNeg = "#286AC7", colBorder = "white", colBorderMaille =
 "black", xlim = NULL, ylim = NULL)
 
 plot_classes(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse =
 NULL, idData, varRatio, methode = "kmeans", nbClasses = 3, bornes = NULL,
 precisionLegClasses = 1, titreLeg = "", labels = NULL, xLeg = NULL,
 yLeg = NULL, cadreLeg = FALSE, xLimCadreLeg = NULL, yLimCadreLeg = NULL,
-titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "defaut",
+titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "Bleu_Jaune",
 palettePos = NULL, paletteNeg = NULL, colBorder = "white", xlim = NULL,
 ylim = NULL)
 
@@ -36,7 +36,7 @@ precisionLegClasses = 1, emprise = "FRM", fondChx = NULL, titreLegRonds =
 "", titreLegClasses = "", labels = NULL, xLegRonds = NULL, yLegRonds = NULL,
 xLegClasses = NULL, yLegClasses = NULL, cadreLeg = FALSE, xLimCadreLegRonds = NULL,
 yLimCadreLegRonds = NULL, xLimCadreLegClasses = NULL, yLimCadreLegClasses = NULL,
-titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "defaut",
+titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "Bleu_Jaune",
 palettePos = NULL, paletteNeg = NULL, colBorder = "white",
 colBorderMaille = "black", xlim = NULL, ylim = NULL)
 
@@ -47,7 +47,7 @@ precisionLegClasses = 1, emprise = "FRM", fondChx = NULL, titreLegRonds = "",
 titreLegClasses = "", labels = NULL, xLegRonds = NULL, yLegRonds = NULL,
 xLegClasses = NULL, yLegClasses = NULL, cadreLeg = FALSE, xLimCadreLegRonds = NULL,
 yLimCadreLegRonds = NULL, xLimCadreLegClasses = NULL, yLimCadreLegClasses = NULL,
-titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "defaut",
+titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "Bleu_Jaune",
 palettePos = NULL, paletteNeg = NULL, colBorder = "white",
 colBorderRonds = "#303030", xlim = NULL, ylim = NULL)
 
@@ -75,7 +75,7 @@ NULL, filtreVol = 0, filtreDist = 100, filtreMajeurs = 10,
 decalageAllerRetour = 0, decalageCentroid = 0, emprise = "FRM",
 precisionLegFleches = 0, titreLeg = "", xLeg = NULL, yLeg = NULL,
 cadreLeg = FALSE, xLimCadreLeg = NULL, yLimCadreLeg = NULL, titreCarte = "",
-sourceCarte = "", etiquettes = NULL, colFleche = "#CD853F", colBorder
+sourceCarte = "", etiquettes = NULL, colFleche = "#FFC300", colBorder
 = "white", colBorderMaille = "black", xlim = NULL, ylim = NULL)
 
 plot_saphirs(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse =
@@ -83,7 +83,7 @@ NULL, typeMaille, idDataDepart, idDataArrivee, varFlux, largeurFlecheMax =
 NULL, direction = "Ent", filtreVol = 0, emprise = "FRM", precisionLegFleches
 = 0, titreLeg = "", xLeg = NULL, yLeg = NULL, cadreLeg = FALSE,
 xLimCadreLeg = NULL, yLimCadreLeg = NULL, titreCarte = "", sourceCarte = "",
-etiquettes = NULL, colEntree = "#CD853F", colSortie = "#6495ED",
+etiquettes = NULL, colEntree = "#FFC300", colSortie = "#286AC7",
 colBorder = "white", colBorderMaille = "black", xlim = NULL, ylim = NULL)
 }
 \arguments{
@@ -257,14 +257,15 @@ des classes dans le systeme de projection locale. Par defaut a NULL.}
 carte. Par defaut a NULL. Voir details.}
 
 \item{colPos}{chaine de caracteres (character). Couleur nommee (par exemple
-"orange") ou hexadecimal (par exemple "#FFA500"). Par defaut "#CD853F".}
+"orange") ou hexadecimal (par exemple "#FFA500"). Par defaut "#FFC300".}
 
 \item{colNeg}{chaine de caracteres (character). Couleur nommee (par exemple
-"blue") ou hexadecimal (par exemple "#0000FF"). Par defaut "#6495ED".}
+"blue") ou hexadecimal (par exemple "#0000FF"). Par defaut "#286AC7".}
 
 \item{stylePalette}{chaine de caracteres (character). Palette de la charte
-INSEE. A choisir entre "InseeFlash", "InseeAnalyse", "InseeDossier",
-"InseePremiere" ou "defaut" (par defaut).}
+INSEE. A choisir entre "Bleu_Jaune" (par defaut), "Bleu_Rouge", "Bleu",
+"Jaune", "Gris", "Turquoise", "Vert", "Violet" (voir
+'affiche_palette(nomPalette)').}
 
 \item{palettePos}{vecteur de caracteres (character). Couleurs nommees (par
 exemple c("red","orange","yellow")) ou hexadecimal (par exemple
@@ -299,15 +300,15 @@ exemple "grey") ou hexadecimal (par exemple "#808080"). Par defaut
 
 \item{colFleche}{chaine de caracteres (character). Couleur nommee (par
 exemple "orange") ou hexadecimal (par exemple "#FFA500"). Par defaut
-"#CD853F".}
+"#FFC300".}
 
 \item{colEntree}{chaine de caracteres (character). Couleur nommee (par
 exemple "orange") ou hexadecimal (par exemple "#FFA500"). Par defaut
-"#CD853F".}
+"#FFC300".}
 
 \item{colSortie}{chaine de caracteres (character). Couleur nommee (par
 exemple "blue") ou hexadecimal (par exemple "#0000FF"). Par defaut
-"#6495ED".}
+"#286AC7".}
 
 \item{xlim}{vecteur numerique (numeric). Coordonnees xmin et xmax de la
 carte. Par defaut a NULL.}

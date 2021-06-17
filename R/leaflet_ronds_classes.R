@@ -1,5 +1,5 @@
 leaflet_ronds_classes <-
-function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,stylePalette="defaut",opacityElargi=0.6,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,precision=1,emprise="FRM",fondEtranger=NULL,fondChx=NULL,zoomMaille=NULL,map_proxy=NULL)
+function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,stylePalette="Bleu_Jaune",opacityElargi=0.6,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,precision=1,emprise="FRM",fondEtranger=NULL,fondChx=NULL,zoomMaille=NULL,map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
 
@@ -140,11 +140,11 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
     {
       if(!is.null(map_proxy))
       {
-        showModal(modalDialog(HTML(paste0("<font size=+1>La maille ne correspond pas au niveau g\u00e9ographique du fichier de donn","\u00e9","es.<br><br>Veuillez svp choisir une maille adapt","\u00e9","e ou modifier le fichier de donn","\u00e9","es.</font>")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
+        showModal(modalDialog(HTML(paste0("<font size=+1>Le nombre de classes est trop \u00e9lev\u00e9 ou bien la maille ne correspond pas au niveau g\u00e9ographique du fichier de donn","\u00e9","es.</font>")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
         return(map_proxy)
       }else
       {
-        stop(simpleError("La maille ne correspond pas au niveau geographique du fichier de donnees. Veuillez svp choisir une maille adaptee ou modifier le fichier de donnees"))
+        stop(simpleError("Le nombre de classes est trop eleve ou bien la maille ne correspond pas au niveau geographique du fichier de donnees."))
       }
     }
 
@@ -160,12 +160,12 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
 
     analyse_WGS84 <- st_transform(analyse$analyse_points,crs=4326)
 
-    max <- max(analyse$donnees[,varRatio], na.rm = TRUE)
-    min <- min(analyse$donnees[,varRatio], na.rm = TRUE)
+    max_donnees <- max(analyse$donnees[,varRatio], na.rm = TRUE)
+    min_donnees <- min(analyse$donnees[,varRatio], na.rm = TRUE)
     if(elargi)
     {
-      max <- max(analyse$donnees_elargi[,varRatio], na.rm = TRUE)
-      min <- min(analyse$donnees_elargi[,varRatio], na.rm = TRUE)
+      max_donnees <- max(analyse$donnees_elargi[,varRatio], na.rm = TRUE)
+      min_donnees <- min(analyse$donnees_elargi[,varRatio], na.rm = TRUE)
     }
 
     if(is.null(bornes))
@@ -204,57 +204,71 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
         }
       }
 
+      nb_pal_neg <- carac_bornes[[3]]
+      nb_pal_pos <- carac_bornes[[4]]
       bornes <- carac_bornes[[1]]
-      bornes[1] <- max(as.numeric(analyse$donnees[,varRatio]), na.rm = TRUE)
       bornes_sansext <- bornes[-1]
       bornes_sansext <- bornes_sansext[-length(bornes_sansext)]
-      bornes_sansext <- sort(bornes_sansext, decreasing = TRUE)
-      bornes <- unique(c(max,bornes_sansext,min))
+      bornes_sansext <- sort(bornes_sansext)
+      bornes <- unique(c(min_donnees,bornes_sansext,max_donnees))
       bornes <- round(bornes,precision)
       pal_classes <- carac_bornes[[2]]
+      bornes_export <- carac_bornes[[1]]
 
-    }else
+    }else # methode manuel, bornes non NULL
     {
-      bornes_sansext <- sort(bornes, decreasing = TRUE)
-      bornes <- unique(c(max,bornes_sansext,min))
+      bornes <- sort(unique(c(max_donnees,bornes,min_donnees)))
+      if(min(bornes) != min_donnees) bornes <- bornes[which(bornes == min_donnees):length(bornes)]
+      if(max(bornes) != max_donnees) bornes <- bornes[1:which(bornes == max_donnees)]
       bornes <- round(bornes,precision)
-
-      pal_classes_pos <- recup_palette(stylePalette)[[1]]
-      pal_classes_neg <- recup_palette(stylePalette)[[2]]
-
-      nb_col_pos <- length(pal_classes_pos)
-
-      if(min<0 & max>=0) # Si - et +
+      
+      if(min_donnees < 0 & max_donnees >= 0) # Si - et +
       {
-        pal_classes_pos <- pal_classes_pos[(nb_col_pos-length(bornes[bornes>0])+1):nb_col_pos]
-        pal_classes_neg <- pal_classes_neg[1:length(bornes[bornes<0])]
-        pal_classes <- c(pal_classes_pos,pal_classes_neg)
-      }
-      if(min>=0) # Si +
-      {
-        if(length(bornes)>=8)
+        if(!0 %in% bornes)
         {
-          pal_classes <- pal_classes_pos
+          col_classe_zero <- recup_palette(stylePalette = "Gris", nbPos = 6)[[1]][1]
+          nb_pal_neg <- length(bornes[bornes < 0]) - 1
+          nb_pal_pos <- length(bornes[bornes > 0]) - 1
+          pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]]
+          pal_classes <- c(pal_classes[0:nb_pal_neg], col_classe_zero, pal_classes[(nb_pal_neg + 1):(length(pal_classes) + 1)])
+          pal_classes <- pal_classes[!is.na(pal_classes)]
         }else
         {
-          pal_classes <- pal_classes_pos[-c(1:(nb_col_pos-length(bornes)+1))] # On enleve les couleurs fonces inutiles
+          nb_pal_neg <- length(bornes[bornes < 0])
+          nb_pal_pos <- length(bornes[bornes > 0])
+          pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]] 
         }
       }
-      if(max<0) # Si -
+      if(min_donnees >= 0) # Si +
       {
-        if(length(bornes)>=8)
+        if(!0 %in% bornes)
         {
-          pal_classes <- pal_classes_neg
+          nb_pal_pos <- length(bornes[bornes > 0]) - 1
         }else
         {
-          pal_classes <- pal_classes_neg[c(1:(length(bornes)-1))] # On enleve les couleurs fonces inutiles
+          nb_pal_pos <- length(bornes[bornes > 0])
         }
+        if(nb_pal_pos > 6) nb_pal_pos <- 6
+        pal_classes <- recup_palette(stylePalette = stylePalette, nbPos = nb_pal_pos)[[1]]
       }
+      if(max_donnees <= 0) # Si -
+      {
+        if(!0 %in% bornes)
+        {
+          nb_pal_neg <- length(bornes[bornes < 0]) - 1
+        }else
+        {
+          nb_pal_neg <- length(bornes[bornes < 0])
+        }
+        if(nb_pal_neg > 6) nb_pal_neg <- 6
+        pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg)[[1]]
+      }
+      bornes_export <- bornes
     }
 
     pal_classes[is.na(pal_classes)] <- "grey"
 
-    palette<-colorBin(palette=rev(pal_classes), domain=0:100, bins=bornes, na.color="grey")
+    palette <- colorBin(palette=pal_classes, domain=0:100, bins=bornes, na.color="grey")
 
     # Fonds habillages
 
@@ -464,7 +478,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
                         fillColor = palette(analyse$donnees_elargi[,varRatio]),
                         fillOpacity = opacityElargi,
                         group = "carte_ronds_elargi",
-                        layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse=analyse,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_ronds_classes_elargi_carte",bornes=bornes,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal_classes,col_border_ronds_pos=colBorderPos,col_border_ronds_neg=colBorderNeg,epaisseurBorder=epaisseurBorder)
+                        layerId = list(analyse_WGS84_elargi=analyse_WGS84_elargi,analyse=analyse,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_ronds_classes_elargi_carte",bornes=bornes_export,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal_classes,nb_pal_pos=nb_pal_pos,nb_pal_neg=nb_pal_neg,col_border_ronds_pos=colBorderPos,col_border_ronds_neg=colBorderNeg,epaisseurBorder=epaisseurBorder)
       )
     }
 
@@ -483,7 +497,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
                       fillColor = palette(analyse$donnees[,varRatio]),
                       fillOpacity = 1,
                       group = "carte_ronds",
-                      layerId = list(analyse_WGS84=analyse_WGS84,analyse=analyse,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_ronds_classes_carte",bornes=bornes,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal_classes,col_border_ronds_pos=colBorderPos,col_border_ronds_neg=colBorderNeg,epaisseurBorder=epaisseurBorder)
+                      layerId = list(analyse_WGS84=analyse_WGS84,analyse=analyse,code_epsg=code_epsg,emprise=emprise,nom_fond="fond_ronds_classes_carte",bornes=bornes_export,max_var=max_var,var_ratio=varRatio,var_volume=varVolume,rayonRond=rayonRond,precision=precision,style=stylePalette,palette=pal_classes,nb_pal_pos=nb_pal_pos,nb_pal_neg=nb_pal_neg,col_border_ronds_pos=colBorderPos,col_border_ronds_neg=colBorderNeg,epaisseurBorder=epaisseurBorder)
     )
 
     return(map)

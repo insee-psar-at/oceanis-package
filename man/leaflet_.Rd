@@ -18,26 +18,26 @@ NULL)
 
 leaflet_ronds(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL,
 idData, varVolume, rayonRond = NULL, rapportRond = NULL, emprise = "FRM",
-fondEtranger = NULL, fondChx = NULL, colPos = "#CD853F", colNeg = "#6495ED",
+fondEtranger = NULL, fondChx = NULL, colPos = "#FFC300", colNeg = "#286AC7",
 colBorderPos = "white", colBorderNeg = "white", epaisseurBorder = 1,
 opacityElargi = 0.6, zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_classes(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL,
 idData, varRatio, methode = "kmeans", nbClasses = 3, bornes = NULL,
-stylePalette = "defaut", opacityElargi = 0.6, colBorder = "white", precision
+stylePalette = "Bleu_Jaune", opacityElargi = 0.6, colBorder = "white", precision
 = 1, emprise = "FRM", fondEtranger = NULL, zoomMaille = NULL, map_proxy =
 NULL)
 
 leaflet_ronds_classes(data, fondMaille, fondMailleElargi = NULL, fondSuppl =
 NULL, idData, varVolume, varRatio, rayonRond = NULL, rapportRond = NULL,
-methode = "kmeans", nbClasses = 3, bornes = NULL, stylePalette = "defaut",
+methode = "kmeans", nbClasses = 3, bornes = NULL, stylePalette = "Bleu_Jaune",
 opacityElargi = 0.6, colBorderPos = "white", colBorderNeg = "white",
 epaisseurBorder = 1, precision = 1, emprise = "FRM", fondEtranger = NULL,
 fondChx = NULL, zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_classes_ronds(data, fondMaille, fondMailleElargi = NULL, fondSuppl =
 NULL, idData, varVolume, varRatio, rayonRond = NULL, rapportRond = NULL,
-methode = "kmeans", nbClasses = 3, bornes = NULL, stylePalette = "defaut",
+methode = "kmeans", nbClasses = 3, bornes = NULL, stylePalette = "Bleu_Jaune",
 opacityElargi = 0.6, colBorderClasses = "white", colBorderRondsPos =
 "#303030", colBorderRondsNeg = "#303030", epaisseurBorder = 1.5, precision =
 1, emprise = "FRM", fondEtranger = NULL, fondChx = NULL, zoomMaille = NULL,
@@ -54,12 +54,12 @@ decalageAllerRetour = 0, decalageCentroid = 0, emprise = "FRM", fondEtranger
 leaflet_joignantes(data, fondMaille, typeMaille, fondSuppl = NULL,
 idDataDepart, idDataArrivee, varFlux, largeurFlecheMax = NULL, filtreVol =
 0, filtreDist = 100, filtreMajeurs = 10, decalageAllerRetour = 0,
-decalageCentroid = 0, colFleche = "#CD853F", colBorder = "#303030", emprise
+decalageCentroid = 0, colFleche = "#FFC300", colBorder = "#303030", emprise
 = "FRM", fondEtranger = NULL, zoomMaille = NULL, map_proxy = NULL)
 
 leaflet_saphirs(data, fondMaille, typeMaille, fondSuppl = NULL,
 idDataDepart, idDataArrivee, varFlux, largeurFlecheMax = NULL, direction =
-"Ent", filtreVol = 0, colEntree = "#CD853F", colSortie = "#6495ED",
+"Ent", filtreVol = 0, colEntree = "#FFC300", colSortie = "#286AC7",
 colBorder = "#303030", emprise = "FRM", fondEtranger = NULL, zoomMaille =
 NULL, map_proxy = NULL)
 }
@@ -152,10 +152,10 @@ fleches aller-retour (km).}
 depuis et vers les centroides des territoires (km).}
 
 \item{colPos}{chaine de caracteres (character). Couleur nommee (par exemple
-"orange") ou hexadecimal (par exemple "#FFA500"). Par defaut "#CD853F".}
+"orange") ou hexadecimal (par exemple "#FFA500"). Par defaut "#FFC300".}
 
 \item{colNeg}{chaine de caracteres (character). Couleur nommee (par exemple
-"blue") ou hexadecimal (par exemple "#0000FF"). Par defaut "#6495ED".}
+"blue") ou hexadecimal (par exemple "#0000FF"). Par defaut "#286AC7".}
 
 \item{colBorder}{chaine de caracteres (character). Couleur nommee (par
 exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white"
@@ -183,20 +183,21 @@ exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white".}
 bordure des ronds. Par defaut a 1".}
 
 \item{stylePalette}{chaine de caracteres (character). Palette de la charte
-INSEE. A choisir entre "InseeFlash", "InseeAnalyse", "InseeDossier",
-"InseePremiere" ou "defaut" (par defaut).}
+INSEE. A choisir entre "Bleu_Jaune" (par defaut), "Bleu_Rouge", "Bleu",
+"Jaune", "Gris", "Turquoise", "Vert", "Violet" (voir
+'affiche_palette(nomPalette)').}
 
 \item{colFleche}{chaine de caracteres (character). Couleur nommee (par
 exemple "orange") ou hexadecimal (par exemple "#FFA500"). Par defaut
-"#CD853F".}
+"#FFC300".}
 
 \item{colEntree}{chaine de caracteres (character). Couleur nommee (par
 exemple "orange") ou hexadecimal (par exemple "#FFA500"). Par defaut
-"#CD853F".}
+"#FFC300".}
 
 \item{colSortie}{chaine de caracteres (character). Couleur nommee (par
 exemple "blue") ou hexadecimal (par exemple "#0000FF"). Par defaut
-"#6495ED".}
+"#286AC7".}
 
 \item{opacityElargi}{valeur numerique (numeric). Opacite de la
 representation elargie. Par defaut a 0.6 (valeur comprise entre
@@ -301,6 +302,12 @@ implementant le parametre \code{bornes} d'un vecteur de valeurs numeriques
 de type c(bornes1,bornes2,...). Le nombre de bornes correspond au nombre de
 classes -1 \code{(length(bornes)==nbClasses-1)}. Il n'est pas obligatoire de
 specifier les valeurs min et max.  }
+
+Les palettes de couleurs disponibles sont celles de la Charte Graphique
+INSEE. En exécutant la fonction affiche_palette(nomPalette), il est
+possible de visualiser les couleurs de chaque palette disponible. A choisir
+entre "Bleu_Jaune" (par defaut), "Bleu_Rouge", "Bleu", "Jaune", "Gris",
+"Turquoise", "Vert", "Violet".
 
 \item{Analyse en classes dans ronds proportionnels}{ L'analyse en classes
 colore l'interieur des ronds (fonction \code{leaflet_ronds_classes()}) }

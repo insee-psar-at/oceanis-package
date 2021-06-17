@@ -1,5 +1,5 @@
 set_couleur_saphirs <-
-function(map,colEntree="#CD853F",colSortie="#6495ED",colBorder="black",map_leaflet=NULL)
+function(map,colEntree="#FFC300",colSortie="#286AC7",colBorder="black",map_leaflet=NULL)
   {
     msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5 <- NULL
 

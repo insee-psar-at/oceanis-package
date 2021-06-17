@@ -1,5 +1,5 @@
 leaflet_joignantes <-
-function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,largeurFlecheMax=NULL,filtreVol=0,filtreDist=100,filtreMajeurs=10,decalageAllerRetour=0,decalageCentroid=0,colFleche="#CD853F",colBorder="#303030",emprise="FRM",fondEtranger=NULL,zoomMaille=NULL,map_proxy=NULL)
+function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,largeurFlecheMax=NULL,filtreVol=0,filtreDist=100,filtreMajeurs=10,decalageAllerRetour=0,decalageCentroid=0,colFleche="#FFC300",colBorder="#303030",emprise="FRM",fondEtranger=NULL,zoomMaille=NULL,map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
 

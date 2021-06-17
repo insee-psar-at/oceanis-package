@@ -100,20 +100,12 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
 
       if(!ronds)
       {
-        nb_classes <- length(unique(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[4]]$fillColor))
-        pal_classes <- unique(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[4]]$fillColor)
+        pal_classes <- rev(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$palette)
       }else
       {
-        nb_classes <- length(unique(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[6]]$fillColor))
-        pal_classes <- unique(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[6]]$fillColor)
+        pal_classes <- rev(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$palette)
       }
-
-      palette <- recup_palette(stylePalette=map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$style)
-      pal_classes_pos <- palette[[1]]
-      pal_classes_neg <- palette[[2]]
-      pal_classes_pos <- pal_classes_pos[pal_classes_pos %in% pal_classes]
-      pal_classes_neg <- pal_classes_neg[pal_classes_neg %in% pal_classes]
-      pal_classes <- c(pal_classes_pos,pal_classes_neg)
+      nb_classes <- length(pal_classes)
 
       # Coordonnees du point haut/gauche des rectangles de la legende
       if(typeLegende==1) decalage <- 0.7 else decalage <- 0.5
@@ -172,18 +164,20 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
           map_proxy <- map
           map <- map_leaflet
         }
+        
+        bornes <- sort(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes, decreasing = TRUE)
 
         for(i in 1:nb_classes)
         {
           if(i==1)
           {
-            label_rectangle <- c(label_rectangle,paste0(format(round(as.numeric(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes[i+1]),precision), big.mark=" ",decimal.mark=",",nsmall=0)," et plus"))
+            label_rectangle <- c(label_rectangle,paste0(format(round(as.numeric(bornes[i+1]),precision), big.mark=" ",decimal.mark=",",nsmall=0)," et plus"))
           }else if(i==nb_classes)
           {
-            label_rectangle <- c(label_rectangle,paste0("Moins de ", format(round(as.numeric(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes[i]),precision), big.mark=" ",decimal.mark=",",nsmall=0)))
+            label_rectangle <- c(label_rectangle,paste0("Moins de ", format(round(as.numeric(bornes[i]),precision), big.mark=" ",decimal.mark=",",nsmall=0)))
           }else
           {
-            label_rectangle <- c(label_rectangle,paste0("De ", format(round(as.numeric(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes[i+1]),precision), big.mark=" ",decimal.mark=",",nsmall=0)," \u00E0 moins de ", format(round(as.numeric(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes[i]),precision), big.mark=" ",decimal.mark=",",nsmall=0)))
+            label_rectangle <- c(label_rectangle,paste0("De ", format(round(as.numeric(bornes[i+1]),precision), big.mark=" ",decimal.mark=",",nsmall=0)," \u00E0 moins de ", format(round(as.numeric(bornes[i]),precision), big.mark=" ",decimal.mark=",",nsmall=0)))
           }
         }
 
@@ -266,10 +260,10 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
 
         if(!is.null(map_leaflet))
         {
-          bornes <- map_leaflet$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes
+          bornes <- sort(map_leaflet$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes, decreasing = TRUE)
         }else
         {
-          bornes <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes
+          bornes <- sort(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes, decreasing = TRUE)
         }
 
         for(i in 1:nb_classes)

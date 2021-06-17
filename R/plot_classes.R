@@ -1,5 +1,5 @@
 plot_classes <-
-function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRatio,methode="kmeans",nbClasses=3,bornes=NULL,precisionLegClasses=1,titreLeg="",labels=NULL,xLeg=NULL,yLeg=NULL,cadreLeg=FALSE,xLimCadreLeg=NULL,yLimCadreLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="white",xlim=NULL,ylim=NULL)
+function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRatio,methode="kmeans",nbClasses=3,bornes=NULL,precisionLegClasses=1,titreLeg="",labels=NULL,xLeg=NULL,yLeg=NULL,cadreLeg=FALSE,xLimCadreLeg=NULL,yLimCadreLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,stylePalette="Bleu_Jaune",palettePos=NULL,paletteNeg=NULL,colBorder="white",xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
 
@@ -94,21 +94,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
     {
       labels<-iconv(labels,"latin1","utf8")
     }
-
-    if(is.null(palettePos) & is.null(paletteNeg))
-    {
-      palette <- recup_palette(stylePalette)
-      inseePos <- palette[[1]]
-      inseeNeg <- palette[[2]]
-    }else
-    {
-      inseePos <- NULL
-      inseeNeg <- NULL
-      stylePalette <- NULL
-      if(!is.null(palettePos)) inseePos <- palettePos
-      if(!is.null(paletteNeg)) inseeNeg <- paletteNeg
-    }
-
+    
     data[,varRatio] <- round(data[,varRatio],precisionLegClasses)
 
     analyse <- merge(fondMaille[,c("CODE","geometry")],data,by="CODE")
@@ -135,50 +121,65 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
       bornes_sansext <- sort(bornes_sansext, decreasing = TRUE)
       bornes <- c(max,bornes_sansext,min)
       bornes <- round(bornes,precisionLegClasses)
-
       pal_classes <- carac_bornes[[2]]
-    }else
+      
+    }else # methode manuel, bornes non NULL
     {
-      bornes_sansext <- sort(bornes, decreasing = TRUE)
-      bornes <- unique(c(max,bornes_sansext,min))
+      bornes <- sort(unique(c(max,bornes,min)))
+      if(min(bornes) != min) bornes <- bornes[which(bornes == min):length(bornes)]
+      if(max(bornes) != max) bornes <- bornes[1:which(bornes == max)]
       bornes <- round(bornes,precisionLegClasses)
-
-      if(min<0 & max>=0) # Si - et +
+      
+      if(min < 0 & max >= 0) # Si - et +
       {
-        pal_classes_pos <- inseePos[(length(inseePos)-length(bornes[bornes>0])+1):length(inseePos)]
-        pal_classes_neg <- inseeNeg[1:length(bornes[bornes<0])]
-        pal_classes <- c(pal_classes_pos,pal_classes_neg)
-      }
-      if(min>=0) # Si +
-      {
-        if(length(bornes)>=(length(inseePos)+1))
+        if(!0 %in% bornes)
         {
-          pal_classes <- inseePos
+          col_classe_zero <- recup_palette(stylePalette = "Gris", nbPos = 6)[[1]][1]
+          nb_pal_neg <- length(bornes[bornes < 0]) - 1
+          nb_pal_pos <- length(bornes[bornes > 0]) - 1
+          pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]]
+          pal_classes <- c(pal_classes[0:nb_pal_neg], col_classe_zero, pal_classes[(nb_pal_neg + 1):(length(pal_classes) + 1)])
+          pal_classes <- pal_classes[!is.na(pal_classes)]
         }else
         {
-          pal_classes <- inseePos[-c(1:(length(inseePos)-length(bornes)+1))] # On enleve les couleurs fonces inutiles
+          nb_pal_neg <- length(bornes[bornes < 0])
+          nb_pal_pos <- length(bornes[bornes > 0])
+          pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]] 
         }
       }
-      if(max<0) # Si -
+      if(min >= 0) # Si +
       {
-        if(length(bornes)>=(length(inseeNeg)+1))
+        if(!0 %in% bornes)
         {
-          pal_classes <- inseeNeg
+          nb_pal_pos <- length(bornes[bornes > 0]) - 1
         }else
         {
-          pal_classes <- inseeNeg[c(1:(length(bornes)-1))] # On enleve les couleurs fonces inutiles
+          nb_pal_pos <- length(bornes[bornes > 0])
         }
+        if(nb_pal_pos > 6) nb_pal_pos <- 6
+        pal_classes <- recup_palette(stylePalette = stylePalette, nbPos = nb_pal_pos)[[1]]
+      }
+      if(max <= 0) # Si -
+      {
+        if(!0 %in% bornes)
+        {
+          nb_pal_neg <- length(bornes[bornes < 0]) - 1
+        }else
+        {
+          nb_pal_neg <- length(bornes[bornes < 0])
+        }
+        if(nb_pal_neg > 6) nb_pal_neg <- 6
+        pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg)[[1]]
       }
     }
 
     if(is.null(pal_classes)) pal_classes <- "grey"
 
     pal_classes[is.na(pal_classes)] <- "grey"
-    palette<-colorBin(palette=rev(pal_classes), domain=0:100, bins=bornes, na.color="grey")
+    palette<-colorBin(palette=pal_classes, domain=0:100, bins=bornes, na.color="grey")
     col <- palette(as.data.frame(analyse)[,varRatio])
 
     analyse <- cbind(as.data.frame(analyse)[,-ncol(analyse)],PALETTE=col,geometry=analyse$geometry)
-
     ff <- lapply(1:length(pal_classes), function(x) analyse[analyse$PALETTE %in% rev(pal_classes)[x],"classe"] <<- x)
     rm(ff)
     analyse <- analyse[,c(1:(ncol(analyse)-2),ncol(analyse),ncol(analyse)-1)]
@@ -209,6 +210,8 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
     }
 
     label_rectangle <- NULL
+    bornes <- sort(bornes, decreasing = TRUE)
+    
     if(is.null(labels))
     {
       for(i in 1:length(pal_classes))
@@ -274,23 +277,11 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
 
     for(i in 1:(length(bornes)-1))
     {
-      if(i == 1)
-      {
-        suppressWarnings(plot(fond_classes[as.data.frame(fond_classes)[,varRatio] <= bornes[1] &
-                                           as.data.frame(fond_classes)[,varRatio] >= bornes[2],],
-                              add=T,
-                              col=pal_classes[i],
-                              border=colBorder,
-                              lwd=1))
-      }else
-      {
-        suppressWarnings(plot(fond_classes[as.data.frame(fond_classes)[,varRatio] < bornes[i] &
-                                             as.data.frame(fond_classes)[,varRatio] >= bornes[i+1],],
-                              add=T,
-                              col=pal_classes[i],
-                              border=colBorder,
-                              lwd=1))
-      }
+      suppressWarnings(plot(fond_classes[as.data.frame(fond_classes)[,"classe"] == i,],
+                            add=T,
+                            col=rev(pal_classes)[i],
+                            border=colBorder,
+                            lwd=1))
     }
 
     if(!is.null(fondSurAnalyse))
@@ -317,7 +308,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
 
     for(i in 1:length(pal_classes))
     {
-      suppressWarnings(plot(st_geometry(fond_leg_classes[i,]),add=T,col=pal_classes[i],border=colBorder,lwd=1))
+      suppressWarnings(plot(st_geometry(fond_leg_classes[i,]),add=T,col=rev(pal_classes)[i],border=colBorder,lwd=1))
       text(max(st_coordinates(fond_leg_classes[i,])[,1])+y_large/2,mean(st_coordinates(fond_leg_classes[i,])[,2]),labels=label_rectangle[i],cex=0.9,adj=0)
     }
 

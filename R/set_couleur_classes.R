@@ -1,5 +1,5 @@
 set_couleur_classes <-
-function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="white",map_leaflet=NULL)
+function(map,stylePalette="Bleu_Jaune",palettePos=NULL,paletteNeg=NULL,colBorder="white",map_leaflet=NULL)
   {
     msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6 <- NULL
 
@@ -13,19 +13,6 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
     if(any(!is.null(msg_error1),!is.null(msg_error2),!is.null(msg_error3),!is.null(msg_error4),!is.null(msg_error5),!is.null(msg_error6)))
     {
       stop(simpleError(paste0(msg_error1,msg_error2,msg_error3,msg_error4,msg_error5,msg_error6)))
-    }
-
-    if(is.null(palettePos) & is.null(paletteNeg))
-    {
-      palette <- recup_palette(stylePalette)
-      inseePos <- palette[[1]]
-      inseeNeg <- palette[[2]]
-    }else
-    {
-      inseePos <- NULL
-      inseeNeg <- NULL
-      if(!is.null(palettePos)) inseePos <- palettePos
-      if(!is.null(paletteNeg)) inseeNeg <- paletteNeg
     }
 
     if(!is.null(map_leaflet))
@@ -75,31 +62,52 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
 
       bornes <- map$x$calls[[idx_carte[i]]]$args[[arg]]$bornes
 
-      nb_col_pos <- length(bornes[bornes>0])
-      nb_col_neg <- length(bornes[bornes<0])
-
-      couleur_pos <- NULL
-      couleur_neg <- NULL
-
-      if(!is.null(inseePos) & nb_col_pos>0) couleur_pos <- inseePos[c((length(inseePos)-nb_col_pos+1):length(inseePos))]
-      if(!is.null(inseeNeg) & nb_col_neg>0) couleur_neg <- inseeNeg[c(1:nb_col_neg)]
-      pal_new <- c(couleur_pos,couleur_neg)
+      if(min(bornes) < 0 & max(bornes) > 0)
+      {
+        if(0 %in% bornes)
+        {
+          nb_col_pos <- length(bornes[bornes>0])
+          nb_col_neg <- length(bornes[bornes<0])
+          col_classe_zero <- c()
+        }else
+        {
+          nb_col_pos <- length(bornes[bornes>0])-1
+          nb_col_neg <- length(bornes[bornes<0])-1
+          col_classe_zero <- recup_palette(stylePalette = "Gris", nbPos = 6)[[1]][1]
+        }
+      }else if(min(bornes) >= 0)
+      {
+        nb_col_pos <- length(bornes[bornes>0])-1
+        nb_col_neg <- 0
+        col_classe_zero <- c()
+      }else if(max(bornes) <= 0)
+      {
+        nb_col_pos <- 0
+        nb_col_neg <- length(bornes[bornes<0])-1
+        col_classe_zero <- c()
+      }
+      
+      if(is.null(palettePos) & is.null(paletteNeg))
+      {
+        pal_new <- recup_palette(stylePalette = stylePalette, nbNeg = nb_col_neg, nbPos = nb_col_pos)[[1]]
+        pal_new <- c(pal_new[0:nb_col_neg], col_classe_zero, pal_new[(nb_col_neg + 1):(length(pal_new) + 1)])
+        pal_new <- pal_new[!is.na(pal_new)]
+      }else
+      {
+        couleur_pos <- NULL
+        couleur_neg <- NULL
+        if(!is.null(palettePos) & nb_col_pos > 0) couleur_pos <- palettePos[c((length(palettePos) - nb_col_pos + 1):length(palettePos))]
+        if(!is.null(paletteNeg) & nb_col_neg > 0) couleur_neg <- paletteNeg[c(1:nb_col_neg)]
+        pal_new <- c(couleur_neg,couleur_pos)
+      }
 
       style_anc <- map$x$calls[[idx_carte[i]]]$args[[arg]]$style
       map$x$calls[[idx_carte[i]]]$args[[arg]]$style <- stylePalette
 
       if(ronds) arg <- 6 else arg <- 4
 
-      palette <- recup_palette(stylePalette=style_anc)
-      inseePos_anc <- palette[[1]]
-      inseeNeg_anc <- palette[[2]]
-
-      couleur_pos_anc <- NULL
-      couleur_neg_anc <- NULL
-      if(!is.null(inseePos_anc) & nb_col_pos>0) couleur_pos_anc <- inseePos_anc[c((length(inseePos_anc)-nb_col_pos+1):length(inseePos_anc))]
-      if(!is.null(inseeNeg_anc) & nb_col_neg>0) couleur_neg_anc <- inseeNeg_anc[c(1:nb_col_neg)]
-      pal_anc <- data.frame(col=c(couleur_pos_anc,couleur_neg_anc))
-
+      pal_anc <- data.frame(col = recup_palette(stylePalette = style_anc, nbNeg = nb_col_neg, nbPos = nb_col_pos)[[1]])
+      
       couleur_analyse <- data.frame(col=map$x$calls[[idx_carte[i]]]$args[[arg]]$fillColor)
       couleur_analyse$id1 <- c(1:nrow(couleur_analyse))
 
@@ -123,7 +131,7 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
     {
       for(i in 1:length(idx_legende))
       {
-        map$x$calls[[idx_legende[i]]]$args[[4]]$fillColor <- pal_new[i]
+        map$x$calls[[idx_legende[i]]]$args[[4]]$fillColor <- rev(pal_new)[i]
       }
     }
 

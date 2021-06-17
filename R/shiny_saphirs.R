@@ -485,7 +485,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
 
         if(exists("fond_pays")) l <- c(l,"fond_pays")
 
-        export_projet_qgis_fleches_saphirs(l,rep_sortie,sortie,titre1,titre2,source,"#CD853F","#6495ED","#303030",annee)
+        export_projet_qgis_fleches_saphirs(l,rep_sortie,sortie,titre1,titre2,source,"#FFC300","#286AC7","#303030",annee)
 
         removeModal()
 
@@ -820,7 +820,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                             weight = 1,
                             options = pathOptions(pane = "fond_trio1", clickable = T),
                             popup = paste0("<b><font color=#2B3E50>",varFlux," : ",donnees,"</font></b>"),
-                            fill = T, fillColor = sapply(donnees, function(x) if(x>0){"#CD853F"}else{"#6495ED"}), fillOpacity = 1,
+                            fill = T, fillColor = sapply(donnees, function(x) if(x>0){"#FFC300"}else{"#286AC7"}), fillOpacity = 1,
                             group = "fleche"
           )
 
@@ -937,7 +937,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                   weight = 1,
                                   options = pathOptions(pane = paste0("fond_trio",i), clickable = T),
                                   popup = paste0("<b><font color=#2B3E50>",varFlux," : ",donnees,"</font></b>"),
-                                  fill = T, fillColor = sapply(donnees, function(x) if(x>0){"#CD853F"}else{"#6495ED"}), fillOpacity = 1,
+                                  fill = T, fillColor = sapply(donnees, function(x) if(x>0){"#FFC300"}else{"#286AC7"}), fillOpacity = 1,
                                   group = "fleche"
             )
 
@@ -999,7 +999,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                               weight = 1,
                               options = pathOptions(pane = paste0("fond_trio",ordre_analyse$a), clickable = T),
                               popup = paste0("<b><font color=#2B3E50>",varFlux," : ",donnees,"</font></b>"),
-                              fill = T, fillColor = sapply(donnees, function(x) if(x>0){"#CD853F"}else{"#6495ED"}), fillOpacity = 1,
+                              fill = T, fillColor = sapply(donnees, function(x) if(x>0){"#FFC300"}else{"#286AC7"}), fillOpacity = 1,
                               group = "fleche"
         )
       },ignoreInit = TRUE)
@@ -1257,7 +1257,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
                                      weight = 1,
                                      options = pathOptions(pane = paste0("fond_trio",i), clickable = T),
                                      popup = paste0("<b><font color=#2B3E50>",varFlux," : ",donnees,"</font></b>"),
-                                     fill = T, fillColor = sapply(donnees, function(x) if(x>0){"#CD853F"}else{"#6495ED"}), fillOpacity = 1
+                                     fill = T, fillColor = sapply(donnees, function(x) if(x>0){"#FFC300"}else{"#286AC7"}), fillOpacity = 1
               )
             }
 

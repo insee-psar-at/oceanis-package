@@ -812,7 +812,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       analyse_leg_ac <- reactive({
         analyse <- analyse_ac()
         analyse$rupture_classes <- palette_ac()[[2]] #bornes
-        analyse$pal_classes <- palette_ac()[[3]] # pal_classes
+        analyse$pal_classes <- rev(palette_ac()[[3]]) # pal_classes
         return(analyse)
       })
 
@@ -922,7 +922,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           pal_classes <- react_bornes_ac()[[2]]
         }
         pal_classes[is.na(pal_classes)] <- "grey"
-        palette<-colorBin(palette=rev(pal_classes), domain=0:100, bins=bornes, na.color="grey")
+        palette<-colorBin(palette=pal_classes, domain=0:100, bins=bornes, na.color="grey")
 
         return(list(palette,bornes,pal_classes))
       })
@@ -946,7 +946,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         pal_classes <- react_bornes_init_ac()[[2]]
 
         pal_classes[is.na(pal_classes)] <- "grey"
-        palette<-colorBin(palette=rev(pal_classes), domain=0:100, bins=bornes, na.color="grey")
+        palette<-colorBin(palette=pal_classes, domain=0:100, bins=bornes, na.color="grey")
 
         return(list(palette,bornes,pal_classes))
       })

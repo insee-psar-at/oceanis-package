@@ -1,5 +1,5 @@
 plot_ronds <-
-function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolume,rayonRond=NULL,rapportRond=NULL,emprise="FRM",fondChx=NULL,precisionLegRonds=0,titreLeg="",xLeg=NULL,yLeg=NULL,cadreLeg=FALSE,xLimCadreLeg=NULL,yLimCadreLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,colPos="#CD853F",colNeg="#6495ED",colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
+function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolume,rayonRond=NULL,rapportRond=NULL,emprise="FRM",fondChx=NULL,precisionLegRonds=0,titreLeg="",xLeg=NULL,yLeg=NULL,cadreLeg=FALSE,xLimCadreLeg=NULL,yLimCadreLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,colPos="#FFC300",colNeg="#286AC7",colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
 
@@ -33,7 +33,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     if(any(class(colBorderMaille)!="character")) msg_error24 <- "La couleur doit etre de type caractere (nommee ou hexadecimal) / "
     if(!is.null(xlim)) if(any(class(xlim)!="numeric")) msg_error25 <- "La variable xlim doit etre de type numerique / "
     if(!is.null(ylim)) if(any(class(ylim)!="numeric")) msg_error26 <- "La variable yim doit etre de type numerique / "
-
+    
     if(length(names(data))<2) msg_error27 <- "Le tableau des donnees n'est pas conforme. Il doit contenir au minimum une variable identifiant et la variable a representer / "
     if(length(names(fondMaille))<3) msg_error28 <- "Le fond de maille n'est pas conforme. La table doit contenir au minimum une variable identifiant, une variable libelle et la geometry / "
 
@@ -257,12 +257,12 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
         plot(st_geometry(fondSousAnalyse[[i]]),col=colFond,border=colBorder2,lwd=epaisseur,add=T)
       }
     }
-
+    
     plot(st_geometry(fondMaille),col="transparent",border=colBorderMaille,add=T)
 
     if(nrow(fond_ronds_pos)>0) plot(st_geometry(fond_ronds_pos),border=colBorder,col=colPos,add=T)
     if(nrow(fond_ronds_neg)>0) plot(st_geometry(fond_ronds_neg),border=colBorder,col=colNeg,add=T)
-
+    
     if(!is.null(fondSurAnalyse))
     {
       for(i in 1:length(fondSurAnalyse))
@@ -274,7 +274,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
         plot(st_geometry(fondSurAnalyse[[i]]),col=colFond,border=colBorder2,lwd=epaisseur,add=T)
       }
     }
-
+    
     if(!is.null(etiquettes))
     {
       for(i in 1:nrow(tableEtiquettes))
@@ -290,7 +290,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     text(pts2_petit_pl[1]+1000,pts2_petit_pl[2],labels=round(max_var/3,precisionLegRonds),cex=0.9,adj=0)
 
     text(min(st_coordinates(fond_leg_ronds[1,])[,1]),max(st_coordinates(fond_leg_ronds[1,])[,2])+(st_bbox(fondMaille)$xmax-st_bbox(fondMaille)$xmin)/20,labels=titreLeg,cex=1,adj=0)
-
+    
     if(titreCarte!="")
     {
       text(((st_bbox(fondMaille)$xmax+x_marge*3)-st_bbox(fondMaille)$xmin)/2,st_bbox(fondMaille)$ymax+y_marge*3,labels=titreCarte)
@@ -304,6 +304,6 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     message(simpleMessage(paste0("[INFO] Le rayon du rond le plus grand est = ",rayonRond," metres")))
     message(simpleMessage(paste0("[INFO] Le rapport du rond le plus grand est = ",rapportRond," metres")))
     message(simpleMessage(paste0("[INFO] Les coordonnees de la legende sont x = ",round(xLeg,2)," metres ; y = ",round(yLeg,2)," metres")))
-
+    
     return(fond_ronds)
   }

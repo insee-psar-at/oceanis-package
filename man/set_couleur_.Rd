@@ -9,33 +9,34 @@
 \alias{set_couleur_saphirs}
 \title{Modify the colors of 'leaflet' map's analysis}
 \usage{
-set_couleur_ronds(map, colorPos = "#CD853F", colorNeg = "#6495ED",
+set_couleur_ronds(map, colorPos = "#FFC300", colorNeg = "#286AC7",
 map_leaflet = NULL)
 
-set_couleur_classes(map, stylePalette = "defaut", palettePos = NULL,
+set_couleur_classes(map, stylePalette = "Bleu_Jaune", palettePos = NULL,
 paletteNeg = NULL, colBorder = "white", map_leaflet = NULL)
 
 set_couleur_typo(map, paletteTypo = NULL, colBorder = "white", map_leaflet =
 NULL)
 
-set_couleur_joignantes(map, colFleche = "#CD853F", colBorder = "black",
+set_couleur_joignantes(map, colFleche = "#FFC300", colBorder = "black",
 map_leaflet = NULL)
 
-set_couleur_saphirs(map, colEntree = "#CD853F", colSortie = "#6495ED",
+set_couleur_saphirs(map, colEntree = "#FFC300", colSortie = "#286AC7",
 colBorder = "black", map_leaflet = NULL)
 }
 \arguments{
 \item{map}{objet leaflet.}
 
 \item{colorPos}{chaine de caracteres (character). Couleur nommee ou
-hexadecimal. Par defaut "#CD853F".}
+hexadecimal. Par defaut "#FFC300".}
 
 \item{colorNeg}{chaine de caracteres (character). Couleur nommee ou
-hexadecimal. Par defaut "#6495ED".}
+hexadecimal. Par defaut "#286AC7".}
 
-\item{stylePalette}{chaine de caracteres (character). A choisir parmi
-"InseeFlash", "InseeAnalyse", "InseeDossier", "InseePremiere" ou "defaut"
-(par defaut).}
+\item{stylePalette}{chaine de caracteres (character). Palette de la charte
+INSEE. A choisir entre "Bleu_Jaune" (par defaut), "Bleu_Rouge", "Bleu",
+"Jaune", "Gris", "Turquoise", "Vert", "Violet" (voir
+'affiche_palette(nomPalette)').}
 
 \item{palettePos}{vecteur de caracteres (character). Specifier le vecteur de
 couleurs (nommees ou hexadecimal) des valeurs positives (au choix). Par
@@ -54,13 +55,13 @@ exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white"
 pour classes et typo, "black" pour joignantes et saphirs.}
 
 \item{colFleche}{chaine de caracteres (character). Couleur nommee ou
-hexadecimal. Par defaut "#CD853F".}
+hexadecimal. Par defaut "#FFC300".}
 
 \item{colEntree}{chaine de caracteres (character). Couleur nommee ou
-hexadecimal. Par defaut "#CD853F".}
+hexadecimal. Par defaut "#FFC300".}
 
 \item{colSortie}{chaine de caracteres (character). Couleur nommee ou
-hexadecimal. Par defaut "#6495ED".}
+hexadecimal. Par defaut "#286AC7".}
 
 \item{map_leaflet}{objet leaflet. Pour l'integration des fonctions leaflet
 dans les applications shiny (cf vignette). Par defaut a NULL.}
@@ -72,31 +73,14 @@ Retourne un objet de type leaflet.
 Modify the colors of 'leaflet' map's analysis.
 }
 \details{
-Les palettes proposees pour l'analyse en classes sont celles utilisees dans
-les publications Insee. Seule la palette par defaut propose des couleurs
-supplementaires par rapport a la palette utilisee dans la publication
-InsesFlash.
+Les palettes proposées pour l'analyse en classes sont celles
+utilisées par la Charte Graphique INSEE. Utilisez la fonction
+affiche_palette(nomPalette) pour visualiser les couleurs d'une palette.
+L'argument 'nomPalette' peut prendre comme valeur : "Bleu_Jaune",
+"Bleu_Rouge", "Bleu", "Jaune", "Gris", "Turquoise", "Vert" ou "Violet"
 
-Les couleurs sont classees du plus fonce au plus clair pour les palettes des
-valeurs positives et du plus clair au plus fonce pour les palettes des
-valeurs negatives.
-
-Le code des couleurs est le code hexadecimal.
-
-\itemize{ \item InseeFlash positives : "#9B231C", "#B24B1D", "#D47130",
-"#E4A75A", "#F2CE93" \item InseeFlash negatives :
-"#ECF1FA","#C9DAF0","#95BAE2","#5182B6","#005289" \item InseeAnalyse
-positives : "#5E2057","#853567","#8E5981","#BA97B2","#D7C0CC" \item
-InseeAnalyse negatives : "#ECF1FA","#C9DAF0","#95BAE2","#5182B6","#005289"
-\item InseeDossier positives :
-"#4F185E","#65317B","#9475A5","#BFA5C6","#E7D1E5" \item InseeDossier
-negatives : "#ECF1FA","#C9DAF0","#95BAE2","#5182B6","#005289" \item
-InseePremiere positives : "#7F0029","#CC1543","#DE635B","#F79C85","#FDE3DE"
-\item InseePremiere negatives :
-"#ECF4D8","#CDD78C","#91B778","#549534","#005941" \item defaut positives :
-"#5A0A14","#82141B","#9B231C","#B24B1D","#D47130","#E4A75A","#F2CE93" \item
-defaut negatives :
-"#C9DAF0","#95BAE2","#5182B6","#005289","#003269","#001E5A","#000050" }
+Le code des couleurs est le code hexadécimal. Pour récupérer les codes
+hexadécimaux des différentes palettes proposées : data("palettes_insee")
 }
 \examples{
 
@@ -115,7 +99,7 @@ map <- set_couleur_ronds(map = map, colorPos = "orange")
 # Ronds proportionnels sur une analyse en classes
 map <- leaflet_classes_ronds(data = donnees_monoloc, fondMaille = depm, idData = "COD_DEP",
 varVolume = "POP_2015", varRatio = "VAR_AN_MOY", nbClasses = 4)
-map <- set_couleur_classes(map = map, stylePalette = "InseePremiere", colBorder = "black")
+map <- set_couleur_classes(map = map, stylePalette = "Bleu_Rouge", colBorder = "black")
 \donttest{
  map
 }
@@ -127,7 +111,7 @@ data("regm")
 map <- leaflet_saphirs(data = donnees_biloc_saphirs, fondMaille = regm, typeMaille = "REG",
 idDataDepart = "REG_DEPART", idDataArrivee = "REG_ARRIVEE",
 varFlux = "MIGR", largeurFlecheMax = 500, direction = "Ent")
-map <- set_couleur_saphirs(map = map, colEntree = "#91B778", colBorder = "grey")
+map <- set_couleur_saphirs(map = map, colEntree = "#4BB375", colBorder = "grey")
 \donttest{
  map
 }

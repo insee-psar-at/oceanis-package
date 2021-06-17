@@ -1,4 +1,18 @@
+
 Changes in version 1.8.0
+
+FEATURES
+
+- Nouvelles palettes de la charte graphique INSEE ("Bleu_Jaune", "Bleu_Rouge", "Bleu", "Jaune", "Gris", "Turquoise", "Vert" et "Violet").
+- Nouvelles données data("palettes_insee") pour charger les codes hexadecimaux par palette.
+- Nouvelle fonction affiche_palette(nomPalette = "Bleu_Jaune") pour visualiser les palettes individuellement.
+- Mise à jour de la documentation et des captures d'écran (aide, vignette oceanis, README)
+
+BUG FIXES and IMPROVEMENTS
+
+- Prise en compte de la borne autour de zéro hors palette (gris clair).
+- Correction d'un bug lors de l'export de cartes Qgis en analyse en classes dans ronds.
+- Ajout des chemins relatifs pour l'accès aux fonds exportés des export Qgis à la place des chemins absolus.
 
 Changes in version 1.7.5.2
 

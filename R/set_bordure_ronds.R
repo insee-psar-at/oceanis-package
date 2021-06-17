@@ -122,7 +122,13 @@ function(map,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,map_lea
     {
       for(i in 1:length(idx_carte))
       {
-        valeurs <- map$x$calls[[idx_carte[i]]]$args[[4]]$analyse$donnees$save
+        if(map$x$calls[[idx_carte[i]]]$args[[5]] == "carte_ronds_elargi")
+        {
+          valeurs <- map$x$calls[[idx_carte[i]]]$args[[4]]$analyse$donnees_elargi$save
+        }else
+        {
+          valeurs <- map$x$calls[[idx_carte[i]]]$args[[4]]$analyse$donnees$save
+        }
 
         val_pos <- which(valeurs>=0)
 

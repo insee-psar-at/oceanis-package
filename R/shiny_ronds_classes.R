@@ -934,7 +934,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       analyse_leg_rp_ac <- reactive({
         analyse <- analyse_rp_ac()[[1]]
         analyse$rupture_classes <- palette_rp_ac()[[2]] #bornes
-        analyse$pal_classes <- palette_rp_ac()[[3]] # pal_classes
+        analyse$pal_classes <- rev(palette_rp_ac()[[3]]) # pal_classes
         return(analyse)
       })
 
@@ -1097,7 +1097,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           pal_classes <- react_bornes_rp_ac()[[2]]
         }
         pal_classes[is.na(pal_classes)] <- "grey"
-        palette<-colorBin(palette=rev(pal_classes), domain=0:100, bins=bornes, na.color="grey")
+        palette<-colorBin(palette=pal_classes, domain=0:100, bins=bornes, na.color="grey")
 
         return(list(palette,bornes,pal_classes))
       })
@@ -1300,7 +1300,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
           pal_classes <- react_bornes_init_rp_ac()[[2]]
           pal_classes[is.na(pal_classes)] <- "grey"
-          palette<-colorBin(palette=rev(pal_classes), domain=0:100, bins=bornes, na.color="grey")
+          palette<-colorBin(palette=pal_classes, domain=0:100, bins=bornes, na.color="grey")
 
           m <- addCircles(map = m,
                           lng = st_coordinates(analyse_WGS84)[,1],

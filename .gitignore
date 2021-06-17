@@ -1,7 +1,7 @@
 .Rbuildignore
 .Rproj.user
 .Rhistory
-oceanis.Rproj
+oceanis-package.Rproj
 data/.Rhistory
 vignettes/oceanis_cache/
 vignettes/oceanis_files/

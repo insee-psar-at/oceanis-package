@@ -54,8 +54,6 @@ function(map,titre=NULL,lng=NULL,lat=NULL,labels=NULL,zoom=8,map_leaflet=NULL)
       }
     }
 
-    code_epsg <- map$x$calls[[idx_carte[length(idx_carte)]]]$args[[4]]$code_epsg
-
     coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
 
     lng_init <- lng

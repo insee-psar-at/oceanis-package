@@ -958,7 +958,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       analyse_leg_ac_rp <- reactive({
         analyse <- analyse_ac_rp()[[1]]
         analyse$rupture_classes <- palette_ac_rp()[[2]] #bornes
-        analyse$pal_classes <- palette_ac_rp()[[3]] # pal_classes
+        analyse$pal_classes <- rev(palette_ac_rp()[[3]]) # pal_classes
         return(analyse)
       })
 
@@ -1124,7 +1124,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           pal_classes <- react_bornes_ac_rp()[[2]]
         }
         pal_classes[is.na(pal_classes)] <- "grey"
-        palette<-colorBin(palette=rev(pal_classes), domain=0:100, bins=bornes, na.color="grey")
+        palette<-colorBin(palette=pal_classes, domain=0:100, bins=bornes, na.color="grey")
 
         return(list(palette,bornes,pal_classes))
       })
@@ -1335,7 +1335,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           pal_classes <- react_bornes_init_ac_rp()[[2]]
 
           pal_classes[is.na(pal_classes)] <- "grey"
-          palette<-colorBin(palette=rev(pal_classes), domain=0:100, bins=bornes, na.color="grey")
+          palette<-colorBin(palette=pal_classes, domain=0:100, bins=bornes, na.color="grey")
 
           analyse_maille <- merge(fond_contour_maille_ac_rp()[[2]][,c("CODE","geometry")],analyse$donnees[,c("CODE","LIBELLE",varVolume,varRatio,"TXT1","TXT2")],by="CODE")
           names(analyse_maille)[3] <- varVolume
