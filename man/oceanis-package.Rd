@@ -7,9 +7,9 @@
 \description{
 Type : Package
 
-Version : 1.0.3
+Version : 1.8.0
 
-Date : 2019-09-06
+Date : 2021-06-17
 
 License : GPL(>=2.0)
 }
