@@ -62,6 +62,11 @@ function(stylePalette, nbNeg = 0, nbPos = 0)
   }
   
   col_palette <- palettes_insee[which(names(palettes_insee) == paste0(stylePalette,"_",nbNeg,"N",nbPos,"P"))]
-
+  
+  if(length(col_palette) == 0)
+  {
+    stop(simpleError("La palette choisie n'est pas adaptee aux classes des donnees."))
+  }
+  
   return(col_palette)
 }

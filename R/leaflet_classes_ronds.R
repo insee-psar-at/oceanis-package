@@ -200,7 +200,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
           return(map_proxy)
         }else
         {
-          stop(simpleError("Le nombre de classes est trop eleve ou bien la maille ne correspond pas au niveau geographique du fichier de donnees."))
+          stop(simpleError("La palette choisie n'est pas adaptee aux classes des donnees ou bien le nombre de classes est trop eleve ou encore la maille ne correspond pas au niveau geographique du fichier de donnees."))
         }
       }
 

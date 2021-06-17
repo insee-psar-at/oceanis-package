@@ -200,7 +200,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
           return(map_proxy)
         }else
         {
-          stop(simpleError("La maille ne correspond pas au niveau geographique du fichier de donnees. Veuillez svp choisir une maille adaptee ou modifier le fichier de donnees"))
+          stop(simpleError("La palette choisie n'est pas adaptée aux classes des donnees ou bien le nombre de classes est trop eleve ou encore la maille ne correspond pas au niveau geographique du fichier de donnees."))
         }
       }
 
