@@ -1,5 +1,5 @@
 leaflet_ronds_classes <-
-function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,stylePalette="Bleu_Jaune",opacityElargi=0.6,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,precision=1,emprise="FRM",fondEtranger=NULL,fondChx=NULL,zoomMaille=NULL,map_proxy=NULL)
+function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,stylePalette="defaut",opacityElargi=0.6,colBorderPos="white",colBorderNeg="white",epaisseurBorder=1,precision=1,emprise="FRM",fondEtranger=NULL,fondChx=NULL,zoomMaille=NULL,map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
 
@@ -200,7 +200,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
           return(map_proxy)
         }else
         {
-          stop(simpleError("La palette choisie n'est pas adaptée aux classes des donnees ou bien le nombre de classes est trop eleve ou encore la maille ne correspond pas au niveau geographique du fichier de donnees."))
+          stop(simpleError("La palette choisie n'est pas adaptee aux classes des donnees ou bien le nombre de classes est trop eleve ou encore la maille ne correspond pas au niveau geographique du fichier de donnees."))
         }
       }
 
@@ -226,7 +226,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
       {
         if(!0 %in% bornes)
         {
-          col_classe_zero <- recup_palette(stylePalette = "Gris", nbPos = 6)[[1]][1]
+          col_classe_zero <- recup_palette(stylePalette = "Insee_Gris", nbPos = 6)[[1]][1]
           nb_pal_neg <- length(bornes[bornes < 0]) - 1
           nb_pal_pos <- length(bornes[bornes > 0]) - 1
           pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]]
@@ -249,6 +249,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
           nb_pal_pos <- length(bornes[bornes > 0])
         }
         if(nb_pal_pos > 6) nb_pal_pos <- 6
+        nb_pal_neg <- 0
         pal_classes <- recup_palette(stylePalette = stylePalette, nbPos = nb_pal_pos)[[1]]
       }
       if(max_donnees <= 0) # Si -
@@ -261,6 +262,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
           nb_pal_neg <- length(bornes[bornes < 0])
         }
         if(nb_pal_neg > 6) nb_pal_neg <- 6
+        nb_pal_pos <- 0
         pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg)[[1]]
       }
       bornes_export <- bornes

@@ -1,5 +1,5 @@
 plot_ronds <-
-function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolume,rayonRond=NULL,rapportRond=NULL,emprise="FRM",fondChx=NULL,precisionLegRonds=0,titreLeg="",xLeg=NULL,yLeg=NULL,cadreLeg=FALSE,xLimCadreLeg=NULL,yLimCadreLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,colPos="#FFC300",colNeg="#286AC7",colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
+function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolume,rayonRond=NULL,rapportRond=NULL,emprise="FRM",fondChx=NULL,precisionLegRonds=0,titreLeg="",xLeg=NULL,yLeg=NULL,cadreLeg=FALSE,xLimCadreLeg=NULL,yLimCadreLeg=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,colPos="#EB617F",colNeg="#286AC7",colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
 

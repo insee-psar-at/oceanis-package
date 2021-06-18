@@ -1,5 +1,5 @@
 set_couleur_ronds <-
-function(map,colorPos="#FFC300",colorNeg="#286AC7",map_leaflet=NULL)
+function(map,colorPos="#EB617F",colorNeg="#286AC7",map_leaflet=NULL)
   {
     msg_error1<-msg_error2<-msg_error3<-msg_error4 <- NULL
 

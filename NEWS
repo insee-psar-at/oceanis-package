@@ -3,9 +3,10 @@ Changes in version 1.8.0
 
 FEATURES
 
-- Nouvelles palettes de la charte graphique INSEE ("Bleu_Jaune", "Bleu_Rouge", "Bleu", "Jaune", "Gris", "Turquoise", "Vert" et "Violet").
+- Nouvelles palettes de la charte graphique INSEE ("defaut", "Insee_Rouge", "Insee_Jaune", "Insee_Bleu", "Insee_Turquoise", "Insee_Vert", "Insee_Violet" et "Insee_Gris",). La palette "defaut" conserve les couleurs par défaut de l'ancienne palette (inspirées de la collection InseeFlash).
 - Nouvelles données data("palettes_insee") pour charger les codes hexadecimaux par palette.
-- Nouvelle fonction affiche_palette(nomPalette = "Bleu_Jaune") pour visualiser les palettes individuellement.
+- Nouvelle fonction affiche_palette(nomPalette = "defaut") pour visualiser les palettes individuellement.
+- La fonction recup_palette a ausi été mise à jour. Les modalités pour stylePalette sont les mêmes que pour affiche_palette. Deux arguments ont été ajoutés : nbNeg et nbPos (par défaut à 0). Attention, au moins un des deux arguments doit être > à 0 pour récupérer une palette et <= à 6.
 - Mise à jour de la documentation et des captures d'écran (aide, vignette oceanis, README)
 
 BUG FIXES and IMPROVEMENTS

@@ -1004,7 +1004,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                           options = pathOptions(pane = "fond_trio1", clickable = T),
                           popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse$donnees$TXT1),
                           fill = T,
-                          fillColor = sapply(analyse$donnees$save, function(x) if(x>0){"#FFC300"}else{"#286AC7"}),
+                          fillColor = sapply(analyse$donnees$save, function(x) if(x>0){"#EB617F"}else{"#286AC7"}),
                           fillOpacity = 1,
                           group = "taille"
           )
@@ -1112,7 +1112,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                                 options = pathOptions(pane = paste0("fond_trio",i), clickable = T),
                                 popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse_rp()[[1]]$donnees$TXT1),
                                 fill = T,
-                                fillColor = sapply(analyse_rp()[[1]]$donnees$save, function(x) if(x>0){"#FFC300"}else{"#286AC7"}),
+                                fillColor = sapply(analyse_rp()[[1]]$donnees$save, function(x) if(x>0){"#EB617F"}else{"#286AC7"}),
                                 fillOpacity = 1,
                                 group = "taille"
             )
@@ -1166,7 +1166,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                             options = pathOptions(pane = paste0("fond_trio",ordre_analyse$a), clickable = T),
                             popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse_rp()[[1]]$donnees$TXT1),
                             fill = T,
-                            fillColor = sapply(analyse_rp()[[1]]$donnees$save, function(x) if(x>0){"#FFC300"}else{"#286AC7"}),
+                            fillColor = sapply(analyse_rp()[[1]]$donnees$save, function(x) if(x>0){"#EB617F"}else{"#286AC7"}),
                             fillOpacity = 1,
                             group = "taille"
         )
@@ -1192,7 +1192,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                             options = pathOptions(pane = paste0("fond_trio",ordre_analyse$a), clickable = T),
                             popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse_rp()[[1]]$donnees$TXT1),
                             fill = T,
-                            fillColor = sapply(analyse_rp()[[1]]$donnees$save, function(x) if(x>0){"#FFC300"}else{"#286AC7"}),
+                            fillColor = sapply(analyse_rp()[[1]]$donnees$save, function(x) if(x>0){"#EB617F"}else{"#286AC7"}),
                             fillOpacity = 1,
                             group = "taille"
         )
@@ -1220,7 +1220,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                               options = pathOptions(pane = "fond_trio3", clickable = T),
                               popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse_rp()[[1]]$donnees_elargi$TXT1),
                               fill = T,
-                              fillColor = sapply(analyse_rp()[[1]]$donnees_elargi$save, function(x) if(x>0){"#FFC300"}else{"#286AC7"}),
+                              fillColor = sapply(analyse_rp()[[1]]$donnees_elargi$save, function(x) if(x>0){"#EB617F"}else{"#286AC7"}),
                               fillOpacity = input$opacite_elargi_rp_id/100,
                               group = "elargi"
           )
@@ -1542,7 +1542,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                                    options = pathOptions(pane = paste0("fond_trio",i), clickable = T),
                                    popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse_rp()[[1]]$donnees$TXT1),
                                    fill = T,
-                                   fillColor = sapply(analyse_rp()[[1]]$donnees$save, function(x) if(x>0){"#FFC300"}else{"#286AC7"}),
+                                   fillColor = sapply(analyse_rp()[[1]]$donnees$save, function(x) if(x>0){"#EB617F"}else{"#286AC7"}),
                                    fillOpacity = 1
               )
             }
@@ -1582,7 +1582,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                                  options = pathOptions(pane = "fond_trio3", clickable = T),
                                  popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse_rp()[[1]]$donnees_elargi$TXT1),
                                  fill = T,
-                                 fillColor = sapply(analyse_rp()[[1]]$donnees_elargi$save, function(x) if(x>0){"#FFC300"}else{"#286AC7"}),
+                                 fillColor = sapply(analyse_rp()[[1]]$donnees_elargi$save, function(x) if(x>0){"#EB617F"}else{"#286AC7"}),
                                  fillOpacity = input$opacite_elargi_rp_id/100
             )
 

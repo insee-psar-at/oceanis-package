@@ -14,7 +14,7 @@ function(data,fondMaille,fondMailleElargi,fondSuppl,idData,varVolume,varRatio,ra
   if(any(class(methode)!="character")) msg_error10 <- "La nom de la methode doit etre de type caractere / "
   if(any(class(nbClasses)!="numeric")) msg_error11 <- "La variable doit etre de type numerique / "
   if(!is.null(bornes)) if(any(class(bornes)!="numeric")) msg_error12 <- "La variable doit etre un vecteur numerique / "
-  if(any(class(stylePalette)!="character")) msg_error13 <- "Le style de palette doit etre un vecteur de type caractere / "
+  if(any(class(stylePalette)!="character")) msg_error13 <- "Le style de la palette doit etre de type caractere ('defaut', 'Insee_Rouge', 'Insee_Jaune', 'Insee_Bleu', 'Insee_Turquoise', 'Insee_Vert', 'Insee_Violet' ou 'Insee_Gris') / "
   if(any(class(opacityElargi)!="numeric")) msg_error14 <- "La variable doit etre de type numerique / "
   if(any(class(emprise)!="character")) msg_error15 <- "La valeur doit etre de type caractere ('FRM', '971', '972', '973', '974', '976' ou '999') / "
   if(any(class(colBorderClasses)!="character")) msg_error16 <- "Le style de couleur doit etre de type caractere / "

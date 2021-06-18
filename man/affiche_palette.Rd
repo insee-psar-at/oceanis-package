@@ -4,12 +4,12 @@
 \alias{affiche_palette}
 \title{Returns a palette colors of the graphic chart of INSEE}
 \usage{
-affiche_palette(nomPalette = "Bleu_Jaune")
+affiche_palette(nomPalette = "defaut")
 }
 \arguments{
 \item{nomPalette}{chaine de caracteres (character). A choisir parmi
-"Bleu_Jaune", "Bleu_Rouge", "Bleu", "Jaune", "Gris", "Turquoise", "Vert"
-ou "Violet".}
+"defaut", "Insee_Rouge", "Insee_Jaune", "Insee_Bleu",
+"Insee_Turquoise", "Insee_Vert", "Insee_Violet" ou "Insee_Gris".}
 }
 \value{
 Affiche la palette dans l'onglet Plots.
@@ -19,19 +19,23 @@ Returns a palette colors of the graphic chart of INSEE.
 }
 \details{
 Les palettes de couleurs disponibles sont celles de la Charte Graphique
-INSEE. En exécutant la fonction affiche_palette(nomPalette), il est possible de
-visualiser les couleurs de chaque palette disponible. Les modalités pour
-l'argument 'nomPalette' sont "Bleu_Jaune", "Bleu_Rouge", "Bleu", "Jaune",
-"Gris", "Turquoise", "Vert" et "Violet".
+INSEE (hors palette "defaut"). En exécutant la fonction affiche_palette(nomPalette),
+il est possible de visualiser les couleurs de chaque palette disponible.
+Les modalités pour l'argument 'nomPalette' sont "defaut", "Insee_Rouge", "Insee_Jaune", 
+"Insee_Bleu", "Insee_Turquoise", "Insee_Vert", "Insee_Violet" et "Insee_Gris".
 
 La fonction permet de visualiser les couleurs de chaque palette.
 
 La liste des valeurs hexadécimales de toutes les palettes est dipsonible en
 chargeant les données suivantes : data("palettes_insee")
+
+Seules les palettes "Insee_Rouge" et "Insee_Jaune" proposent des palettes pour des valeurs
+négatives et positives. Pour ces deux palettes, la palette "Insee_Bleu" inversée est
+utilisée pour représenter les valeurs négatives.
 }
 \examples{
 
-affiche_palette(nomPalette = "Bleu_Jaune")
+affiche_palette(nomPalette = "defaut")
 
 }
 \references{

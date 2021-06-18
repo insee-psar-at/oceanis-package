@@ -355,15 +355,15 @@ map <- add_titre(map = map,
                  titre = "Population des departements de la region Provence-Alpes-Cote d'Azur en 2015 et son evolution depuis 2010")
 
 # affichage de la palette par defaut
-# affiche_palette(nomPalette = "Bleu_Jaune")
-recup_palette(stylePalette = "Bleu_Jaune", nbPos = 3)
+# affiche_palette(nomPalette = "defaut")
+recup_palette(stylePalette = "defaut", nbPos = 3)
 
-# affichage de la palette InseePremiere
-recup_palette(stylePalette = "Bleu_Rouge", nbPos = 3)
+# affichage de la palette Insee_Rouge
+recup_palette(stylePalette = "Insee_Rouge", nbPos = 3)
 
 # modification du style de la palette et de la bordure des ronds
 map <- set_couleur_classes(map = map,
-                           stylePalette = "Bleu_Rouge",
+                           stylePalette = "Insee_Rouge",
                            colBorder = "grey")
 
 # modification de l'opacite de la representation elargie
@@ -663,7 +663,7 @@ map <- set_bordure_ronds(map = map,
                          colBorderPos = "grey")
 # modification du style de la palette
 map <- set_couleur_classes(map = map,
-                           stylePalette = "Bleu_Rouge")
+                           stylePalette = "Insee_Rouge")
 # modification de l'opacite de la representation elargie
 map <- set_opacite_elargi(map,
                           opacite = 0.6)

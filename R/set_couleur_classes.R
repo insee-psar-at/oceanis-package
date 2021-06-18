@@ -1,10 +1,10 @@
 set_couleur_classes <-
-function(map,stylePalette="Bleu_Jaune",palettePos=NULL,paletteNeg=NULL,colBorder="white",map_leaflet=NULL)
+function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="white",map_leaflet=NULL)
   {
     msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6 <- NULL
 
     if(any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
-    if(any(class(stylePalette)!="character")) msg_error2 <- "Le style de la palette doit etre de type caractere ('InseeFlash', 'InseeAnalyse', 'InseeDossier', 'InseePremiere' ou 'defaut') / "
+    if(any(class(stylePalette)!="character")) msg_error2 <- "Le style de la palette doit etre de type caractere ('defaut', 'Insee_Rouge', 'Insee_Jaune', 'Insee_Bleu', 'Insee_Turquoise', 'Insee_Vert', 'Insee_Violet' ou 'Insee_Gris') / "
     if(!is.null(palettePos)) if(any(class(palettePos)!="character")) msg_error3 <- "La palette des classes doit etre un vecteur de type caractere / "
     if(!is.null(paletteNeg)) if(any(class(paletteNeg)!="character")) msg_error4 <- "La palette des classes doit etre un vecteur de type caractere / "
     if(any(class(colBorder)!="character")) msg_error5 <- "La couleur de la bordure doit etre de type caractere (nommee ou hexadecimal) / "

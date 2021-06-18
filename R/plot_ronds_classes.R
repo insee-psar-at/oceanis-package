@@ -1,5 +1,5 @@
 plot_ronds_classes <-
-function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,precisionLegRonds=0,precisionLegClasses=1,emprise="FRM",fondChx=NULL,titreLegRonds="",titreLegClasses="",labels=NULL,xLegRonds=NULL,yLegRonds=NULL,xLegClasses=NULL,yLegClasses=NULL,cadreLeg=FALSE,xLimCadreLegRonds=NULL,yLimCadreLegRonds=NULL,xLimCadreLegClasses=NULL,yLimCadreLegClasses=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,stylePalette="Bleu_Jaune",palettePos=NULL,paletteNeg=NULL,colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
+function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,precisionLegRonds=0,precisionLegClasses=1,emprise="FRM",fondChx=NULL,titreLegRonds="",titreLegClasses="",labels=NULL,xLegRonds=NULL,yLegRonds=NULL,xLegClasses=NULL,yLegClasses=NULL,cadreLeg=FALSE,xLimCadreLegRonds=NULL,yLimCadreLegRonds=NULL,xLimCadreLegClasses=NULL,yLimCadreLegClasses=NULL,titreCarte="",sourceCarte="",etiquettes=NULL,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="white",colBorderMaille="black",xlim=NULL,ylim=NULL)
   {
     options("stringsAsFactors"=FALSE)
 
@@ -38,7 +38,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     if(any(class(titreCarte)!="character")) msg_error29 <- "Le titre de la carte doit etre de type caractere / "
     if(any(class(sourceCarte)!="character")) msg_error30 <- "La source de la carte doit etre de type caractere / "
     if(!is.null(etiquettes)) if(!any(class(etiquettes) %in% "character" | class(etiquettes) %in% "data.frame")) msg_error31 <- "La table des etiquettes peut etre soit un vecteur caractere soit un data.frame (voir aide) / "
-    if(any(class(stylePalette)!="character")) msg_error32 <- "Le style de la palette doit etre de type caractere ('InseeFlash', 'InseeAnalyse', 'InseeDossier', 'InseePremiere' ou 'defaut') / "
+    if(any(class(stylePalette)!="character")) msg_error32 <- "Le style de la palette doit etre de type caractere ('defaut', 'Insee_Rouge', 'Insee_Jaune', 'Insee_Bleu', 'Insee_Turquoise', 'Insee_Vert', 'Insee_Violet' ou 'Insee_Gris') / "
     if(!is.null(palettePos)) if(any(class(palettePos)!="character")) msg_error33 <- "La palette des classes doit etre un vecteur de type caractere / "
     if(!is.null(paletteNeg)) if(any(class(paletteNeg)!="character")) msg_error34 <- "La palette des classes doit etre un vecteur de type caractere / "
     if(any(class(colBorder)!="character")) msg_error35 <- "La couleur de la bordure doit etre de type caractere (nommee ou hexadecimal) / "
@@ -307,7 +307,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
       {
         if(!0 %in% bornes)
         {
-          col_classe_zero <- recup_palette(stylePalette = "Gris", nbPos = 6)[[1]][1]
+          col_classe_zero <- recup_palette(stylePalette = "Insee_Gris", nbPos = 6)[[1]][1]
           nb_pal_neg <- length(bornes[bornes < 0]) - 1
           nb_pal_pos <- length(bornes[bornes > 0]) - 1
           pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]]
@@ -330,6 +330,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
           nb_pal_pos <- length(bornes[bornes > 0])
         }
         if(nb_pal_pos > 6) nb_pal_pos <- 6
+        nb_pal_neg <- 0
         pal_classes <- recup_palette(stylePalette = stylePalette, nbPos = nb_pal_pos)[[1]]
       }
       if(max <= 0) # Si -
@@ -342,6 +343,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
           nb_pal_neg <- length(bornes[bornes < 0])
         }
         if(nb_pal_neg > 6) nb_pal_neg <- 6
+        nb_pal_pos <- 0
         pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg)[[1]]
       }
     }

@@ -1,5 +1,5 @@
 set_couleur_joignantes <-
-function(map,colFleche="#FFC300",colBorder="black",map_leaflet=NULL)
+function(map,colFleche="#286AC7",colBorder="black",map_leaflet=NULL)
   {
     msg_error1<-msg_error2<-msg_error3<-msg_error4 <- NULL
 

@@ -1,5 +1,5 @@
 calcul_bornes <-
-function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette="Bleu_Jaune",palettePos=NULL,paletteNeg=NULL)
+function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL)
   {
     if(min(bornes_analyse$brks)<0 & max(bornes_analyse$brks)>=0) # Si - et +
     {
@@ -124,7 +124,7 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
           {
             if(!0 %in% bornes)
             {
-              col_classe_zero <- recup_palette(stylePalette = "Gris", nbPos = 6)[[1]][1]
+              col_classe_zero <- recup_palette(stylePalette = "Insee_Gris", nbPos = 6)[[1]][1]
               nb_pal_neg <- length(bornes[bornes < 0]) - 1
               nb_pal_pos <- length(bornes[bornes > 0]) - 1
               pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]]

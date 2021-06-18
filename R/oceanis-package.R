@@ -440,8 +440,8 @@ NULL
 #' Les palettes de couleurs disponibles sont celles de la Charte Graphique
 #' INSEE. En exécutant la fonction affiche_palette(nomPalette), il est
 #' possible de visualiser les couleurs de chaque palette disponible. A choisir
-#' entre "Bleu_Jaune" (par defaut), "Bleu_Rouge", "Bleu", "Jaune", "Gris",
-#' "Turquoise", "Vert", "Violet".
+#' entre "defaut", "Insee_Rouge", "Insee_Jaune",  "Insee_Bleu", "Insee_Turquoise",
+#' "Insee_Vert", "Insee_Violet" ou "Insee_Gris".
 #'
 #' \item{Analyse en classes dans ronds proportionnels}{ L'analyse en classes
 #' colore l'interieur des ronds (fonction \code{leaflet_ronds_classes()}) }
@@ -495,26 +495,26 @@ NULL
 #'
 #' leaflet_ronds(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL,
 #' idData, varVolume, rayonRond = NULL, rapportRond = NULL, emprise = "FRM",
-#' fondEtranger = NULL, fondChx = NULL, colPos = "#FFC300", colNeg = "#286AC7",
+#' fondEtranger = NULL, fondChx = NULL, colPos = "#EB617F", colNeg = "#286AC7",
 #' colBorderPos = "white", colBorderNeg = "white", epaisseurBorder = 1,
 #' opacityElargi = 0.6, zoomMaille = NULL, map_proxy = NULL)
 #'
 #' leaflet_classes(data, fondMaille, fondMailleElargi = NULL, fondSuppl = NULL,
 #' idData, varRatio, methode = "kmeans", nbClasses = 3, bornes = NULL,
-#' stylePalette = "Bleu_Jaune", opacityElargi = 0.6, colBorder = "white", precision
+#' stylePalette = "defaut", opacityElargi = 0.6, colBorder = "white", precision
 #' = 1, emprise = "FRM", fondEtranger = NULL, zoomMaille = NULL, map_proxy =
 #' NULL)
 #'
 #' leaflet_ronds_classes(data, fondMaille, fondMailleElargi = NULL, fondSuppl =
 #' NULL, idData, varVolume, varRatio, rayonRond = NULL, rapportRond = NULL,
-#' methode = "kmeans", nbClasses = 3, bornes = NULL, stylePalette = "Bleu_Jaune",
+#' methode = "kmeans", nbClasses = 3, bornes = NULL, stylePalette = "defaut",
 #' opacityElargi = 0.6, colBorderPos = "white", colBorderNeg = "white",
 #' epaisseurBorder = 1, precision = 1, emprise = "FRM", fondEtranger = NULL,
 #' fondChx = NULL, zoomMaille = NULL, map_proxy = NULL)
 #'
 #' leaflet_classes_ronds(data, fondMaille, fondMailleElargi = NULL, fondSuppl =
 #' NULL, idData, varVolume, varRatio, rayonRond = NULL, rapportRond = NULL,
-#' methode = "kmeans", nbClasses = 3, bornes = NULL, stylePalette = "Bleu_Jaune",
+#' methode = "kmeans", nbClasses = 3, bornes = NULL, stylePalette = "defaut",
 #' opacityElargi = 0.6, colBorderClasses = "white", colBorderRondsPos =
 #' "#303030", colBorderRondsNeg = "#303030", epaisseurBorder = 1.5, precision =
 #' 1, emprise = "FRM", fondEtranger = NULL, fondChx = NULL, zoomMaille = NULL,
@@ -531,12 +531,12 @@ NULL
 #' leaflet_joignantes(data, fondMaille, typeMaille, fondSuppl = NULL,
 #' idDataDepart, idDataArrivee, varFlux, largeurFlecheMax = NULL, filtreVol =
 #' 0, filtreDist = 100, filtreMajeurs = 10, decalageAllerRetour = 0,
-#' decalageCentroid = 0, colFleche = "#FFC300", colBorder = "#303030", emprise
+#' decalageCentroid = 0, colFleche = "#286AC7", colBorder = "#303030", emprise
 #' = "FRM", fondEtranger = NULL, zoomMaille = NULL, map_proxy = NULL)
 #'
 #' leaflet_saphirs(data, fondMaille, typeMaille, fondSuppl = NULL,
 #' idDataDepart, idDataArrivee, varFlux, largeurFlecheMax = NULL, direction =
-#' "Ent", filtreVol = 0, colEntree = "#FFC300", colSortie = "#286AC7",
+#' "Ent", filtreVol = 0, colEntree = "#EB617F", colSortie = "#286AC7",
 #' colBorder = "#303030", emprise = "FRM", fondEtranger = NULL, zoomMaille =
 #' NULL, map_proxy = NULL)
 #'
@@ -599,7 +599,7 @@ NULL
 #' @param decalageCentroid valeur numerique (numeric). Decalage des fleches
 #' depuis et vers les centroides des territoires (km).
 #' @param colPos chaine de caracteres (character). Couleur nommee (par exemple
-#' "orange") ou hexadecimal (par exemple "#FFA500"). Par defaut "#FFC300".
+#' "orange") ou hexadecimal (par exemple "#FFA500"). Par defaut "#EB617F".
 #' @param colNeg chaine de caracteres (character). Couleur nommee (par exemple
 #' "blue") ou hexadecimal (par exemple "#0000FF"). Par defaut "#286AC7".
 #' @param colBorder chaine de caracteres (character). Couleur nommee (par
@@ -621,15 +621,15 @@ NULL
 #' @param epaisseurBorder chaine de caracteres (numeric). Epaisseur de la
 #' bordure des ronds. Par defaut a 1".
 #' @param stylePalette chaine de caracteres (character). Palette de la charte
-#' INSEE. A choisir entre "Bleu_Jaune" (par defaut), "Bleu_Rouge", "Bleu",
-#' "Jaune", "Gris", "Turquoise", "Vert", "Violet" (voir
-#' 'affiche_palette(nomPalette)').
+#' INSEE. A choisir entre "defaut", "Insee_Rouge", "Insee_Jaune", "Insee_Bleu",
+#' "Insee_Turquoise", "Insee_Vert", "Insee_Violet" ou "Insee_Gris"
+#' (voir 'affiche_palette(nomPalette)').
 #' @param colFleche chaine de caracteres (character). Couleur nommee (par
 #' exemple "orange") ou hexadecimal (par exemple "#FFA500"). Par defaut
-#' "#FFC300".
+#' "#286AC7".
 #' @param colEntree chaine de caracteres (character). Couleur nommee (par
 #' exemple "orange") ou hexadecimal (par exemple "#FFA500"). Par defaut
-#' "#FFC300".
+#' "#EB617F".
 #' @param colSortie chaine de caracteres (character). Couleur nommee (par
 #' exemple "blue") ou hexadecimal (par exemple "#0000FF"). Par defaut
 #' "#286AC7".
@@ -938,14 +938,14 @@ NULL
 #' "FRM", fondChx = NULL, precisionLegRonds = 0, titreLeg = "", xLeg = NULL,
 #' yLeg = NULL, cadreLeg = FALSE, xLimCadreLeg = NULL, yLimCadreLeg = NULL,
 #' titreCarte = "", sourceCarte = "", etiquettes = NULL, colPos =
-#' "#FFC300", colNeg = "#286AC7", colBorder = "white", colBorderMaille =
+#' "#EB617F", colNeg = "#286AC7", colBorder = "white", colBorderMaille =
 #' "black", xlim = NULL, ylim = NULL)
 #'
 #' plot_classes(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse =
 #' NULL, idData, varRatio, methode = "kmeans", nbClasses = 3, bornes = NULL,
 #' precisionLegClasses = 1, titreLeg = "", labels = NULL, xLeg = NULL,
 #' yLeg = NULL, cadreLeg = FALSE, xLimCadreLeg = NULL, yLimCadreLeg = NULL,
-#' titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "Bleu_Jaune",
+#' titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "defaut",
 #' palettePos = NULL, paletteNeg = NULL, colBorder = "white", xlim = NULL,
 #' ylim = NULL)
 #'
@@ -956,7 +956,7 @@ NULL
 #' "", titreLegClasses = "", labels = NULL, xLegRonds = NULL, yLegRonds = NULL,
 #' xLegClasses = NULL, yLegClasses = NULL, cadreLeg = FALSE, xLimCadreLegRonds = NULL,
 #' yLimCadreLegRonds = NULL, xLimCadreLegClasses = NULL, yLimCadreLegClasses = NULL,
-#' titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "Bleu_Jaune",
+#' titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "defaut",
 #' palettePos = NULL, paletteNeg = NULL, colBorder = "white",
 #' colBorderMaille = "black", xlim = NULL, ylim = NULL)
 #'
@@ -967,7 +967,7 @@ NULL
 #' titreLegClasses = "", labels = NULL, xLegRonds = NULL, yLegRonds = NULL,
 #' xLegClasses = NULL, yLegClasses = NULL, cadreLeg = FALSE, xLimCadreLegRonds = NULL,
 #' yLimCadreLegRonds = NULL, xLimCadreLegClasses = NULL, yLimCadreLegClasses = NULL,
-#' titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "Bleu_Jaune",
+#' titreCarte = "", sourceCarte = "", etiquettes = NULL, stylePalette = "defaut",
 #' palettePos = NULL, paletteNeg = NULL, colBorder = "white",
 #' colBorderRonds = "#303030", xlim = NULL, ylim = NULL)
 #'
@@ -995,7 +995,7 @@ NULL
 #' decalageAllerRetour = 0, decalageCentroid = 0, emprise = "FRM",
 #' precisionLegFleches = 0, titreLeg = "", xLeg = NULL, yLeg = NULL,
 #' cadreLeg = FALSE, xLimCadreLeg = NULL, yLimCadreLeg = NULL, titreCarte = "",
-#' sourceCarte = "", etiquettes = NULL, colFleche = "#FFC300", colBorder
+#' sourceCarte = "", etiquettes = NULL, colFleche = "#286AC7", colBorder
 #' = "white", colBorderMaille = "black", xlim = NULL, ylim = NULL)
 #'
 #' plot_saphirs(data, fondMaille, fondSousAnalyse = NULL, fondSurAnalyse =
@@ -1003,7 +1003,7 @@ NULL
 #' NULL, direction = "Ent", filtreVol = 0, emprise = "FRM", precisionLegFleches
 #' = 0, titreLeg = "", xLeg = NULL, yLeg = NULL, cadreLeg = FALSE,
 #' xLimCadreLeg = NULL, yLimCadreLeg = NULL, titreCarte = "", sourceCarte = "",
-#' etiquettes = NULL, colEntree = "#FFC300", colSortie = "#286AC7",
+#' etiquettes = NULL, colEntree = "#EB617F", colSortie = "#286AC7",
 #' colBorder = "white", colBorderMaille = "black", xlim = NULL, ylim = NULL)
 #'
 #' @param data tableau de donnees (data.frame).
@@ -1123,13 +1123,13 @@ NULL
 #' (data.frame). Liste des codes de la maille dont on affiche le libelle sur la
 #' carte. Par defaut a NULL. Voir details.
 #' @param colPos chaine de caracteres (character). Couleur nommee (par exemple
-#' "orange") ou hexadecimal (par exemple "#FFA500"). Par defaut "#FFC300".
+#' "orange") ou hexadecimal (par exemple "#FFA500"). Par defaut "#EB617F".
 #' @param colNeg chaine de caracteres (character). Couleur nommee (par exemple
 #' "blue") ou hexadecimal (par exemple "#0000FF"). Par defaut "#286AC7".
 #' @param stylePalette chaine de caracteres (character). Palette de la charte
-#' INSEE. A choisir entre "Bleu_Jaune" (par defaut), "Bleu_Rouge", "Bleu",
-#' "Jaune", "Gris", "Turquoise", "Vert", "Violet" (voir
-#' 'affiche_palette(nomPalette)').
+#' INSEE. A choisir entre "defaut", "Insee_Rouge", "Insee_Jaune", "Insee_Bleu",
+#' "Insee_Turquoise", "Insee_Vert", "Insee_Violet" ou "Insee_Gris" 
+#' (voir 'affiche_palette(nomPalette)').
 #' @param palettePos vecteur de caracteres (character). Couleurs nommees (par
 #' exemple c("red","orange","yellow")) ou hexadecimal (par exemple
 #' c("#FFA500")). Par defaut a NULL.
@@ -1154,10 +1154,10 @@ NULL
 #' "#303030".
 #' @param colFleche chaine de caracteres (character). Couleur nommee (par
 #' exemple "orange") ou hexadecimal (par exemple "#FFA500"). Par defaut
-#' "#FFC300".
+#' "#286AC7".
 #' @param colEntree chaine de caracteres (character). Couleur nommee (par
 #' exemple "orange") ou hexadecimal (par exemple "#FFA500"). Par defaut
-#' "#FFC300".
+#' "#EB617F".
 #' @param colSortie chaine de caracteres (character). Couleur nommee (par
 #' exemple "blue") ou hexadecimal (par exemple "#0000FF"). Par defaut
 #' "#286AC7".
@@ -1236,8 +1236,9 @@ NULL
 #' @details Les palettes proposées pour l'analyse en classes sont celles
 #' utilisées par la Charte Graphique INSEE. Utilisez la fonction
 #' affiche_palette(nomPalette) pour visualiser les couleurs d'une palette.
-#' L'argument 'nomPalette' peut prendre comme valeur : "Bleu_Jaune",
-#' "Bleu_Rouge", "Bleu", "Jaune", "Gris", "Turquoise", "Vert" ou "Violet"
+#' L'argument 'nomPalette' peut prendre comme valeur : "defaut", "Insee_Rouge",
+#' "Insee_Jaune", "Insee_Bleu", "Insee_Turquoise", "Insee_Vert", "Insee_Violet"
+#' ou "Insee_Gris".
 #'
 #' Le code des couleurs est le code hexadécimal. Pour récupérer les codes
 #' hexadécimaux des différentes palettes proposées : data("palettes_insee")
@@ -1245,29 +1246,29 @@ NULL
 #' @aliases set_couleur_ronds set_couleur_classes set_couleur_typo
 #' set_couleur_joignantes set_couleur_saphirs
 #'
-#' @usage set_couleur_ronds(map, colorPos = "#FFC300", colorNeg = "#286AC7",
+#' @usage set_couleur_ronds(map, colorPos = "#EB617F", colorNeg = "#286AC7",
 #' map_leaflet = NULL)
 #'
-#' set_couleur_classes(map, stylePalette = "Bleu_Jaune", palettePos = NULL,
+#' set_couleur_classes(map, stylePalette = "defaut", palettePos = NULL,
 #' paletteNeg = NULL, colBorder = "white", map_leaflet = NULL)
 #'
 #' set_couleur_typo(map, paletteTypo = NULL, colBorder = "white", map_leaflet =
 #' NULL)
 #'
-#' set_couleur_joignantes(map, colFleche = "#FFC300", colBorder = "black",
+#' set_couleur_joignantes(map, colFleche = "#286AC7", colBorder = "black",
 #' map_leaflet = NULL)
 #'
-#' set_couleur_saphirs(map, colEntree = "#FFC300", colSortie = "#286AC7",
+#' set_couleur_saphirs(map, colEntree = "#EB617F", colSortie = "#286AC7",
 #' colBorder = "black", map_leaflet = NULL)
 #'
 #' @param map objet leaflet.
 #' @param colorPos chaine de caracteres (character). Couleur nommee ou
-#' hexadecimal. Par defaut "#FFC300".
+#' hexadecimal. Par defaut "#EB617F".
 #' @param colorNeg chaine de caracteres (character). Couleur nommee ou
 #' hexadecimal. Par defaut "#286AC7".
-#' @param stylePalette chaine de caracteres (character). Palette de la charte
-#' INSEE. A choisir entre "Bleu_Jaune" (par defaut), "Bleu_Rouge", "Bleu",
-#' "Jaune", "Gris", "Turquoise", "Vert", "Violet" (voir
+#' @param stylePalette chaine de caracteres (character). A choisir parmi
+#' "defaut", "Insee_Rouge", "Insee_Jaune", "Insee_Bleu", "Insee_Turquoise",
+#' "Insee_Vert", "Insee_Violet" ou "Insee_Gris" (voir
 #' 'affiche_palette(nomPalette)').
 #' @param palettePos vecteur de caracteres (character). Specifier le vecteur de
 #' couleurs (nommees ou hexadecimal) des valeurs positives (au choix). Par
@@ -1282,9 +1283,9 @@ NULL
 #' exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white"
 #' pour classes et typo, "black" pour joignantes et saphirs.
 #' @param colFleche chaine de caracteres (character). Couleur nommee ou
-#' hexadecimal. Par defaut "#FFC300".
+#' hexadecimal. Par defaut "#286AC7".
 #' @param colEntree chaine de caracteres (character). Couleur nommee ou
-#' hexadecimal. Par defaut "#FFC300".
+#' hexadecimal. Par defaut "#EB617F".
 #' @param colSortie chaine de caracteres (character). Couleur nommee ou
 #' hexadecimal. Par defaut "#286AC7".
 #' @param map_leaflet objet leaflet. Pour l'integration des fonctions leaflet
@@ -1324,7 +1325,7 @@ NULL
 #' # Ronds proportionnels sur une analyse en classes
 #' map <- leaflet_classes_ronds(data = donnees_monoloc, fondMaille = depm, idData = "COD_DEP",
 #' varVolume = "POP_2015", varRatio = "VAR_AN_MOY", nbClasses = 4)
-#' map <- set_couleur_classes(map = map, stylePalette = "Bleu_Rouge", colBorder = "black")
+#' map <- set_couleur_classes(map = map, stylePalette = "Insee_Rouge", colBorder = "black")
 #' \donttest{
 #'  map
 #' }

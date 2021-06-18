@@ -1,5 +1,5 @@
 leaflet_classes_ronds <-
-function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,stylePalette="Bleu_Jaune",opacityElargi=0.6,colBorderClasses="white",colBorderRondsPos="#303030",colBorderRondsNeg="#303030",epaisseurBorder=1.5,precision=1,emprise="FRM",fondEtranger=NULL,fondChx=NULL,zoomMaille=NULL,map_proxy=NULL)
+function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,varRatio,rayonRond=NULL,rapportRond=NULL,methode="kmeans",nbClasses=3,bornes=NULL,stylePalette="defaut",opacityElargi=0.6,colBorderClasses="white",colBorderRondsPos="#303030",colBorderRondsNeg="#303030",epaisseurBorder=1.5,precision=1,emprise="FRM",fondEtranger=NULL,fondChx=NULL,zoomMaille=NULL,map_proxy=NULL)
   {
     options("stringsAsFactors"=FALSE)
 
@@ -226,7 +226,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
       {
         if(!0 %in% bornes)
         {
-          col_classe_zero <- recup_palette(stylePalette = "Gris", nbPos = 6)[[1]][1]
+          col_classe_zero <- recup_palette(stylePalette = "Insee_Gris", nbPos = 6)[[1]][1]
           nb_pal_neg <- length(bornes[bornes < 0]) - 1
           nb_pal_pos <- length(bornes[bornes > 0]) - 1
           pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]]
@@ -249,6 +249,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
           nb_pal_pos <- length(bornes[bornes > 0])
         }
         if(nb_pal_pos > 6) nb_pal_pos <- 6
+        nb_pal_neg <- 0
         pal_classes <- recup_palette(stylePalette = stylePalette, nbPos = nb_pal_pos)[[1]]
       }
       if(max_donnees <= 0) # Si -
@@ -261,6 +262,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
           nb_pal_neg <- length(bornes[bornes < 0])
         }
         if(nb_pal_neg > 6) nb_pal_neg <- 6
+        nb_pal_pos <- 0
         pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg)[[1]]
       }
       bornes_export <- bornes

@@ -8,8 +8,8 @@ recup_palette(stylePalette, nbNeg = 0, nbPos = 0)
 }
 \arguments{
 \item{stylePalette}{chaine de caracteres (character). A choisir parmi
-"Bleu_Jaune", "Bleu_Rouge", "Bleu", "Jaune", "Gris", "Turquoise", "Vert"
-ou "Violet".}
+"defaut", "Insee_Rouge", "Insee_Jaune", "Insee_Bleu", "Insee_Turquoise",
+"Insee_Vert", "Insee_Violet" ou "Insee_Gris".}
 
 \item{nbNeg}{numeric. Nombre de classes negatives. Par defaut 0.}
 
@@ -23,10 +23,14 @@ Returns a palette of the graphic chart of INSEE.
 }
 \details{
 Les palettes de couleurs disponibles sont celles de la Charte Graphique
-INSEE. En exécutant la fonction affiche_palette(nomPalette), il est possible de
-visualiser les couleurs de chaque palette disponible. Les modalités pour
-l'argument 'nomPalette' sont "Bleu_Jaune", "Bleu_Rouge", "Bleu", "Jaune",
-"Gris", "Turquoise", "Vert" et "Violet".
+INSEE (hors palette "defaut"). En exécutant la fonction affiche_palette(nomPalette),
+il est possible de visualiser les couleurs de chaque palette disponible.
+Les modalités pour l'argument 'nomPalette' sont "defaut", "Insee_Rouge", "Insee_Jaune", 
+"Insee_Bleu", "Insee_Turquoise", "Insee_Vert", "Insee_Violet" et "Insee_Gris".
+
+Seules les palettes "Insee_Rouge" et "Insee_Jaune" proposent des palettes pour des valeurs
+négatives et positives. Pour ces deux palettes, la palette "Insee_Bleu" inversée est
+utilisée pour représenter les valeurs négatives.
 
 La fonction renvoie une liste d'un vecteur composé du nom de la palette au format
 nomPalette_xN_yP et des valeurs hexadécimales de la palette.
@@ -39,10 +43,10 @@ supérieur à 0.
 }
 \examples{
 
-recup_palette(stylePalette = "Bleu_Jaune", nbNeg = 3, nbPos = 3)
+recup_palette(stylePalette = "defaut", nbNeg = 3, nbPos = 3)
 
-# $Bleu_Jaune_3N3P
-# [1] "#0F417A" "#286AC7" "#8DB0E1" "#FBD616" "#FFC300" "#E89E0B"
+# $defaut_3N3P
+# [1] "#003269" "#005289" "#95BAE2" "#E4A75A" "#D47130" "#B24B1D"
 
 }
 \references{

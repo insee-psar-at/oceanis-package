@@ -9,33 +9,33 @@
 \alias{set_couleur_saphirs}
 \title{Modify the colors of 'leaflet' map's analysis}
 \usage{
-set_couleur_ronds(map, colorPos = "#FFC300", colorNeg = "#286AC7",
+set_couleur_ronds(map, colorPos = "#EB617F", colorNeg = "#286AC7",
 map_leaflet = NULL)
 
-set_couleur_classes(map, stylePalette = "Bleu_Jaune", palettePos = NULL,
+set_couleur_classes(map, stylePalette = "defaut", palettePos = NULL,
 paletteNeg = NULL, colBorder = "white", map_leaflet = NULL)
 
 set_couleur_typo(map, paletteTypo = NULL, colBorder = "white", map_leaflet =
 NULL)
 
-set_couleur_joignantes(map, colFleche = "#FFC300", colBorder = "black",
+set_couleur_joignantes(map, colFleche = "#286AC7", colBorder = "black",
 map_leaflet = NULL)
 
-set_couleur_saphirs(map, colEntree = "#FFC300", colSortie = "#286AC7",
+set_couleur_saphirs(map, colEntree = "#EB617F", colSortie = "#286AC7",
 colBorder = "black", map_leaflet = NULL)
 }
 \arguments{
 \item{map}{objet leaflet.}
 
 \item{colorPos}{chaine de caracteres (character). Couleur nommee ou
-hexadecimal. Par defaut "#FFC300".}
+hexadecimal. Par defaut "#EB617F".}
 
 \item{colorNeg}{chaine de caracteres (character). Couleur nommee ou
 hexadecimal. Par defaut "#286AC7".}
 
-\item{stylePalette}{chaine de caracteres (character). Palette de la charte
-INSEE. A choisir entre "Bleu_Jaune" (par defaut), "Bleu_Rouge", "Bleu",
-"Jaune", "Gris", "Turquoise", "Vert", "Violet" (voir
+\item{stylePalette}{chaine de caracteres (character). A choisir parmi
+"defaut", "Insee_Rouge", "Insee_Jaune", "Insee_Bleu", "Insee_Turquoise",
+"Insee_Vert", "Insee_Violet" ou "Insee_Gris" (voir
 'affiche_palette(nomPalette)').}
 
 \item{palettePos}{vecteur de caracteres (character). Specifier le vecteur de
@@ -55,10 +55,10 @@ exemple "white") ou hexadecimal (par exemple "#FFFFFF"). Par defaut "white"
 pour classes et typo, "black" pour joignantes et saphirs.}
 
 \item{colFleche}{chaine de caracteres (character). Couleur nommee ou
-hexadecimal. Par defaut "#FFC300".}
+hexadecimal. Par defaut "#286AC7".}
 
 \item{colEntree}{chaine de caracteres (character). Couleur nommee ou
-hexadecimal. Par defaut "#FFC300".}
+hexadecimal. Par defaut "#EB617F".}
 
 \item{colSortie}{chaine de caracteres (character). Couleur nommee ou
 hexadecimal. Par defaut "#286AC7".}
@@ -76,8 +76,9 @@ Modify the colors of 'leaflet' map's analysis.
 Les palettes proposées pour l'analyse en classes sont celles
 utilisées par la Charte Graphique INSEE. Utilisez la fonction
 affiche_palette(nomPalette) pour visualiser les couleurs d'une palette.
-L'argument 'nomPalette' peut prendre comme valeur : "Bleu_Jaune",
-"Bleu_Rouge", "Bleu", "Jaune", "Gris", "Turquoise", "Vert" ou "Violet"
+L'argument 'nomPalette' peut prendre comme valeur : "defaut", "Insee_Rouge",
+"Insee_Jaune", "Insee_Bleu", "Insee_Turquoise", "Insee_Vert", "Insee_Violet"
+ou "Insee_Gris".
 
 Le code des couleurs est le code hexadécimal. Pour récupérer les codes
 hexadécimaux des différentes palettes proposées : data("palettes_insee")
@@ -99,7 +100,7 @@ map <- set_couleur_ronds(map = map, colorPos = "orange")
 # Ronds proportionnels sur une analyse en classes
 map <- leaflet_classes_ronds(data = donnees_monoloc, fondMaille = depm, idData = "COD_DEP",
 varVolume = "POP_2015", varRatio = "VAR_AN_MOY", nbClasses = 4)
-map <- set_couleur_classes(map = map, stylePalette = "Bleu_Rouge", colBorder = "black")
+map <- set_couleur_classes(map = map, stylePalette = "Insee_Rouge", colBorder = "black")
 \donttest{
  map
 }
