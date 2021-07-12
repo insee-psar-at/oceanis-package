@@ -380,13 +380,13 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         fond_france <- st_transform(fond_habillage_ty()[[1]],crs = as.numeric(code_epsg_ty()))
         fond_pays <- st_transform(fond_habillage_ty()[[2]],crs = as.numeric(code_epsg_ty()))
 
-        st_write(fond_typo, paste0(rep_sortie,"/fond_maille_typo_carte.shp"), delete_dsn = TRUE, quiet = TRUE)
-        st_write(fond_contour,paste0(rep_sortie,"/fond_contour.shp"), delete_dsn = TRUE, quiet = TRUE)
-        if(exists("fond_territoire")) if(!is.null(fond_territoire)) st_write(fond_territoire, paste0(rep_sortie,"/fond_territoire.shp"), delete_dsn = TRUE, quiet = TRUE)
-        if(exists("fond_departement")) if(!is.null(fond_departement)) st_write(fond_departement, paste0(rep_sortie,"/fond_departement.shp"), delete_dsn = TRUE, quiet = TRUE)
-        if(exists("fond_region")) if(!is.null(fond_region)) st_write(fond_region,paste0(rep_sortie,"/fond_region.shp"), delete_dsn = TRUE, quiet = TRUE)
-        st_write(fond_france,paste0(rep_sortie,"/fond_france.shp"), delete_dsn = TRUE, quiet = TRUE)
-        if(exists("fond_pays")) if(!is.null(fond_pays)) st_write(fond_pays,paste0(rep_sortie,"/fond_pays.shp"), delete_dsn = TRUE, quiet = TRUE)
+        suppressWarnings(st_write(fond_typo, paste0(rep_sortie,"/fond_maille_typo_carte.shp"), delete_dsn = TRUE, quiet = TRUE))
+        suppressWarnings(st_write(fond_contour,paste0(rep_sortie,"/fond_contour.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_territoire")) if(!is.null(fond_territoire)) suppressWarnings(st_write(fond_territoire, paste0(rep_sortie,"/fond_territoire.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_departement")) if(!is.null(fond_departement)) suppressWarnings(st_write(fond_departement, paste0(rep_sortie,"/fond_departement.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_region")) if(!is.null(fond_region)) suppressWarnings(st_write(fond_region,paste0(rep_sortie,"/fond_region.shp"), delete_dsn = TRUE, quiet = TRUE))
+        suppressWarnings(st_write(fond_france,paste0(rep_sortie,"/fond_france.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_pays")) if(!is.null(fond_pays)) suppressWarnings(st_write(fond_pays,paste0(rep_sortie,"/fond_pays.shp"), delete_dsn = TRUE, quiet = TRUE))
 
         files <- c(paste0(rep_sortie,"/fond_maille_typo_carte.shp"),paste0(rep_sortie,"/fond_maille_typo_carte.dbf"),paste0(rep_sortie,"/fond_maille_typo_carte.prj"),paste0(rep_sortie,"/fond_maille_typo_carte.shx"),files)
         files <- c(paste0(rep_sortie,"/fond_contour.shp"),paste0(rep_sortie,"/fond_contour.dbf"),paste0(rep_sortie,"/fond_contour.prj"),paste0(rep_sortie,"/fond_contour.shx"),files)
@@ -869,7 +869,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         zoom <- as.numeric(input$mymap_ty_zoom)
         coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
 
-        position_leg <- t(data_frame(c(lon_lat_ty()[[1]],lon_lat_ty()[[2]])))
+        position_leg <- t(data.frame(c(lon_lat_ty()[[1]],lon_lat_ty()[[2]])))
 
         # On cree les rectangles
         nb_typo <- length(unique(analyse_ty()[[1]]$classe))
@@ -1045,7 +1045,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           zoom <- as.numeric(input$mymap_ty_zoom)
           coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
 
-          position_leg <- t(data_frame(c(lon_lat_ty()[[1]],lon_lat_ty()[[2]])))
+          position_leg <- t(data.frame(c(lon_lat_ty()[[1]],lon_lat_ty()[[2]])))
 
           # On cree les rectangles
           nb_typo <- length(unique(analyse_ty()[[1]]$classe))

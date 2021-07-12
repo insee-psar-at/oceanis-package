@@ -2,7 +2,10 @@ shiny_classes <-
 function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData,varRatio,emprise="FRM",fondEtranger=NULL)
   {
     options("stringsAsFactors"=FALSE)
-
+  
+    require(shiny)
+    require(shinyBS)
+  
     # Verification des parametres
     msg_error1<-msg_error2<-msg_error3<-msg_error4<-msg_error5<-msg_error6<-msg_error7<-msg_error8<-msg_error9<-msg_error10<-msg_error11<-msg_error12<-msg_error13<-msg_error14<-msg_error15<-msg_error16<-msg_error17<-msg_error18 <- NULL
 
@@ -130,6 +133,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                                              h4(HTML("<b><font color=#95BAE2>CLASSES</font></b>")),
                                              uiOutput("liste_classes_ac"),
                                              uiOutput("methode_ac"),
+                                             uiOutput("palette_insee_ac"),
                                              uiOutput("distribution_variable_ac"),
                                              conditionalPanel(condition = 'input.distribution_variable_ac_id',
                                                               verticalLayout(
@@ -143,7 +147,11 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                                                               )
                                              ),
                                              conditionalPanel(condition = 'input.methode_ac_id=="manuel"',
+                                                              br(),
+                                                              uiOutput("zone_bornes_max_ac"),
                                                               uiOutput("zone_bornes_ac"),
+                                                              uiOutput("zone_bornes_min_ac"),
+                                                              br(),
                                                               uiOutput("valid_bornes_ac")
                                              ),
                                              tags$hr(style="border: 5px solid #5182B6"),
@@ -259,42 +267,43 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
         output$liste_classes_ac <- renderUI({
           selectInput("nb_classes_ac_id", label = h5("Nombre de classes"),
-                      choices = nb_classes_ac(), selected = 4)
+                      choices = nb_classes_ac()[[1]], selected = nb_classes_ac()[[1]][1])
         })
         output$methode_ac <- renderUI({
           selectInput("methode_ac_id", label = h5("M\u00e9thode de calcul des classes"),
                       choices = methode_calcul, selected="kmeans")
         })
+        
+        output$palette_insee_ac <- renderUI({
+          selectInput("palette_insee_ac_id", label = h5("Palette de couleurs"), 
+                      choices = nb_classes_ac()[[2]], selected=nb_classes_ac()[[2]][1])
+        })
 
         output$distribution_variable_ac <- renderUI({
-          bsButton("distribution_variable_ac_id",label="Distribution de la variable", style="btn btn-info", icon = icon("bar-chart-o"),
+          
+          bsButton(inputId="distribution_variable_ac_id",label="Distribution de la variable", style="btn btn-info", icon = icon("bar-chart-o"),
                    type = "toggle", block = FALSE, disabled = FALSE,
                    value = FALSE)
         })
 
         observeEvent(input$distribution_variable_ac_id,{
-          if(!input$distribution_variable_ac_id) return()
-          updateButton(session, "distribution_variable_ac_id", value = TRUE)
-        }, ignoreInit = TRUE)
-
-        observeEvent(input$distribution_variable_ac_id,{
-
+          
           output$distribution_ac <- renderPlot({
             dt_donnees <- data.frame(VAR=as.numeric(analyse_ac()$donnees[,varRatio]))
-            ggplot(dt_donnees, aes(x=dt_donnees$VAR)) +
-              stat_bin(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR, na.rm = TRUE)))), closed = "left", fill="#5182B6", col="white") +
-              scale_x_continuous(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR, na.rm = TRUE)))), labels = round(unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR, na.rm = TRUE)))),2)) +
-              ggtitle(label=paste0("Distribution de la variable  : ",varRatio)) +
-              xlab(label = varRatio)
+            ggplot(dt_donnees, aes(x=VAR)) +
+                   stat_bin(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR, na.rm = TRUE)))), closed = "left", fill="#5182B6", col="white") +
+                   scale_x_continuous(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR, na.rm = TRUE)))), labels = round(unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR, na.rm = TRUE)))),2)) +
+                   ggtitle(label=paste0("Distribution de la variable  : ",varRatio)) +
+                   xlab(label = varRatio)
           })
-
+          
           output$slider_bornes_ac <- renderUI({
             lapply(1:(as.numeric(input$nb_classes_ac_id)-1)+1, function(i) {
               sliderInput(inputId = paste0("slider_bornes_", i,"_ac_id"), label = NULL,
-                          value = rev(react_bornes_ac()[[1]])[i], min = min(react_bornes_ac()[[1]]), max = max(react_bornes_ac()[[1]], na.rm = TRUE), step = 0.001) #min = rev(react_bornes_ac()[[1]])[i-1], max = rev(react_bornes_ac()[[1]])[i+1]
+                          value = rev(react_bornes_ac()[[1]])[i], min = round(min(react_bornes_ac()[[1]]),3), max = round(max(react_bornes_ac()[[1]]),3), step = 0.001) #min = rev(react_bornes_ac()[[1]])[i-1], max = rev(react_bornes_ac()[[1]])[i+1]
             })
           })
-
+          
           output$valid_slider_bornes_ac <- renderUI({
             actionButton("valid_slider_bornes_ac_id",label=label_bouton_ac(), icon=icon("refresh"), style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
           })
@@ -319,28 +328,40 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           return(bornes)
         })
 
+        output$zone_bornes_max_ac <- renderUI({
+          
+          HTML(paste0("Borne max : ", round(max(as.numeric(analyse_ac()$donnees[,varRatio])),3)))
+          
+        })
+        
         output$zone_bornes_ac <- renderUI({
-
+          
           if(!is.null(input$methode_ac_id))
           {
             if(input$methode_ac_id=="manuel")
               suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse_ac()$donnees[,varRatio]),as.numeric(input$nb_classes_ac_id),style="kmeans",rtimes=10,intervalClosure="left"))
             else
-              suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse_ac()$donnees[,varRatio]),input$nb_classes_ac_id,style=input$methode_ac_id,rtimes=10,intervalClosure="left"))
-
-            carac_bornes <- calcul_bornes(analyse_ac()$donnees,bornes_analyse,varRatio,input$nb_classes_ac_id,input$methode_ac_id)
-
+              suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse_ac()$donnees[,varRatio]),as.numeric(input$nb_classes_ac_id),style=input$methode_ac_id,rtimes=10,intervalClosure="left"))
+            
+            carac_bornes <- calcul_bornes(analyse_ac()$donnees,bornes_analyse,varRatio,input$nb_classes_ac_id,input$methode_ac_id,input$palette_insee_ac_id)
+            
             if(!is.null(input$nb_classes_ac_id))
             {
               if(input$methode_ac_id=="manuel")
               {
-                lapply(1:(as.numeric(input$nb_classes_ac_id)-1)+1, function(i) {
-                  numericInput(inputId = paste0("bornes_", i,"_ac_id"), label = paste("Choix de la borne ", i-1),
-                               value = carac_bornes[[1]][i])
+                lapply(1:(as.numeric(input$nb_classes_ac_id)-1), function(i) {
+                  numericInput(inputId = paste0("bornes_", i,"_ac_id"), label = paste("Choix de la borne ", i),
+                               value = round(rev(carac_bornes[[1]])[i+1],3))
                 })
               }
             }
           }
+        })
+        
+        output$zone_bornes_min_ac <- renderUI({
+          
+          HTML(paste0("Borne min : ", round(min(as.numeric(analyse_ac()$donnees[,varRatio])),3)))
+          
         })
 
         output$valid_bornes_ac <- renderUI({
@@ -483,15 +504,14 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
       # Pour calculer les bornes des classes
       react_bornes_ac <- reactive({
-
         if(is.null(input$nb_classes_ac_id) | is.null(input$methode_ac_id))
         {
-          max_classes$a <- 4
+          max_classes$a <- 3
           methode <- "kmeans"
           suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse_ac()$donnees[,varRatio]),max_classes$a,style=methode,rtimes=10,intervalClosure="left"))
         }else if(input$nb_classes_ac_id=="" | input$methode_ac_id=="")
         {
-          max_classes$a <- 4
+          max_classes$a <- 3
           methode <- "kmeans"
           suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse_ac()$donnees[,varRatio]),max_classes$a,style=methode,rtimes=10,intervalClosure="left"))
         }else
@@ -506,43 +526,52 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         }
         if(methode!="manuel")
         {
-          carac_bornes <- calcul_bornes(analyse_ac()$donnees,bornes_analyse,varRatio,max_classes$a,methode)
+          carac_bornes <- calcul_bornes(analyse_ac()$donnees,bornes_analyse,varRatio,max_classes$a,methode,input$palette_insee_ac_id)
         }else if(methode=="manuel")
         {
           carac_bornes <- react_bornes_manuel_1_ac()
         }
-
+        
         return(carac_bornes) #list(bornes=carac_bornes[[1]],pal_classes=carac_bornes[[2]])
       })
-
+      
       # Pour calculer les bornes des classes
       react_bornes_init_ac <- reactive({
-
-        suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse_ac()$donnees[,varRatio]),4,style="kmeans",rtimes=10,intervalClosure="left"))
-        carac_bornes <- calcul_bornes(analyse_ac()$donnees,bornes_analyse,varRatio,4,"kmeans")
+        
+        suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse_ac()$donnees[,varRatio]),3,style="kmeans",rtimes=10,intervalClosure="left"))
+        if(min(bornes_analyse$brks)<0 & max(bornes_analyse$brks)>=0)
+        {
+          palette_init <- "Insee_Rouge"
+        }else
+        {
+          palette_init <- "Insee_Bleu"
+        }
+        carac_bornes <- calcul_bornes(analyse_ac()$donnees,bornes_analyse,varRatio,3,"kmeans",palette_init)
         return(carac_bornes) #list(bornes=carac_bornes[[1]],pal_classes=carac_bornes[[2]])
       })
-
-      # Pour mettre a jour les bornes en mode manuel
+      
+      # Pour mettre à jour les bornes en mode manuel
       react_bornes_manuel_1_ac <- eventReactive(input$valid_bornes_ac_id,{
-
+        
         suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse_ac()$donnees[,varRatio]),max_classes$a,style="kmeans",rtimes=10,intervalClosure="left"))
-
-        carac_bornes <- calcul_bornes(analyse_ac()$donnees,bornes_analyse,varRatio,input$nb_classes_ac_id,input$methode_ac_id)
-
         bornes <- vector()
-        for (i in 0:(as.numeric(input$nb_classes_ac_id))+1) {
+        for (i in 1:(as.numeric(input$nb_classes_ac_id)-1)) {
           bornes<-c(bornes,input[[paste0("bornes_", i,"_ac_id")]])
         }
+        
+        bornes_analyse$brks <- c(min(bornes_analyse$brks), bornes, max(bornes_analyse$brks))
+        
+        carac_bornes <- calcul_bornes(analyse_ac()$donnees,bornes_analyse,varRatio,input$nb_classes_ac_id,input$methode_ac_id,input$palette_insee_ac_id)
+        
         bornes <- c(carac_bornes[[1]][1],bornes,carac_bornes[[1]][length(carac_bornes[[1]])])
         bornes <- sort(unique(bornes),decreasing = T)
-
+        
         carac_bornes[[1]] <- bornes
-
+        
         return(carac_bornes)
-      },ignoreNULL = FALSE)
-
-      # Pour mettre a jour les bornes dans la distribution
+      },ignoreNULL = TRUE)
+      
+      # Pour mettre à jour les bornes dans la distribution
       observeEvent(input$valid_slider_bornes_ac_id,{
         updateSelectInput(session, inputId = "methode_ac_id", selected = "manuel")
         for (i in 0:(as.numeric(input$nb_classes_ac_id))+1) {
@@ -552,7 +581,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
       # Pour renvoyer la fourchette de classes possible
       nb_classes_ac <- reactive({
-
+        if(is.null(varRatio)) return(NULL)
+        
         if(elargi_ac())
         {
           donnees <- analyse_ac()$donnees_elargi[,varRatio]
@@ -560,28 +590,41 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         {
           donnees <- analyse_ac()$donnees[,varRatio]
         }
-
+        
         suppressWarnings(
-          if(min(donnees, na.rm = TRUE)<0 & max(donnees, na.rm = TRUE)>0) # Si + et -
+          if(min(donnees)<0 & max(donnees)>0) # Si + et -
           {
             if(length(donnees)>3 & length(donnees)<9)
             {
-              return(c(3:(length(donnees)-1)))
+              max_classes <- c(3:(length(donnees)-1))
             }else
             {
-              return(c(3:9))
+              max_classes <- c(3:9)
             }
-          }else # Si tout + ou tout -
+            max_palettes <- c("Insee_Rouge","Insee_Jaune")
+          }else if(min(donnees)>0) # Si tout +
           {
-            if(length(donnees)>3 & length(donnees)<5)
+            if(length(donnees)>3 & length(donnees)<6)
             {
-              return(c(3:(length(donnees)-1)))
+              max_classes <- c(3:(length(donnees)-1))
             }else
             {
-              return(c(3:5))
+              max_classes <- c(3:6)
             }
+            max_palettes <- c("Insee_Bleu","Insee_Jaune","Insee_Rouge","Insee_Violet","Insee_Turquoise","Insee_Vert","Insee_Gris")
+          }else if(max(donnees)<0) # Si tout -
+          {
+            if(length(donnees)>3 & length(donnees)<6)
+            {
+              max_classes <- c(3:(length(donnees)-1))
+            }else
+            {
+              max_classes <- c(3:6)
+            }
+            max_palettes <- c("Insee_Bleu","Violet_Neg","Turquoise_Neg","Vert_Neg","Gris_Neg")
           }
         )
+        return(list(max_classes,max_palettes))
       })
       observe({nb_classes_ac()})
 
@@ -617,7 +660,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         {
           max_classes <- input$nb_classes_ac_id
         }
-
+        
         if(!is.null(lon_lat_ac()[[1]]))
         {
           suppressWarnings(test_affiche_leg <- try(table_classe <- data.frame(classe=c(max_classes:1),label=legende$a,couleurs=analyse_leg_ac()$pal_classes, stringsAsFactors = F),silent=TRUE))
@@ -663,12 +706,12 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           suppressWarnings(write_fond_classes_elargi <- try(st_write(fond_classes_elargi, paste0(rep_sortie,"fond_maille_elargi_carte.shp"), delete_dsn = TRUE, quiet = TRUE),silent=TRUE))
           suppressWarnings(write_fond_maille_elargi <- try(st_write(fond_maille_elargi, paste0(rep_sortie,"fond_maille_elargi.shp"), delete_dsn = TRUE, quiet = TRUE),silent=TRUE))
 
-          st_write(fond_classes_elargi, paste0(rep_sortie,"/fond_maille_elargi_carte.shp"), delete_dsn = TRUE, quiet = TRUE)
-          st_write(fond_maille_elargi,paste0(rep_sortie,"/fond_maille_elargi.shp"), delete_dsn = TRUE, quiet = TRUE)
+          suppressWarnings(st_write(fond_classes_elargi, paste0(rep_sortie,"/fond_maille_elargi_carte.shp"), delete_dsn = TRUE, quiet = TRUE))
+          suppressWarnings(st_write(fond_maille_elargi,paste0(rep_sortie,"/fond_maille_elargi.shp"), delete_dsn = TRUE, quiet = TRUE))
           files <- c(paste0(rep_sortie,"/fond_maille_elargi_carte.shp"),paste0(rep_sortie,"/fond_maille_elargi_carte.dbf"),paste0(rep_sortie,"/fond_maille_elargi_carte.prj"),paste0(rep_sortie,"/fond_maille_elargi_carte.shx"),files)
           files <- c(paste0(rep_sortie,"/fond_maille_elargi.shp"),paste0(rep_sortie,"/fond_maille_elargi.dbf"),paste0(rep_sortie,"/fond_maille_elargi.prj"),paste0(rep_sortie,"/fond_maille_elargi.shx"),files)
         }
-
+        
         analyse_donnees <- analyse_ac()[[1]] #donnees
         analyse_maille <- analyse_ac()[[2]] #fond maille
 
@@ -677,13 +720,10 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         names(analyse_donnees) <- c(names_donnees,"val","classe")
         analyse_classes <- merge(table_classe,analyse_donnees,by.x="couleurs",by.y="classe")
         analyse_classes <- analyse_classes[,c("CODE","LIBELLE",varRatio,"val","classe")]
-
         analyse_classes <- analyse_classes[order(analyse_classes[,varRatio],decreasing = T),]
-
         analyse_maille <- merge(analyse_maille,analyse_classes[,c("CODE",varRatio,"val","classe")],by="CODE")
-        names(analyse_maille) <- c("CODE","LIBELLE",varRatio,"val","classe","geometry")
+        analyse_maille <- analyse_maille[,c("CODE","LIBELLE",varRatio,"val","classe","geometry")]
         analyse_maille <- st_sf(analyse_maille,stringsAsFactors = FALSE)
-
         fond_classes <- analyse_maille
 
         fond_contour <- st_transform(fondContour, crs= as.numeric(code_epsg_ac()))
@@ -692,15 +732,15 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         if(input$ajout_reg_ac_id) fond_region <- st_transform(fond_region_ac(), crs= as.numeric(code_epsg_ac()))
         fond_france <- st_transform(fond_habillage_ac()[[1]], crs= as.numeric(code_epsg_ac()))
         fond_pays <- st_transform(fond_habillage_ac()[[2]], crs= as.numeric(code_epsg_ac()))
-
-        st_write(fond_classes, paste0(rep_sortie,"/fond_maille_carte.shp"), delete_dsn = TRUE, quiet = TRUE)
-        st_write(fond_contour,paste0(rep_sortie,"/fond_contour.shp"), delete_dsn = TRUE, quiet = TRUE)
-        if(exists("fond_territoire")) if(!is.null(fond_territoire)) st_write(fond_territoire, paste0(rep_sortie,"/fond_territoire.shp"), delete_dsn = TRUE, quiet = TRUE)
-        if(exists("fond_departement")) if(!is.null(fond_departement)) st_write(fond_departement, paste0(rep_sortie,"/fond_departement.shp"), delete_dsn = TRUE, quiet = TRUE)
-        if(exists("fond_region")) if(!is.null(fond_region)) st_write(fond_region,paste0(rep_sortie,"/fond_region.shp"), delete_dsn = TRUE, quiet = TRUE)
-        st_write(fond_france,paste0(rep_sortie,"/fond_france.shp"), delete_dsn = TRUE, quiet = TRUE)
-        if(exists("fond_pays")) if(!is.null(fond_pays)) st_write(fond_pays,paste0(rep_sortie,"/fond_pays.shp"), delete_dsn = TRUE, quiet = TRUE)
-
+        
+        suppressWarnings(st_write(fond_classes, paste0(rep_sortie,"/fond_maille_carte.shp"), delete_dsn = TRUE, quiet = TRUE))
+        suppressWarnings(st_write(fond_contour,paste0(rep_sortie,"/fond_contour.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_territoire")) if(!is.null(fond_territoire)) suppressWarnings(st_write(fond_territoire, paste0(rep_sortie,"/fond_territoire.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_departement")) if(!is.null(fond_departement)) suppressWarnings(st_write(fond_departement, paste0(rep_sortie,"/fond_departement.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_region")) if(!is.null(fond_region)) suppressWarnings(st_write(fond_region,paste0(rep_sortie,"/fond_region.shp"), delete_dsn = TRUE, quiet = TRUE))
+        suppressWarnings(st_write(fond_france,paste0(rep_sortie,"/fond_france.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_pays")) if(!is.null(fond_pays)) suppressWarnings(st_write(fond_pays,paste0(rep_sortie,"/fond_pays.shp"), delete_dsn = TRUE, quiet = TRUE))
+        
         files <- c(paste0(rep_sortie,"/fond_maille_carte.shp"),paste0(rep_sortie,"/fond_maille_carte.dbf"),paste0(rep_sortie,"/fond_maille_carte.prj"),paste0(rep_sortie,"/fond_maille_carte.shx"),files)
         files <- c(paste0(rep_sortie,"/fond_contour.shp"),paste0(rep_sortie,"/fond_contour.dbf"),paste0(rep_sortie,"/fond_contour.prj"),paste0(rep_sortie,"/fond_contour.shx"),files)
         if(exists("fond_territoire")) if(!is.null(fond_territoire)) files <- c(paste0(rep_sortie,"/fond_territoire.shp"),paste0(rep_sortie,"/fond_territoire.dbf"),paste0(rep_sortie,"/fond_territoire.prj"),paste0(rep_sortie,"/fond_territoire.shx"),files)
@@ -708,7 +748,6 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         if(exists("fond_region")) if(!is.null(fond_region)) files <- c(paste0(rep_sortie,"/fond_region.shp"),paste0(rep_sortie,"/fond_region.dbf"),paste0(rep_sortie,"/fond_region.prj"),paste0(rep_sortie,"/fond_region.shx"),files)
         files <- c(paste0(rep_sortie,"/fond_france.shp"),paste0(rep_sortie,"/fond_france.dbf"),paste0(rep_sortie,"/fond_france.prj"),paste0(rep_sortie,"/fond_france.shx"),files)
         if(exists("fond_pays")) if(!is.null(fond_pays)) files <- c(paste0(rep_sortie,"/fond_pays.shp"),paste0(rep_sortie,"/fond_pays.dbf"),paste0(rep_sortie,"/fond_pays.prj"),paste0(rep_sortie,"/fond_pays.shx"),files)
-
         chemin_fonds <- rep_sortie
         titre1 <- paste0(input$titre1_qgis_ac_id,"\n")
         titre2 <- input$titre2_qgis_ac_id
@@ -741,11 +780,11 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         }
 
         l <- c(l,"fond_pays")
-
+        
         export_projet_qgis_classes(l,rep_sortie,sortie,titre1,titre2,source,titre_leg_classes,table_classe,variable_a_representer,annee)
 
         removeModal()
-
+        
         showModal(modalDialog(HTML(paste0("<font size=+1>Le projet Qgis a \u00e9t\u00e9 cr","\u00e9","ee.</font>")), size="m", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
 
         return(files)
@@ -913,7 +952,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           showModal(modalDialog(HTML(paste0("<font size=+1>Les bornes calcul\u00e9es avec la methode '",input$methode_ac_id,"' ne sont pas uniques. La methode kmeans a donc \u00e9t\u00e9 retenue.</font>")), size="l", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
           Sys.sleep(7)
           suppressWarnings(bornes_analyse <- classIntervals(as.numeric(analyse_ac()$donnees[,varRatio]),max_classes$a,style="kmeans",rtimes=10,intervalClosure="left"))
-          carac_bornes <- calcul_bornes(analyse_ac()$donnees,bornes_analyse,varRatio,max_classes$a,"kmeans")
+          carac_bornes <- calcul_bornes(analyse_ac()$donnees,bornes_analyse,varRatio,max_classes$a,"kmeans",input$palette_insee_ac_id)
           updateSelectInput(session,"methode_ac_id",choices = methode_calcul, selected="kmeans")
           bornes <- carac_bornes[[1]]
           pal_classes <- carac_bornes[[2]]
@@ -1243,10 +1282,10 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         }
       },ignoreInit = TRUE)
 
-      # MODIFICATION DU NOMBRE DE CLASSES, DE LA METHODE OU DES BORNES
+      # MODIFICATION DU NOMBRE DE CLASSES, DE LA METHODE, DES BORNES OU DE LA PALETTE
 
-      observeEvent(list(input$nb_classes_ac_id,input$methode_ac_id,input$valid_bornes_ac_id),{
-        req(input$nb_classes_ac_id,input$methode_ac_id)
+      observeEvent(list(input$nb_classes_ac_id,input$methode_ac_id,input$valid_bornes_ac_id,input$palette_insee_ac_id),{
+        req(input$nb_classes_ac_id,input$methode_ac_id,input$palette_insee_ac_id)
 
         proxy <- leafletProxy("mymap_ac")
 
@@ -1280,8 +1319,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
       # MODIFICATION DE LA REPRESENTATION ELARGIE
 
-      observeEvent(list(input$elargi_ac_id,input$opacite_elargi_ac_id,input$nb_classes_ac_id,input$methode_ac_id,input$valid_bornes_ac_id),{
-        req(input$elargi_ac_id,input$opacite_elargi_ac_id,input$nb_classes_ac_id,input$methode_ac_id)
+      observeEvent(list(input$elargi_ac_id,input$opacite_elargi_ac_id,input$nb_classes_ac_id,input$methode_ac_id,input$valid_bornes_ac_id,input$palette_insee_ac_id),{
+        req(input$elargi_ac_id,input$opacite_elargi_ac_id,input$nb_classes_ac_id,input$methode_ac_id,input$palette_insee_ac_id)
 
         proxy <- leafletProxy("mymap_ac")
 
@@ -1373,7 +1412,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         return(list(lon,lat))
       })
 
-      observeEvent(list(input$mymap_ac_zoom,input$mymap_ac_click,input$type_legende_ac_id,input$titre_classes_legende_ac_id,input$nb_classes_ac_id,input$methode_ac_id,input$valid_bornes_ac_id),{
+      observeEvent(list(input$mymap_ac_zoom,input$mymap_ac_click,input$type_legende_ac_id,input$titre_classes_legende_ac_id,input$nb_classes_ac_id,input$methode_ac_id,input$palette_insee_ac_id,input$valid_bornes_ac_id),{
         if(is.null(input$affiche_legende_ac_id)) return(NULL)
 
         if(input$affiche_legende_ac_id==FALSE) return(NULL)
@@ -1388,7 +1427,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         zoom <- as.numeric(input$mymap_ac_zoom)
         coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
 
-        position_leg <- t(data_frame(c(lon_lat_ac()[[1]],lon_lat_ac()[[2]])))
+        position_leg <- t(data.frame(c(lon_lat_ac()[[1]],lon_lat_ac()[[2]])))
 
         if(is.null(input$type_legende_ac_id)) return(NULL)
 
@@ -1747,7 +1786,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           zoom <- as.numeric(input$mymap_ac_zoom)
           coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
 
-          position_leg <- t(data_frame(c(lon_lat_ac()[[1]],lon_lat_ac()[[2]])))
+          position_leg <- t(data.frame(c(lon_lat_ac()[[1]],lon_lat_ac()[[2]])))
 
           if(input$type_legende_ac_id==1) # Litterale
           {

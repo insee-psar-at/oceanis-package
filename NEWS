@@ -1,4 +1,12 @@
 
+Changes in version 1.8.1
+
+FEATURES
+
+- Les palettes négatives pour le turquoise, vert, violet et gris ne porte plus la mention Insee (Turquoise_Neg_XN_0P, Vert_Neg_XN_0P, Violet_Neg_XN_0P, Gris_Neg_XN_0P).
+- Pour les fonctions shiny_xxx, possibilité de changer de palettes de couleurs depuis l'interface shiny.
+- Les couleurs de la palette "defaut" correspondent aux couleurs de la palette "RdYlBu" de ColorBrewer.
+
 Changes in version 1.8.0
 
 FEATURES

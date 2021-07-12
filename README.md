@@ -1,5 +1,5 @@
 
-# oceanis-package (version 1.8.0)
+# oceanis-package (version 1.8.1)
 
 <!-- badges: start -->
 [![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](https://github.com/SNStatComp/awesome-official-statistics-software)
@@ -43,9 +43,14 @@ L'aide du package et la vignette proposent des exemples de réalisation de carte
 
 La vignette propose notamment un exemple de scénario de réalisation de cartes depuis le chargement des données et des fonds jusqu'à son exportation en fichier image ou en projet Qgis.
 
-Pour installer le package _oceanis_ depuis GitHub et le charger dans R :
+Pour installer le package _oceanis_ sur poste depuis GitLab et le charger dans R :
 ```r
-devtools::install_github("insee-psar-at/oceanis-package")
+remotes::install_gitlab(
+     repo = "psar-at/unite-ced/oceanis-package",
+     host = "gitlab.insee.fr",
+     dependencies = TRUE,
+     build_vignettes = TRUE
+)
 library(oceanis)
 ```
 ou à partir du CRAN :
@@ -53,34 +58,47 @@ ou à partir du CRAN :
 install.packages("oceanis")
 library(oceanis)
 ```
+Pour installer le package _oceanis_ sur AUS :
+```r
+#install.packages("remotes", type = "source")
+
+    remotes::install_gitlab(
+    repo = "psar-at/unite-ced/oceanis-package-aus",
+    host = "gitlab.insee.fr", 
+    upgrade = "never",
+    build = FALSE,
+    dependencies = TRUE
+    )
+library(oceanis)
+```
 
 Ci-dessous quelques exemples de cartes réalisées avec le package _oceanis_ :
 
 - Fonction _shiny_classes_ronds_
 
-![](vignettes/images/readme_shiny_ac_rp.PNG)
+![](vignettes/images/readme_shiny_ac_rp.png)
 
 - Fonction _shiny_saphirs_
 
-![](vignettes/images/readme_shiny_fs.PNG)
+![](vignettes/images/readme_shiny_fs.png)
 
 - Fonctions _leaflet_ronds_classes_, _add_legende_classes_ et _add_legende_ronds_
 
-![](vignettes/images/readme_leaflet_rp_ac.PNG)
+![](vignettes/images/readme_leaflet_rp_ac.png)
 
 - Fonctions _leaflet_typo_ et _add_legende_typo_
 
-![](vignettes/images/readme_leaflet_typo.PNG)
+![](vignettes/images/readme_leaflet_typo.png)
 
 - Fonctions _leaflet_fonds_simples_, _add_typo_symboles_ et _add_legende_typo_symboles_
 
-![](vignettes/images/readme_leaflet_typo_symbole.PNG)
+![](vignettes/images/readme_leaflet_typo_symbole.png)
 
 - Fonctions _leaflet_joignantes_ et _add_legende_joignantes_
 
-![](vignettes/images/readme_leaflet_fj.PNG)
+![](vignettes/images/readme_leaflet_fj.png)
 
 - Fonctions _plot_classes_ronds_ et _coordonnees_etiquettes_
 
-![](vignettes/images/readme_plot_ac_rp.PNG)
+![](vignettes/images/readme_plot_ac_rp.png)
 

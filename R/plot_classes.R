@@ -27,7 +27,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
     if(!is.null(labels)) if(any(class(labels)!="character")) msg_error18 <- "Les labels de la legende doivent etre de type caractere / "
     if(any(class(sourceCarte)!="character")) msg_error19 <- "La source de la carte doit etre de type caractere / "
     if(!is.null(etiquettes)) if(!any(class(etiquettes) %in% "character" | class(etiquettes) %in% "data.frame")) msg_error20 <- "La table des etiquettes peut etre soit un vecteur caractere soit un data.frame (voir aide) / "
-    if(any(class(stylePalette)!="character")) msg_error21 <- "Le style de la palette doit etre de type caractere ('defaut', 'Insee_Rouge', 'Insee_Jaune', 'Insee_Bleu', 'Insee_Turquoise', 'Insee_Vert', 'Insee_Violet' ou 'Insee_Gris') / "
+    if(!is.null(stylePalette)) if(any(class(stylePalette)!="character")) msg_error21 <- "Le style de la palette doit etre de type caractere ('defaut', 'Insee_Rouge', 'Insee_Jaune', 'Insee_Bleu', 'Insee_Turquoise', 'Insee_Vert', 'Insee_Violet' ou 'Insee_Gris') / "
     if(!is.null(palettePos)) if(any(class(palettePos)!="character")) msg_error22 <- "La palette des classes doit etre un vecteur de type caractere / "
     if(!is.null(paletteNeg)) if(any(class(paletteNeg)!="character")) msg_error23 <- "La palette des classes doit etre un vecteur de type caractere / "
     if(any(class(colBorder)!="character")) msg_error24 <- "La couleur de la bordure doit etre de type caractere (nommee ou hexadecimal) / "
@@ -132,46 +132,70 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varRati
       
       if(min < 0 & max >= 0) # Si - et +
       {
-        if(!0 %in% bornes)
+        if(!is.null(stylePalette))
         {
-          col_classe_zero <- recup_palette(stylePalette = "Insee_Gris", nbPos = 6)[[1]][1]
-          nb_pal_neg <- length(bornes[bornes < 0]) - 1
-          nb_pal_pos <- length(bornes[bornes > 0]) - 1
-          pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]]
-          pal_classes <- c(pal_classes[0:nb_pal_neg], col_classe_zero, pal_classes[(nb_pal_neg + 1):(length(pal_classes) + 1)])
-          pal_classes <- pal_classes[!is.na(pal_classes)]
+          if(!0 %in% bornes)
+          {
+            col_classe_zero <- recup_palette(stylePalette = "Insee_Gris", nbPos = 6)[[1]][1]
+            nb_pal_neg <- length(bornes[bornes < 0]) - 1
+            nb_pal_pos <- length(bornes[bornes > 0]) - 1
+            pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]]
+            pal_classes <- c(pal_classes[0:nb_pal_neg], col_classe_zero, pal_classes[(nb_pal_neg + 1):(length(pal_classes) + 1)])
+            pal_classes <- pal_classes[!is.na(pal_classes)]
+          }else
+          {
+            nb_pal_neg <- length(bornes[bornes < 0])
+            nb_pal_pos <- length(bornes[bornes > 0])
+            pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]] 
+          }
         }else
         {
-          nb_pal_neg <- length(bornes[bornes < 0])
-          nb_pal_pos <- length(bornes[bornes > 0])
-          pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]] 
+          palettePos <- palettePos[(length(palettePos)-length(bornes[bornes>0])+1):length(palettePos)]
+          paletteNeg <- paletteNeg[1:length(bornes[bornes<0])]
+          pal_classes <- c(paletteNeg,palettePos)
         }
       }
       if(min >= 0) # Si +
       {
-        if(!0 %in% bornes)
+        if(!is.null(stylePalette))
         {
-          nb_pal_pos <- length(bornes[bornes > 0]) - 1
+          if(!0 %in% bornes)
+          {
+            nb_pal_pos <- length(bornes[bornes > 0]) - 1
+          }else
+          {
+            nb_pal_pos <- length(bornes[bornes > 0])
+          }
+          if(nb_pal_pos > 6) nb_pal_pos <- 6
+          nb_pal_neg <- 0
+          pal_classes <- recup_palette(stylePalette = stylePalette, nbPos = nb_pal_pos)[[1]]
         }else
         {
-          nb_pal_pos <- length(bornes[bornes > 0])
+          palettePos <- palettePos[(length(palettePos)-length(bornes[bornes>0])+1):length(palettePos)]
+          paletteNeg <- paletteNeg[1:length(bornes[bornes<0])]
+          pal_classes <- c(paletteNeg,palettePos)
         }
-        if(nb_pal_pos > 6) nb_pal_pos <- 6
-        nb_pal_neg <- 0
-        pal_classes <- recup_palette(stylePalette = stylePalette, nbPos = nb_pal_pos)[[1]]
       }
       if(max <= 0) # Si -
       {
-        if(!0 %in% bornes)
+        if(!is.null(stylePalette))
         {
-          nb_pal_neg <- length(bornes[bornes < 0]) - 1
+          if(!0 %in% bornes)
+          {
+            nb_pal_neg <- length(bornes[bornes < 0]) - 1
+          }else
+          {
+            nb_pal_neg <- length(bornes[bornes < 0])
+          }
+          if(nb_pal_neg > 6) nb_pal_neg <- 6
+          nb_pal_pos <- 0
+          pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg)[[1]]
         }else
         {
-          nb_pal_neg <- length(bornes[bornes < 0])
+          palettePos <- palettePos[(length(palettePos)-length(bornes[bornes>0])+1):length(palettePos)]
+          paletteNeg <- paletteNeg[1:length(bornes[bornes<0])]
+          pal_classes <- c(paletteNeg,palettePos)
         }
-        if(nb_pal_neg > 6) nb_pal_neg <- 6
-        nb_pal_pos <- 0
-        pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg)[[1]]
       }
     }
 

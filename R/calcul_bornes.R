@@ -13,10 +13,7 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
         suppressWarnings(bornes_analyse <- classIntervals(as.numeric(donnees[,names(donnees)[sapply(donnees,is.numeric)][2]]),4,style="kmeans",rtimes=10,intervalClosure="left"))
       }else
       {
-        if(methode!="manuel")
-          suppressWarnings(bornes_analyse <- classIntervals(donnees[,variable_classe],as.numeric(max_classes),style=methode,rtimes=10,intervalClosure="left"))
-        else
-          suppressWarnings(bornes_analyse <- classIntervals(donnees[,variable_classe],as.numeric(max_classes),style="kmeans",rtimes=10,intervalClosure="left"))
+        if(methode!="manuel") suppressWarnings(bornes_analyse <- classIntervals(donnees[,variable_classe],as.numeric(max_classes),style=methode,rtimes=10,intervalClosure="left"))
       }
       
       bornes <- bornes_analyse$brks
@@ -31,7 +28,7 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
       borne_pos <- min(bornes[bornes > 0])
       borne_neg <- max(bornes[bornes < 0])
       
-      if(methode != "quantile")
+      if(!methode %in% c("quantile","manuel"))
       {
         if(!any(bornes %in% 0)) # Si la methode kmeans genere une borne 0, c'est ideale la distribution est parfaite pour la methode choisie sinon on doit generer une borne zero
         {
@@ -104,17 +101,20 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
           bornes <- sort(bornes, decreasing = TRUE)
         }
         
+        if(length(bornes[bornes<0]) > 6) nb_pal_neg <- 6 else nb_pal_neg <- length(bornes[bornes<0])
+        if(length(bornes[bornes>0]) > 6) nb_pal_pos <- 6 else nb_pal_pos <- length(bornes[bornes>0])
+        
         if(!is.null(stylePalette))
         {
-          pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = length(bornes[bornes < 0]), nbPos = length(bornes[bornes > 0]))[[1]]
+          pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]]
         }else
         {
           palettePos <- palettePos[(length(palettePos)-length(bornes[bornes>0])+1):length(palettePos)]
           paletteNeg <- paletteNeg[1:length(bornes[bornes<0])]
-          pal_classes <- c(palettePos,paletteNeg)
+          pal_classes <- c(paletteNeg,palettePos)
         }
         
-      }else if(methode == "quantile")# Pour la methode des quantiles, on ne gere pas la borne zero pour ne pas fausser l'equi-distribution des effectifs dans les classes.
+      }else if(methode != "manuel")# Pour la methode des quantiles, on ne gere pas la borne zero pour ne pas fausser l'equi-distribution des effectifs dans les classes.
       {
         message(simpleMessage("La methode des quantiles ne permet pas de gerer la borne a 0. Vous pouvez passer en mode manuel pour modifier les bornes des classes."))
         
@@ -127,6 +127,8 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
               col_classe_zero <- recup_palette(stylePalette = "Insee_Gris", nbPos = 6)[[1]][1]
               nb_pal_neg <- length(bornes[bornes < 0]) - 1
               nb_pal_pos <- length(bornes[bornes > 0]) - 1
+              if(nb_pal_neg > 6) nb_pal_neg <- 6
+              if(nb_pal_pos > 6) nb_pal_pos <- 6
               pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]]
               pal_classes <- c(pal_classes[0:nb_pal_neg], col_classe_zero, pal_classes[(nb_pal_neg + 1):(length(pal_classes) + 1)])
               pal_classes <- pal_classes[!is.na(pal_classes)]
@@ -134,11 +136,15 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
             {
               nb_pal_neg <- length(bornes[bornes < 0])
               nb_pal_pos <- length(bornes[bornes > 0])
+              if(nb_pal_neg > 6) nb_pal_neg <- 6 
+              if(nb_pal_pos > 6) nb_pal_pos <- 6
               pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]] 
             }
           }
           if(min(bornes) >= 0) # Si +
           {
+            nb_pal_neg <- 0
+            
             if(!0 %in% bornes)
             {
               nb_pal_pos <- length(bornes[bornes > 0]) - 1
@@ -151,6 +157,8 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
           }
           if(max(bornes) <= 0) # Si -
           {
+            nb_pal_pos <- 0
+            
             if(!0 %in% bornes)
             {
               nb_pal_neg <- length(bornes[bornes < 0]) - 1
@@ -163,18 +171,64 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
           }
         }else
         {
-          palettePos <- palettePos[(length(palettePos)-length(bornes[bornes > 0]) + 1):length(palettePos)]
-          paletteNeg <- paletteNeg[1:length(bornes[bornes < 0])]
-          pal_classes <- c(palettePos,paletteNeg)
+          if(min(bornes) < 0 & max(bornes) >= 0) # Si - et +
+          {
+            nb_pal_neg <- length(bornes[bornes<0])
+            nb_pal_pos <- length(bornes[bornes>0])
+            
+            if(!0 %in% bornes)
+            {
+              palettePos <- palettePos[(length(palettePos)-length(bornes[bornes > 0]) + 1):length(palettePos)]
+              paletteNeg <- paletteNeg[1:length(bornes[bornes < 0])]
+              pal_classes <- c(paletteNeg,palettePos)
+            }else
+            {
+              palettePos <- palettePos[(length(palettePos)-length(bornes[bornes > 0]) + 1):length(palettePos)]
+              paletteNeg <- paletteNeg[1:length(bornes[bornes < 0])]
+              pal_classes <- c(paletteNeg,palettePos)
+            }
+          }
+          if(min(bornes) >= 0) # Si +
+          {
+            nb_pal_neg <- 0
+            nb_pal_pos <- length(bornes[bornes>0])
+            pal_classes <- palettePos[(length(palettePos)-length(bornes[bornes > 0]) + 1):length(palettePos)]
+          }
+          if(max(bornes) <= 0) # Si -
+          {
+            nb_pal_neg <- length(bornes[bornes<0])
+            nb_pal_pos <- 0
+            pal_classes <- paletteNeg[1:length(bornes[bornes < 0])]
+          }
         }
         
-      }else{}
+      }else # méthode "manuel"
+      {
+        if(!0 %in% bornes) # Si il n'y a pas de 0, on détermine la couleur de la classe autour de 0
+        {
+          col_classe_zero <- palettes_insee[which(names(palettes_insee) == paste0("Insee_Gris_0N6P"))][[1]][1]
+          nb_pal_neg <- length(bornes[bornes < 0]) - 1
+          nb_pal_pos <- length(bornes[bornes > 0]) - 1
+          if(nb_pal_neg > 6) nb_pal_neg <- 6 
+          if(nb_pal_pos > 6) nb_pal_pos <- 6
+          pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]]
+          pal_classes <- c(pal_classes[0:nb_pal_neg], col_classe_zero, pal_classes[(nb_pal_neg + 1):(length(pal_classes) + 1)])
+          pal_classes <- pal_classes[!is.na(pal_classes)]
+        }else # Si il y a le 0 de présent
+        {
+          nb_pal_neg <- length(bornes[bornes < 0])
+          nb_pal_pos <- length(bornes[bornes > 0])
+          if(nb_pal_neg > 6) nb_pal_neg <- 6 
+          if(nb_pal_pos > 6) nb_pal_pos <- 6
+          pal_classes <- recup_palette(stylePalette = stylePalette, nbNeg = nb_pal_neg, nbPos = nb_pal_pos)[[1]]
+        }
+      }
       
     }
     
     if(min(bornes_analyse$brks) >= 0) # Si +
     {
-      bornes <- c(bornes_analyse$brks[bornes_analyse$brks >= 0])
+      bornes <- sort(c(bornes_analyse$brks[bornes_analyse$brks >= 0]), decreasing = T)
       nb_pal_neg <- 0
       
       if(!is.null(stylePalette))
@@ -203,7 +257,7 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
     
     if(max(bornes_analyse$brks) < 0) # Si -
     {
-      bornes <- c(bornes_analyse$brks[bornes_analyse$brks < 0])
+      bornes <- sort(c(bornes_analyse$brks[bornes_analyse$brks < 0]), decreasing = T)
       nb_pal_pos <- 0
       
       if(!is.null(stylePalette))

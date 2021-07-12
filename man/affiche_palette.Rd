@@ -8,8 +8,9 @@ affiche_palette(nomPalette = "defaut")
 }
 \arguments{
 \item{nomPalette}{chaine de caracteres (character). A choisir parmi
-"defaut", "Insee_Rouge", "Insee_Jaune", "Insee_Bleu",
-"Insee_Turquoise", "Insee_Vert", "Insee_Violet" ou "Insee_Gris".}
+"defaut", "Insee_Rouge", "Insee_Jaune", "Insee_Bleu", "Insee_Turquoise",
+"Insee_Vert", "Insee_Violet", "Insee_Gris", "Turquoise_Neg", "Vert_Neg",
+"Violet_Neg" ou "Gris_Neg".}
 }
 \value{
 Affiche la palette dans l'onglet Plots.
@@ -18,20 +19,25 @@ Affiche la palette dans l'onglet Plots.
 Returns a palette colors of the graphic chart of INSEE.
 }
 \details{
-Les palettes de couleurs disponibles sont celles de la Charte Graphique
-INSEE (hors palette "defaut"). En exécutant la fonction affiche_palette(nomPalette),
-il est possible de visualiser les couleurs de chaque palette disponible.
-Les modalités pour l'argument 'nomPalette' sont "defaut", "Insee_Rouge", "Insee_Jaune", 
-"Insee_Bleu", "Insee_Turquoise", "Insee_Vert", "Insee_Violet" et "Insee_Gris".
+Les couleurs de palettes préfixées par "Insee_" sont celles de la charte graphique
+INSEE. La fonction affiche_palette(nomPalette) permet de visualiser les couleurs de chaque
+palette disponible.
+Les modalités pour l'argument 'nomPalette' sont "Insee_Rouge", "Insee_Jaune", Insee_Bleu",
+"Insee_Turquoise", "Insee_Vert", "Insee_Violet" et "Insee_Gris" pour les palettes de la
+charte graphique INSEE, "defaut", "Turquoise_Neg", "Vert_Neg", "Violet_Neg" et "Gris_Neg"
+pour les palettes hors charte.
 
-La fonction permet de visualiser les couleurs de chaque palette.
-
-La liste des valeurs hexadécimales de toutes les palettes est dipsonible en
-chargeant les données suivantes : data("palettes_insee")
+La palette "defaut" reprend les couleurs de la palette RdYlBu de ColorBrewer.
 
 Seules les palettes "Insee_Rouge" et "Insee_Jaune" proposent des palettes pour des valeurs
-négatives et positives. Pour ces deux palettes, la palette "Insee_Bleu" inversée est
-utilisée pour représenter les valeurs négatives.
+négatives et positives. Pour ces deux palettes, la palette "Insee_Bleu" est utilisée
+pour représenter les valeurs négatives. Cette dernière peut également être utilisée seule 
+pour des valeurs uniquement positives ou négatives.
+
+La fonction permet de visualiser tous les dégradés possibles pour une palette donnée.
+
+La liste des valeurs hexadécimales de toutes les palettes est dipsonible en chargeant
+les données suivantes : data("palettes_insee")
 }
 \examples{
 
@@ -42,6 +48,9 @@ affiche_palette(nomPalette = "defaut")
 Un convertisseur de couleurs pour visualiser une couleur a
 partir de son nom, son code hexadecimal ou RGB :
 http://www.proftnj.com/RGB3.htm
+
+ColorBrewer 2.0 :
+https://colorbrewer2.org/#type=diverging&scheme=RdYlBu&n=10
 }
 \seealso{
 \code{\link{set_couleur_classes}}
