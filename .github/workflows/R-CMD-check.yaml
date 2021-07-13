@@ -25,6 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))
+          remotes::install_version("sf",upgrade="never", version = "0.9-7")
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
       - name: Check
