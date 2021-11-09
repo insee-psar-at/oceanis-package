@@ -24,15 +24,11 @@ jobs:
       - name: Install curl
         run: sudo apt-get install -y libcurl4-openssl-dev
       - name: Install Depends
-        run: |
-          install.package(shiny)
-          install.package(shinyBS)
+        run: install.packages(c('shiny', 'shinyBS'))
       - name: Install Imports
-        run: |
-          install.packages(c("sf", "utils", "shinyjs", "shinythemes", "DT", "stringr", "leaflet", "leaflet.extras", "classInt" , "grDevices", "ggplot2", "dplyr", "graphics", "lwgeom", "mapview", "zip"))
+        run: install.packages(c("sf", "utils", "shinyjs", "shinythemes", "DT", "stringr", "leaflet", "leaflet.extras", "classInt" , "grDevices", "ggplot2", "dplyr", "graphics", "lwgeom", "mapview", "zip"))
       - name: Install Suggests
-        run: |
-          install.packages(c("knitr", "rmarkdown", "markdown", "rio"))
+        run: install.packages(c("knitr", "rmarkdown", "markdown", "rio"))
       - name: Check
         run: |
           install.packages(c("rcmdcheck"))  
