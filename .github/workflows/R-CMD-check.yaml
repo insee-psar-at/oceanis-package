@@ -21,13 +21,8 @@ jobs:
         uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.r-version }}
-      - name: Install Depends
-        run: install.packages(c("shiny", "shinyBS"))
-      - name: Install Imports
-        run: install.packages(c("sf", "utils", "shinyjs", "shinythemes", "DT", "stringr", "leaflet", "leaflet.extras", "classInt" , "grDevices", "ggplot2", "dplyr", "graphics", "lwgeom", "mapview", "zip"))
-      - name: Install Suggests
-        run: install.packages(c("knitr", "rmarkdown", "markdown", "rio"))
-      - name: Check
+      - name: Install dependencies
         run: |
-          install.package("rcmdcheck")
-          rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+          install.packages(c("remotes", "rcmdcheck"))
+      - name: Check
+        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
