@@ -17,6 +17,7 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
       }
       
       bornes <- bornes_analyse$brks
+      bornes <- sort(bornes, decreasing = T)
       
       # On separe les donnees en 2, positives ou nulles d'un cote et negatives de l'autre
       donnees_pos <- donnees[donnees[,variable_classe] >= 0,variable_classe]
@@ -283,5 +284,6 @@ function(donnees,bornes_analyse,variable_classe,max_classes,methode,stylePalette
         nb_pal_neg <- length(pal_classes)
       }
     }
+  
     return(list(bornes,pal_classes,nb_pal_neg,nb_pal_pos))
   }

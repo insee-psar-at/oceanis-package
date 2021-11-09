@@ -45,6 +45,7 @@ function(map)
 
       code_epsg <- map$x$calls[[idx_fleche]]$args[[2]]$code_epsg
       emprise <- map$x$calls[[idx_fleche]]$args[[2]]$emprise
+      max_var <- map$x$calls[[idx_fleche]]$args[[2]]$max_var
 
       list_fonds <- list()
       nom_fonds <- c()
@@ -95,21 +96,19 @@ function(map)
 
       if(!is.null(idx_legende))
       {
-        large <- map$x$calls[[idx_fleche[1]]]$args[[2]]$distance
-        long <- large*2
+        large <- map$x$calls[[idx_fleche]]$args[[2]]$distance
+        long <- large * 1.5
 
-        gf <- st_sf(geometry=st_sfc(st_polygon(list(as.matrix(map$x$calls[[idx_legende[1]]]$args[[1]][[1]][[1]][[1]]))),crs=4326))
+        gf <- st_sf(geometry=st_sfc(st_polygon(list(as.matrix(map$x$calls[[idx_legende[2]]]$args[[1]][[1]][[1]][[1]]))),crs=4326))
         x <- st_bbox(gf)$xmin
         y <- st_bbox(gf)$ymin
-        flux_leg_pl <- flux_legende_joignantes_pl(x,y,long,large,code_epsg)
+        flux_leg_pl <- fleche_legende(x,y,long,large,max_var,code_epsg)[[5]]
 
-        max_var <- map$x$calls[[idx_fleche]]$args[[2]]$max_var
-        flux_leg_pl <- cbind(VAR=c(max_var,max_var/3),flux_leg_pl)
-        names(flux_leg_pl) <- c(var_flux,"geometry")
+        flux_leg_pl <- cbind(ETI_VAL=c(max_var,max_var/3),flux_leg_pl)
 
         list_fonds[[l]] <- flux_leg_pl
 
-        nom_fonds <- c(nom_fonds,map$x$calls[[idx_legende[[1]]]]$args[[2]]$nom_fond)
+        nom_fonds <- c(nom_fonds,map$x$calls[[idx_legende[[2]]]]$args[[2]]$nom_fond)
 
         l <- l+1
       }

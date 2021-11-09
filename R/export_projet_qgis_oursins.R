@@ -1,9 +1,10 @@
 export_projet_qgis_oursins <-
 function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,epaisseur,colTrait,annee)
   {
-    chemin_fonds <- paste0(chemin_fonds,"/")
+    chemin_fonds <- paste0(chemin_fonds,"/layers/")
     
     fond_maille <- read_sf(paste0(chemin_fonds,"fond_maille.shp"))
+    
     xmin=st_bbox(fond_maille)[1]-0.10*(st_bbox(fond_maille)[3]-st_bbox(fond_maille)[1])
     xmax=st_bbox(fond_maille)[3]+0.10*(st_bbox(fond_maille)[3]-st_bbox(fond_maille)[1])
     ymin=st_bbox(fond_maille)[2]-0.10*(st_bbox(fond_maille)[4]-st_bbox(fond_maille)[2])
@@ -61,7 +62,7 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,epaisseur,colTra
       #param idcouche, chemincouche, nomcouche
       nomcouche=l[i]
       chemincouche=paste0(chemin_fonds,nomcouche,".shp")
-      chemincoucherelatif=paste0("./",nomcouche,".shp")
+      chemincoucherelatif=paste0("./layers/",nomcouche,".shp")
       
       BLOCCATEGORIES=data.frame()
       
@@ -131,8 +132,9 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,epaisseur,colTra
     projproj=projcouche
     qgs1=modif_canevas(xmin,xmax,ymin,ymax,projproj,length(l))
     #etape finale
+    blocproperties <- balises_qgis()[[13]]
     BLOCCOMPOSER=data.frame(V1=c(BLOCCOMPOSER[1:43,],BLOCLAYERITEM[,1],BLOCCOMPOSER[45:94,]))
-    canevas_final=data.frame(V1=c(qgs1[1:19,],BLOCLEG[,1],qgs1[21,],BLOCCOMPOSER[,1],qgs1[23,],BLOCPROJECT[,1],qgs1[25:26,]))
+    canevas_final=data.frame(V1=c(qgs1[1:19,],BLOCLEG[,1],qgs1[21,],BLOCCOMPOSER[,1],qgs1[23,],BLOCPROJECT[,1],qgs1[25,],blocproperties[,1],qgs1[26,]))
     colnames(canevas_final)=NULL
-    write.csv(canevas_final,paste0(chemin_fonds,nom_projet,".qgs"),row.names = F, quote = F, fileEncoding = "UTF-8")
+    write.csv(canevas_final,paste0(substr(chemin_fonds,1,nchar(chemin_fonds)-7),nom_projet,".qgs"),row.names = F, quote = F, fileEncoding = "UTF-8")
   }

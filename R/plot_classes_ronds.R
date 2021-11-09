@@ -243,7 +243,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     fond_leg_pr <- st_sf(geometry=st_sfc(st_geometry(fond_leg_pr),crs=st_crs(fondMaille)))
     fond_leg_ronds <- rbind(fond_leg_gr,fond_leg_pr)
 
-    fond_leg_ronds <- st_sf(VAR=c(max_var,max_var/3),geometry=st_sfc(st_geometry(fond_leg_ronds),crs=st_crs(fondMaille)))
+    fond_leg_ronds <- st_sf(ETI_VAL=c(max_var,max_var/3),geometry=st_sfc(st_geometry(fond_leg_ronds),crs=st_crs(fondMaille)))
     names(fond_leg_ronds) <- c(varVolume,"geometry")
 
     xmin <- min(st_coordinates(fond_leg_ronds)[,1]) - x_large
@@ -498,7 +498,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
 
     if(cadreLeg) suppressWarnings(plot(bbox_leg_ronds,add=T,col="white",border="white",lwd=1))
 
-    plot(st_geometry(fond_leg_ronds),add=T,col="transparent",border=colBorderRonds)
+    plot(st_geometry(fond_leg_ronds),add=T,col="transparent",border="black")
     text(pts2_grand_pl[1]+1000,pts2_grand_pl[2],labels=round(max_var,precisionLegRonds),cex=0.9,adj=0)
     text(pts2_petit_pl[1]+1000,pts2_petit_pl[2],labels=round(max_var/3,precisionLegRonds),cex=0.9,adj=0)
 

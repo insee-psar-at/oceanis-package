@@ -1,9 +1,10 @@
 export_projet_qgis_fleches_joignantes <-
 function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,colFleche,colBorder,annee)
   {
-    chemin_fonds <- paste0(chemin_fonds,"/")
+    chemin_fonds <- paste0(chemin_fonds,"/layers/")
     
     fond_maille <- read_sf(paste0(chemin_fonds,"fond_maille.shp"))
+    
     xmin=st_bbox(fond_maille)[1]-0.10*(st_bbox(fond_maille)[3]-st_bbox(fond_maille)[1])
     xmax=st_bbox(fond_maille)[3]+0.10*(st_bbox(fond_maille)[3]-st_bbox(fond_maille)[1])
     ymin=st_bbox(fond_maille)[2]-0.10*(st_bbox(fond_maille)[4]-st_bbox(fond_maille)[2])
@@ -61,7 +62,7 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,colFleche,colBor
       #param idcouche, chemincouche, nomcouche
       nomcouche=l[i]
       chemincouche=paste0(chemin_fonds,nomcouche,".shp")
-      chemincoucherelatif=paste0("./",nomcouche,".shp")
+      chemincoucherelatif=paste0("./layers/",nomcouche,".shp")
       
       BLOCCATEGORIES=data.frame()      
       
@@ -132,15 +133,26 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,colFleche,colBor
       bloclayeritem=data.frame(V1=c(bloclayeritem[1,],blocvector[,1],bloclayeritem[3,]))
       BLOCLAYERITEM=rbind(BLOCLAYERITEM,bloclayeritem)
       
+      if (l[i]=="fond_flux_leg")
+      {
+        BLOCLABELING <- balises_qgis()[[12]]
+        BLOCLABELING[55,] <- paste0(substr(BLOCLABELING[55,],1,48),"x_max($geometry) + ((x_max($geometry) - x_min($geometry)) / 10)",substr(BLOCLABELING[55,],103,105))
+        BLOCLABELING[60,] <- paste0(substr(BLOCLABELING[60,],1,48),"y_max($geometry) - ((y_max($geometry) - y_min($geometry)) / 2)",substr(BLOCLABELING[60,],65,67))
+      }else
+      {
+        BLOCLABELING <- data.frame()
+      }
+      
       toto=modif_blocprojectlayers(geometrie,idcouche,chemincoucherelatif,nomcouche,projcouche,attr,typeanalyse)
-      toto=rbind(data.frame(V1=toto[1:13,]),BLOCCATEGORIES,data.frame(V1=toto[15,]),BLOCSYMBOLS,data.frame(V1=toto[17:23,]))
+      toto=rbind(data.frame(V1=toto[1:13,]),BLOCCATEGORIES,data.frame(V1=toto[15,]),data.frame(V1=BLOCSYMBOLS[1:12,]),data.frame(V1=toto[17:20,]),BLOCLABELING,data.frame(V1=toto[21:23,]))
       BLOCPROJECT=rbind(BLOCPROJECT,toto)
     }
     projproj=projcouche
     qgs1=modif_canevas(xmin,xmax,ymin,ymax,projproj,length(l))
     #etape finale
+    blocproperties <- balises_qgis()[[13]]
     BLOCCOMPOSER=data.frame(V1=c(BLOCCOMPOSER[1:43,],BLOCLAYERITEM[,1],BLOCCOMPOSER[45:94,]))
-    canevas_final=data.frame(V1=c(qgs1[1:19,],BLOCLEG[,1],qgs1[21,],BLOCCOMPOSER[,1],qgs1[23,],BLOCPROJECT[,1],qgs1[25:26,]))
+    canevas_final=data.frame(V1=c(qgs1[1:19,],BLOCLEG[,1],qgs1[21,],BLOCCOMPOSER[,1],qgs1[23,],BLOCPROJECT[,1],qgs1[25,],blocproperties[,1],qgs1[26,]))
     colnames(canevas_final)=NULL
-    write.csv(canevas_final,paste0(chemin_fonds,nom_projet,".qgs"),row.names = F, quote = F, fileEncoding = "UTF-8")
+    write.csv(canevas_final,paste0(substr(chemin_fonds,1,nchar(chemin_fonds)-7),nom_projet,".qgs"),row.names = F, quote = F, fileEncoding = "UTF-8")
   }

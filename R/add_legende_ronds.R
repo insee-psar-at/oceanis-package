@@ -2,7 +2,6 @@ add_legende_ronds <-
 function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
   {
     # Verification des parametres
-
     msg_error1<-msg_error2<-msg_error3<-msg_error4 <- NULL
 
     if (any(!any(class(map) %in% "leaflet"), !any(class(map) %in% "htmlwidget"))) if(!any(class(map) %in% "leaflet_proxy")) msg_error1 <- "La carte doit etre un objet leaflet ou leaflet_proxy / "
@@ -16,6 +15,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
     }
 
     if(is.null(titre)) titre <- " "
+    titre<-iconv(titre,"latin1","utf8")
 
     coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
 
@@ -77,7 +77,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
 
         max_var <- map$x$calls[[j]]$args[[4]]$max_var
         max_var <- as.numeric(str_replace_all(max_var,",","."))
-
+        
         lng_init <- lng
         lat_init <- lat
         if(is.null(lng_init) | is.null(lat_init))
@@ -156,25 +156,34 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
 
       ronds_sf_leg <- ronds_leg[[1]]
 
-      # Pour le leaflet en WGS84
-      x1_grand <- st_coordinates(ronds_sf_leg)[which(st_coordinates(ronds_sf_leg)[,4]==1),"X"][which.max(st_coordinates(ronds_sf_leg)[which(st_coordinates(ronds_sf_leg)[,4]==1),"Y"])]
-      y1_grand <- max(st_coordinates(ronds_sf_leg)[which(st_coordinates(ronds_sf_leg)[,4]==1),"Y"])
-      pts1_grand <- c(x1_grand,y1_grand)
-      x2_grand <- x1_grand+(max(st_coordinates(ronds_sf_leg)[which(st_coordinates(ronds_sf_leg)[,4]==1),"X"])-x1_grand)+coeff*0.5
-      y2_grand <- max(st_coordinates(ronds_sf_leg)[which(st_coordinates(ronds_sf_leg)[,4]==1),"Y"])
-      pts2_grand <- c(x2_grand,y2_grand)
-      ligne_grand <- rbind(pts1_grand,pts2_grand)
-
-      x1_petit <- st_coordinates(ronds_sf_leg)[which(st_coordinates(ronds_sf_leg)[,4]==2),"X"][which.max(st_coordinates(ronds_sf_leg)[which(st_coordinates(ronds_sf_leg)[,4]==2),"Y"])]
-      y1_petit <- max(st_coordinates(ronds_sf_leg)[which(st_coordinates(ronds_sf_leg)[,4]==2),"Y"])
-      pts1_petit <- c(x1_petit,y1_petit)
-      x2_petit <- x1_petit+(max(st_coordinates(ronds_sf_leg)[which(st_coordinates(ronds_sf_leg)[,4]==1),"X"])-x1_petit)+coeff*0.5
-      y2_petit <- max(st_coordinates(ronds_sf_leg)[which(st_coordinates(ronds_sf_leg)[,4]==2),"Y"])
-      pts2_petit <- c(x2_petit,y2_petit)
-      ligne_petit <- rbind(pts1_petit,pts2_petit)
-
-      lignes <- st_multilinestring(list(ligne_grand,ligne_petit))
-
+      lignes <- construction_lignes_legende(ronds_leg,coeff,code_epsg)
+      
+      # On ajoute un cadre blanc autour de la legende
+      bbox_ronds <- st_bbox(ronds_leg[[2]])
+      bbox_lignes <- st_bbox(lignes[[2]])
+      rectangle <- c(bbox_ronds[1],bbox_ronds[2],bbox_lignes[3],bbox_ronds[4])
+      large <- rectangle[3]-rectangle[1]
+      rectangle[1] <- rectangle[1] - large / 3
+      rectangle[2] <- rectangle[2] - large / 3
+      rectangle[3] <- rectangle[3] + large / 6 * nchar(max_var)
+      rectangle[4] <- rectangle[4] + large / 2
+      
+      vec <- matrix(c(rectangle[1],rectangle[2],   rectangle[3],rectangle[2],   rectangle[3],rectangle[4],   rectangle[1],rectangle[4],   rectangle[1],rectangle[2]),5,2,byrow=T)
+      rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(code_epsg))
+      
+      rectangle <- st_transform(rectangle, crs = 4326)
+      
+      # leaflet du cadre blanc en 1er
+      map <- addPolygons(map = map,
+                         data = rectangle,
+                         stroke = FALSE,
+                         options = pathOptions(pane = "fond_legende", clickable = F),
+                         fill = T,
+                         fillColor = "white",
+                         fillOpacity = 0.8,
+                         group = "legende_ronds"
+      )
+      
       suppressWarnings(map <- addCircles(map = map,
                                          lng = st_coordinates(st_centroid(ronds_sf_leg))[,1],
                                          lat = st_coordinates(st_centroid(ronds_sf_leg))[,2],
@@ -189,12 +198,13 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
                                          fillColor = "white",
                                          fillOpacity = 1,
                                          group = "legende_ronds",
-                                         layerId = list(code_epsg=code_epsg,nom_fond="fond_ronds_leg_carte")
+                                         layerId = list(code_epsg=code_epsg,nom_fond="fond_ronds_leg")
                               )
       )
 
       # leaflet lignes
-      map <- addPolylines(map = map, data = lignes,
+      map <- addPolylines(map = map,
+                          data = lignes[[1]],
                           stroke = TRUE,
                           opacity = 1,
                           color = "#2B3E50",
@@ -203,12 +213,13 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
                           fill = F,
                           fillOpacity = 1,
                           group = "legende_ronds",
-                          layerId = list(code_epsg=code_epsg,nom_fond="fond_lignes_leg")
+                          layerId = list(code_epsg=code_epsg,nom_fond="fond_lignes")
       )
 
       # leaflet valeur ronds
       map <- addLabelOnlyMarkers(map = map,
-                                 lng = ligne_grand[2,1], lat = ligne_grand[2,2], #ligne_grand
+                                 lng = st_bbox(lignes[[1]][1,])[3],
+                                 lat = st_bbox(lignes[[1]][1,])[4], #ligne_grand
                                  label = as.character(format(round(max_var,precision),big.mark=" ",decimal.mark=",",nsmall=0)),
                                  labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                              style = list(
@@ -220,7 +231,8 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
       )
 
       map <- addLabelOnlyMarkers(map = map,
-                                 lng = ligne_petit[2,1], lat = ligne_petit[2,2], #ligne_petit
+                                 lng = st_bbox(lignes[[1]][2,])[3],
+                                 lat = st_bbox(lignes[[1]][2,])[4], #ligne_petit
                                  label = as.character(format(round(max_var/3,precision),big.mark=" ",decimal.mark=",",nsmall=0)),
                                  labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                              style = list(
@@ -231,24 +243,27 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
                                  layerId = list(code_epsg=code_epsg)
       )
 
-      if(!is.null(titre))
-      {
-        # On ajoute un titre a la legende
-        x_titre_1 <- min(st_coordinates(ronds_sf_leg)[which(st_coordinates(ronds_sf_leg)[,4]==1),"X"])
-        y_titre_1 <- y1_grand+coeff*0.8
-
-        map <- addLabelOnlyMarkers(map = map,
-                                   lng = x_titre_1, lat = y_titre_1,
-                                   label = titre,
-                                   labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
-                                                               style = list(
-                                                                 "color" = "black",
-                                                                 "font-size" = "14px"
-                                                               )),
-                                   group = "legende_ronds",
-                                   layerId = list(code_epsg=code_epsg)
-        )
-      }
+      # leaflet titre
+      
+      rectangle <- st_transform(rectangle, crs = as.numeric(code_epsg))
+      
+      pt_titre <- st_sfc(st_geometry(st_point(c(min(st_coordinates(rectangle)[,"X"]) + large/6,
+                                                max(st_coordinates(rectangle)[,"Y"]) - large/4))),
+                         crs = as.numeric(code_epsg))
+      pt_titre <- st_transform(pt_titre, crs = 4326)
+      
+      map <- addLabelOnlyMarkers(map = map,
+                                 lng = st_coordinates(pt_titre)[1],
+                                 lat = st_coordinates(pt_titre)[2],
+                                 label = titre,
+                                 labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
+                                                             style = list(
+                                                               "color" = "black",
+                                                               "font-size" = "14px"
+                                                             )),
+                                 group = "legende_ronds",
+                                 layerId = list(code_epsg=code_epsg)
+      )
     }
 
     message(simpleMessage(paste0("[INFO] Les coordonn","\u00e9","es de la l\u00e9gende des ronds sont : longitude (x) = ",lng," degr\u00e9 ; latitude (y) = ",lat," degr\u00e9")))

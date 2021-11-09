@@ -3,6 +3,7 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,var_depart_k,var_
   {
     if(is.null(type)) type <- "Ent"
     
+    donnees_k$save <- donnees_k[,var_flux_k]
     donnees_k[,var_flux_k] <- as.numeric(donnees_k[,var_flux_k])
     suppressWarnings(donnees_k <- donnees_k[!is.na(donnees_k[,var_flux_k]),])
     
@@ -28,7 +29,7 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,var_depart_k,var_
       
       base$typeFlux <- -1
       
-      base <- base[,c(var_depart_k,var_arrivee_k,var_flux_k,"X.R","Y.R","X.T","Y.T","typeFlux")]
+      base <- base[,c(var_depart_k,var_arrivee_k,var_flux_k,"save","X.R","Y.R","X.T","Y.T","typeFlux")]
     }
     if(type=="Ent")
     {
@@ -43,7 +44,7 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,var_depart_k,var_
       
       base$typeFlux <- 1
       
-      base <- base[,c(var_depart_k,var_arrivee_k,var_flux_k,"X.R","Y.R","X.T","Y.T","typeFlux")]
+      base <- base[,c(var_depart_k,var_arrivee_k,var_flux_k,"save","X.R","Y.R","X.T","Y.T","typeFlux")]
     }
     
     if(type=="Sol")
@@ -62,7 +63,7 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,var_depart_k,var_
       if(nrow(temp1)>0)
       {
         temp1$typeFlux <- 1
-        temp1 <- temp1[,c(var_depart_k,var_arrivee_k,var_flux_k,"X.R","Y.R","X.T","Y.T","typeFlux")]
+        temp1 <- temp1[,c(var_depart_k,var_arrivee_k,var_flux_k,"save","X.R","Y.R","X.T","Y.T","typeFlux")]
       }
       
       temp2 <- base[base[,var_flux_k]<0,]
@@ -83,7 +84,7 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,var_depart_k,var_
       if(nrow(temp2)>0)
       {
         temp2$typeFlux <- -1
-        temp2 <- temp2[,c(var_depart_k,var_arrivee_k,var_flux_k,"X.R","Y.R","X.T","Y.T","typeFlux")]
+        temp2 <- temp2[,c(var_depart_k,var_arrivee_k,var_flux_k,"save","X.R","Y.R","X.T","Y.T","typeFlux")]
       }
       
       temp2 <- temp2[rev(order(temp2[,var_flux_k])),]
@@ -165,7 +166,7 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,var_depart_k,var_
       l[[i]] <- st_polygon(list(fleche))
     }
     
-    fleche <- st_sf(cbind(base[,c(var_depart_k,var_arrivee_k,var_flux_k)],geometry=st_sfc(l)), crs=st_crs(fond_carto_k))
+    fleche <- st_sf(cbind(base[,c(var_depart_k,var_arrivee_k,var_flux_k,"save")],geometry=st_sfc(l)), crs=st_crs(fond_carto_k))
     
     return(list(analyse=fleche))
   }

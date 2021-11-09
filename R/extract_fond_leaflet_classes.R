@@ -19,9 +19,9 @@ function(map)
         if(map$x$calls[[i]]$args[4]=="map-source") idx_source <- i
       }
 
-      if(map$x$calls[[i]]$method %in% "addRectangles")
+      if(map$x$calls[[i]]$method %in% "addPolygons")
       {
-        if(map$x$calls[[i]]$args[[6]]=="legende_classes") idx_legende <- c(idx_legende,i)
+        if(map$x$calls[[i]]$args[[3]]=="legende_classes_rectangle") idx_legende <- c(idx_legende,i)
       }
       if(!is.null(idx_legende)) # la legende existe
       {
@@ -103,7 +103,10 @@ function(map)
             }
             if(map$x$calls[[idx_legende[i]]]$method %in% "addPolygons")
             {
-              palette <- c(palette,map$x$calls[[idx_legende[i]]]$args[4][[1]]$fillColor)
+              if(map$x$calls[[idx_legende[i]]]$args[[3]] != "legende_classes_rectangle")
+              {
+                palette <- c(palette,map$x$calls[[idx_legende[i]]]$args[4][[1]]$fillColor)
+              }
             }
           }
         }

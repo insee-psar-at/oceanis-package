@@ -1,5 +1,5 @@
 
-# oceanis-package (version 1.8.1)
+# oceanis-package (version 1.8.3)
 
 <!-- badges: start -->
 [![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](https://github.com/SNStatComp/awesome-official-statistics-software)

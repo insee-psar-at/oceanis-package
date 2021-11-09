@@ -24,6 +24,11 @@ function(map)
         if(map$x$calls[[i]]$args[[5]] %in% c("carte_ronds","carte_ronds_elargi")) idx_carte_ronds <- c(idx_carte_ronds,i)
       }
 
+      if(map$x$calls[[i]]$method %in% "addPolygons")
+      {
+        if(map$x$calls[[i]]$args[[3]]=="legende_ronds") idx_legende_ronds <- c(idx_legende_ronds,i)
+      }
+      
       if(map$x$calls[[i]]$method %in% "addCircles")
       {
         if(map$x$calls[[i]]$args[[5]]=="legende_ronds") idx_legende_ronds <- c(idx_legende_ronds,i)
@@ -83,18 +88,18 @@ function(map)
         ronds_pl <- cbind(COL=col,ronds_pl)
         varVolume <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$var_volume
         val <- map$x$calls[[idx_carte_ronds[i]]]$args[[4]]$analyse$donnees[,varVolume]
-        ronds_pl <- cbind(VAL=val,ronds_pl)
+        ronds_pl <- cbind(ETI_VAL=val,ronds_pl)
 
         fond_pos <- NULL
         fond_neg <- NULL
 
-        if(nrow(ronds_pl[ronds_pl$VAL>0,])>0)
+        if(nrow(ronds_pl[ronds_pl$ETI_VAL>0,])>0)
         {
-          fond_pos <- ronds_pl[ronds_pl$VAL>0,]
+          fond_pos <- ronds_pl[ronds_pl$ETI_VAL>0,]
         }
-        if(nrow(ronds_pl[ronds_pl$VAL<0,])>0)
+        if(nrow(ronds_pl[ronds_pl$ETI_VAL<0,])>0)
         {
-          fond_neg <- ronds_pl[ronds_pl$VAL<0,]
+          fond_neg <- ronds_pl[ronds_pl$ETI_VAL<0,]
         }
 
         if(!is.null(fond_pos))
@@ -123,37 +128,10 @@ function(map)
 
           ronds_pl_leg <- ronds_pl
           val <- c(map$x$calls[[idx_legende_ronds[i]]]$args[[7]][1],map$x$calls[[idx_legende_ronds[i]]]$args[[7]][2])
-          ronds_pl_leg <- cbind(VAL=val,ronds_pl_leg)
+          ronds_pl_leg <- cbind(ETI_VAL=val,ronds_pl_leg)
 
           list_fonds[[l]] <- ronds_pl_leg
           nom_fonds <- c(nom_fonds,map$x$calls[[idx_legende_ronds[i]]]$args[[4]]$nom_fond)
-          l <- l+1
-        }
-
-        if(map$x$calls[[idx_legende_ronds[i]]]$method %in% "addPolylines")
-        {
-          # Pour l'export Qgis en projection locale
-          x1_grand_pl <- st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"X"][which.max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"Y"])]
-          y1_grand_pl <- max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"Y"])
-          pts1_grand_pl <- c(x1_grand_pl,y1_grand_pl)
-          x2_grand_pl <- x1_grand_pl+(max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"X"])-x1_grand_pl)+(max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"X"])-min(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"X"]))/3
-          y2_grand_pl <- max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"Y"])
-          pts2_grand_pl <- c(x2_grand_pl,y2_grand_pl)
-          ligne_grand_pl <- rbind(pts1_grand_pl,pts2_grand_pl)
-
-          x1_petit_pl <- x1_grand_pl
-          y1_petit_pl <- max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==2),"Y"])
-          pts1_petit_pl <- c(x1_petit_pl,y1_petit_pl)
-          x2_petit_pl <- x2_grand_pl
-          y2_petit_pl <- max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==2),"Y"])
-          pts2_petit_pl <- c(x2_petit_pl,y2_petit_pl)
-          ligne_petit_pl <- rbind(pts1_petit_pl,pts2_petit_pl)
-
-          lignes_pl <- st_sf(st_geometry(st_multilinestring(list(ligne_grand_pl,ligne_petit_pl))))
-          lignes_pl <- st_set_crs(lignes_pl,as.numeric(map$x$calls[[idx_legende_ronds[i]]]$args[[2]]$code_epsg))
-
-          list_fonds[[l]] <- lignes_pl
-          nom_fonds <- c(nom_fonds,map$x$calls[[idx_legende_ronds[i]]]$args[[2]]$nom_fond)
           l <- l+1
         }
       }

@@ -187,8 +187,8 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
 
     long_pl <- large_pl*2
 
-    flux_leg <- flux_legende_joignantes_pl(fond_points_WGS84$lng,fond_points_WGS84$lat,long_pl,large_pl,code_epsg)
-    flux_leg <- cbind(flux_leg,VALEUR=c(vmax,vmax/3))
+    flux_leg <- fleche_legende(fond_points_WGS84$lng,fond_points_WGS84$lat,long_pl,large_pl,vmax,code_epsg)[[5]]
+    flux_leg <- cbind(flux_leg,ETI_VAL=c(vmax,vmax/3))
 
     if(!is.null(etiquettes))
     {

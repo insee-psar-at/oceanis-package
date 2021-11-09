@@ -9,9 +9,11 @@ function(map,cheminDossier,nomFichier,titre1="",titre2="",source="")
 
     if(is.null(list_fonds)) stop(simpleError("La legende de la typologie n'a pas ete creee. Veuillez svp utiliser la fonction add_legende_typo(map) pour ajouter une legende de typologie a votre carte."))
 
+    dir.create(paste0(rep_sortie,"/layers"),showWarnings = F)
+    
     for(i in 1:length(list_fonds[[1]]))
     {
-      suppressWarnings(st_write(list_fonds[[1]][[i]], paste0(rep_sortie,"/",list_fonds[[2]][[i]],".shp"), delete_dsn = TRUE, quiet = TRUE))
+      suppressWarnings(st_write(list_fonds[[1]][[i]], paste0(rep_sortie,"/layers/",list_fonds[[2]][[i]],".shp"), delete_dsn = TRUE, quiet = TRUE))
     }
 
     annee <- format(Sys.time(), format = "%Y")

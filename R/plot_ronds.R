@@ -182,7 +182,6 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
 
     ronds_pl_leg <- ronds_leg[[2]]
 
-    # Pour l'export Qgis en projection locale
     x1_grand_pl <- st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"X"][which.max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"Y"])]
     y1_grand_pl <- max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"Y"])
     pts1_grand_pl <- c(x1_grand_pl,y1_grand_pl)
@@ -208,7 +207,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
     fond_leg_pr <- st_sf(geometry=st_sfc(st_geometry(fond_leg_pr),crs=st_crs(fondMaille)))
     fond_leg_ronds <- rbind(fond_leg_gr,fond_leg_pr)
 
-    fond_leg_ronds <- st_sf(VAR=c(max_var,max_var/3),geometry=st_sfc(st_geometry(fond_leg_ronds),crs=st_crs(fondMaille)))
+    fond_leg_ronds <- st_sf(ETI_VAL=c(max_var,max_var/3),geometry=st_sfc(st_geometry(fond_leg_ronds),crs=st_crs(fondMaille)))
     names(fond_leg_ronds) <- c(varVolume,"geometry")
 
     x_marge <- (st_bbox(fondMaille)$xmax-st_bbox(fondMaille)$xmin)/20
@@ -285,7 +284,7 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
 
     if(cadreLeg) suppressWarnings(plot(bbox_leg_ronds,add=T,col="white",border="white",lwd=1))
 
-    plot(st_geometry(fond_leg_ronds),add=T,col="transparent",border=colBorder)
+    plot(st_geometry(fond_leg_ronds),add=T,col="transparent",border="black")
     text(pts2_grand_pl[1]+1000,pts2_grand_pl[2],labels=round(max_var,precisionLegRonds),cex=0.9,adj=0)
     text(pts2_petit_pl[1]+1000,pts2_petit_pl[2],labels=round(max_var/3,precisionLegRonds),cex=0.9,adj=0)
 

@@ -91,7 +91,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                               sidebarLayout(
 
                                 sidebarPanel(width = 3,
-                                             style = "overflow-y:scroll; min-height: 840px; max-height: 840px",
+                                             style = "overflow-y:scroll; min-height: 1000px; max-height: 1000px",
                                              h4(HTML("<b><font color=#95BAE2>VARIABLES</font></b>")),
                                              uiOutput("variable_typo_ty"),
                                              tags$hr(style="border: 5px solid #5182B6"), #337ab7
@@ -156,13 +156,13 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                 ),
                                 tabsetPanel(id="onglets_ty",
                                             tabPanel(title=HTML("<b>Carte</b>"),value="carte",
-                                                     leafletOutput("mymap_ty",width="100%",height = 800)),
+                                                     leafletOutput("mymap_ty",width="112%",height = 950)),
                                             tabPanel(title=HTML(paste0("<b>Donn","\u00e9","es/Maille</b>")),value="donnees",
                                                      h5("S\u00e9lectionnez une ou plusieurs lignes pour ensuite les visualiser sur la carte."),
-                                                     DT::dataTableOutput("mydonnees_ty",width="100%",height = 800)),
+                                                     DT::dataTableOutput("mydonnees_ty",width="112%",height = 950)),
                                             tabPanel(title=HTML("<b>Contour</b>"),value="contour",
                                                      h5("S\u00e9lectionnez une ou plusieurs lignes pour ensuite les visualiser sur la carte."),
-                                                     DT::dataTableOutput("mycontour_ty",width="100%",height = 800))
+                                                     DT::dataTableOutput("mycontour_ty",width="112%",height = 950))
                                 )
                               )
     )
@@ -337,9 +337,18 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
                                                         paste0(input$sortie_qgis_ty_id,".zip")
                                                       },
                                                       content = function(file){
+                                                        owd <- setwd(tempdir())
+                                                        on.exit(setwd(owd))
+                                                        
+                                                        rep_sortie <- dirname(file)
+                                                        
+                                                        dir.create("layers",showWarnings = F)
+                                                        
                                                         files <- EXPORT_PROJET_QGIS_TY(file)
-
-                                                        zip(file,files, flags = "-j9X")
+                                                        
+                                                        zip::zip(zipfile = paste0("./",basename(file)),
+                                                                 files = files,
+                                                                 mode = "cherry-pick")
                                                       }
       )
 
@@ -349,8 +358,10 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         showModal(modalDialog(HTML("<i class=\"fa fa-spinner fa-spin fa-2x fa-fw\"></i> <font size=+1>Export du projet Qgis en cours...</font> "), size="m", footer=NULL, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
 
         sortie <- input$sortie_qgis_ty_id
+        
+        files <- c("layers", paste0(sortie,".qgs"))
+        
         rep_sortie <- dirname(file)
-        files <- c(paste0(rep_sortie,"/",sortie,".qgs"))
 
         nb_typo <- length(unique(analyse_ty()[[1]]$classe))
 
@@ -380,21 +391,13 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         fond_france <- st_transform(fond_habillage_ty()[[1]],crs = as.numeric(code_epsg_ty()))
         fond_pays <- st_transform(fond_habillage_ty()[[2]],crs = as.numeric(code_epsg_ty()))
 
-        suppressWarnings(st_write(fond_typo, paste0(rep_sortie,"/fond_maille_typo_carte.shp"), delete_dsn = TRUE, quiet = TRUE))
-        suppressWarnings(st_write(fond_contour,paste0(rep_sortie,"/fond_contour.shp"), delete_dsn = TRUE, quiet = TRUE))
-        if(exists("fond_territoire")) if(!is.null(fond_territoire)) suppressWarnings(st_write(fond_territoire, paste0(rep_sortie,"/fond_territoire.shp"), delete_dsn = TRUE, quiet = TRUE))
-        if(exists("fond_departement")) if(!is.null(fond_departement)) suppressWarnings(st_write(fond_departement, paste0(rep_sortie,"/fond_departement.shp"), delete_dsn = TRUE, quiet = TRUE))
-        if(exists("fond_region")) if(!is.null(fond_region)) suppressWarnings(st_write(fond_region,paste0(rep_sortie,"/fond_region.shp"), delete_dsn = TRUE, quiet = TRUE))
-        suppressWarnings(st_write(fond_france,paste0(rep_sortie,"/fond_france.shp"), delete_dsn = TRUE, quiet = TRUE))
-        if(exists("fond_pays")) if(!is.null(fond_pays)) suppressWarnings(st_write(fond_pays,paste0(rep_sortie,"/fond_pays.shp"), delete_dsn = TRUE, quiet = TRUE))
-
-        files <- c(paste0(rep_sortie,"/fond_maille_typo_carte.shp"),paste0(rep_sortie,"/fond_maille_typo_carte.dbf"),paste0(rep_sortie,"/fond_maille_typo_carte.prj"),paste0(rep_sortie,"/fond_maille_typo_carte.shx"),files)
-        files <- c(paste0(rep_sortie,"/fond_contour.shp"),paste0(rep_sortie,"/fond_contour.dbf"),paste0(rep_sortie,"/fond_contour.prj"),paste0(rep_sortie,"/fond_contour.shx"),files)
-        if(exists("fond_territoire")) if(!is.null(fond_territoire)) files <- c(paste0(rep_sortie,"/fond_territoire.shp"),paste0(rep_sortie,"/fond_territoire.dbf"),paste0(rep_sortie,"/fond_territoire.prj"),paste0(rep_sortie,"/fond_territoire.shx"),files)
-        if(exists("fond_departement")) if(!is.null(fond_departement)) files <- c(paste0(rep_sortie,"/fond_departement.shp"),paste0(rep_sortie,"/fond_departement.dbf"),paste0(rep_sortie,"/fond_departement.prj"),paste0(rep_sortie,"/fond_departement.shx"),files)
-        if(exists("fond_region")) if(!is.null(fond_region)) files <- c(paste0(rep_sortie,"/fond_region.shp"),paste0(rep_sortie,"/fond_region.dbf"),paste0(rep_sortie,"/fond_region.prj"),paste0(rep_sortie,"/fond_region.shx"),files)
-        files <- c(paste0(rep_sortie,"/fond_france.shp"),paste0(rep_sortie,"/fond_france.dbf"),paste0(rep_sortie,"/fond_france.prj"),paste0(rep_sortie,"/fond_france.shx"),files)
-        if(exists("fond_pays")) if(!is.null(fond_pays)) files <- c(paste0(rep_sortie,"/fond_pays.shp"),paste0(rep_sortie,"/fond_pays.dbf"),paste0(rep_sortie,"/fond_pays.prj"),paste0(rep_sortie,"/fond_pays.shx"),files)
+        suppressWarnings(st_write(fond_typo, paste0(rep_sortie,"/layers/fond_maille_typo_carte.shp"), delete_dsn = TRUE, quiet = TRUE))
+        suppressWarnings(st_write(fond_contour,paste0(rep_sortie,"/layers/fond_contour.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_territoire")) if(!is.null(fond_territoire)) suppressWarnings(st_write(fond_territoire, paste0(rep_sortie,"/layers/fond_territoire.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_departement")) if(!is.null(fond_departement)) suppressWarnings(st_write(fond_departement, paste0(rep_sortie,"/layers/fond_departement.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_region")) if(!is.null(fond_region)) suppressWarnings(st_write(fond_region,paste0(rep_sortie,"/layers/fond_region.shp"), delete_dsn = TRUE, quiet = TRUE))
+        suppressWarnings(st_write(fond_france,paste0(rep_sortie,"/layers/fond_france.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_pays")) if(!is.null(fond_pays)) suppressWarnings(st_write(fond_pays,paste0(rep_sortie,"/layers/fond_pays.shp"), delete_dsn = TRUE, quiet = TRUE))
 
         chemin_fonds <- rep_sortie
         titre1 <- paste0(input$titre1_qgis_ty_id,"\n")
@@ -405,15 +408,14 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         titre_leg_typo <- input$titre_typo_legende_ty_id
 
         l <- c()
-        if(exists("fond_territoire")) l <- "fond_territoire"
+        
+        l <- c(l,"fond_maille_typo_carte")
+        
+        if(exists("fond_territoire")) l <- c(l,"fond_territoire")
         if(exists("fond_departement")) l <- c(l,"fond_departement")
         if(exists("fond_region")) l <- c(l,"fond_region")
 
-        l=c("fond_france",
-            "fond_contour",
-            l,
-            "fond_maille_typo_carte"
-        )
+        l <- c(l,"fond_france","fond_contour")
 
         if(exists("fond_pays")) l <- c(l,"fond_pays")
 
@@ -451,6 +453,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
 
         analyse <- analyse[[1]]
         analyse[,"TXT1"] <- paste0("<b> <font color=#2B3E50>",format(as.data.frame(analyse)[,varTypo], big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
+        analyse <- analyse[order(as.data.frame(analyse)[,varTypo]),]
         analyse_WGS84 <- st_transform(analyse,crs=4326)
         return(list(analyse,analyse_WGS84))
       })
@@ -587,12 +590,24 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         {
           showModal(modalDialog(HTML("<i class=\"fa fa-spinner fa-spin fa-2x fa-fw\"></i><font size=+1>\u00c9laboration de la carte...</font> "), size="m", footer=NULL, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
 
+          if(is.null(fondEtranger))
+          {
+            proj4 <- st_crs(fondMaille)$proj4string
+          }else{
+            proj4 <- st_crs(fondEtranger)$proj4string
+          }
+          
           # Construction de la map par defaut
 
           m <- leaflet(padding = 0,
                        options = leafletOptions(
                          preferCanvas = TRUE,
-                         transition = 2
+                         transition = 2,
+                         crs = leafletCRS(crsClass = "L.Proj.CRS",
+                                          code = paste0("EPSG:", code_epsg_ty()),
+                                          proj4def = proj4,
+                                          resolutions = 2^(16:1)
+                         )
                        )) %>%
 
             setMapWidgetStyle(list(background = "#AFC9E0")) %>%
@@ -613,15 +628,14 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
             # Pour gerer l'ordre des calques
             addMapPane(name = "fond_pays", zIndex = 401) %>%
             addMapPane(name = "fond_france", zIndex = 402) %>%
-            addMapPane(name = "fond_habillage", zIndex = 403) %>%
-            addMapPane(name = "fond_dep", zIndex = 404) %>%
-            addMapPane(name = "fond_reg", zIndex = 405) %>%
-            addMapPane(name = "fond_territoire", zIndex = 406) %>%
-            addMapPane(name = "fond_duo2", zIndex = 407) %>%
-            addMapPane(name = "fond_duo1", zIndex = 408) %>%
-            addMapPane(name = "selection", zIndex = 409) %>%
+            addMapPane(name = "fond_dep", zIndex = 403) %>%
+            addMapPane(name = "fond_reg", zIndex = 404) %>%
+            addMapPane(name = "fond_territoire", zIndex = 405) %>%
+            addMapPane(name = "fond_duo2", zIndex = 406) %>%
+            addMapPane(name = "fond_duo1", zIndex = 407) %>%
+            addMapPane(name = "selection", zIndex = 408) %>%
 
-            addMapPane(name = "fond_legende", zIndex = 410)
+            addMapPane(name = "fond_legende", zIndex = 409)
 
           # AFFICHAGE DES FONDS D'HABILLAGE
 
@@ -669,7 +683,6 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           )
 
           # AFFICHAGE DE LA MAILLE ET DE L'ANALYSE
-
           m <- addPolygons(map = m, data = analyse_ty()[[2]], opacity = 1,
                            stroke = TRUE, color = "white", weight = 1,
                            options = pathOptions(pane = "fond_duo1", clickable = T),
@@ -681,7 +694,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
           )
 
           removeModal()
-
+          
           showModal(modalDialog(HTML("<font size=+1>Veuillez patientez svp, la carte va s'afficher dans quelques secondes...<br><br><i class=\"fa fa-hand-pointer-o fa-fw\"></i><b>Double-cliquez</b> ensuite sur la carte pour afficher la l\u00e9gende.</font> "), size="m", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
 
           return(m)
@@ -861,101 +874,140 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         if(input$affiche_legende_ty_id==FALSE) return(NULL)
 
         if(is.null(lon_lat_ty()[[1]])) return(NULL)
-
+        
         proxy <- leafletProxy("mymap_ty")
         proxy <- clearGroup(map=proxy, group="leg")
         proxy <- clearMarkers(map=proxy)
 
         zoom <- as.numeric(input$mymap_ty_zoom)
         coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-
-        position_leg <- t(data.frame(c(lon_lat_ty()[[1]],lon_lat_ty()[[2]])))
-
+        
+        pt <- st_sfc(st_geometry(st_point(c(lon_lat_ty()[[1]],lon_lat_ty()[[2]]))), crs = 4326)
+        pt <- st_transform(pt, crs = as.numeric(code_epsg_ty()))
+        coord_pt <- st_coordinates(pt)[1:2]
+        
+        position_leg <- t(data.frame(c(coord_pt[1],coord_pt[2])))
+        
         # On cree les rectangles
         nb_typo <- length(unique(analyse_ty()[[1]]$classe))
-
+        
+        large <- as.numeric((st_bbox(fondMaille)[4] - st_bbox(fondMaille)[2]) / 20)
+        
         for(i in 1:nb_typo)
         {
           # Coordonnees du point haut/gauche des rectangles de la legende
           x_coord_rectangle <- position_leg[1]
           if(i==1) #1er rectangle
           {
-            y_coord_rectangle <- position_leg[2]-coeff
+            y_coord_rectangle <- position_leg[2]
           }else
           {
-            y_coord_rectangle <- y_coord_rectangle-coeff*0.7
+            y_coord_rectangle <- y_coord_rectangle - large - large / 4
           }
-          assign(paste0("rectangle_",i),list(matrix(c(x_coord_rectangle,y_coord_rectangle,x_coord_rectangle+coeff*1,y_coord_rectangle,x_coord_rectangle+coeff*1,y_coord_rectangle+coeff*0.5,x_coord_rectangle,y_coord_rectangle+coeff*0.5,x_coord_rectangle,y_coord_rectangle),ncol=2, byrow=TRUE)))
+          assign(paste0("rectangle_",i),st_sfc(st_polygon(list(matrix(c(x_coord_rectangle,               y_coord_rectangle,
+                                                                        x_coord_rectangle + large * 1.5, y_coord_rectangle,
+                                                                        x_coord_rectangle + large * 1.5, y_coord_rectangle - large,
+                                                                        x_coord_rectangle,               y_coord_rectangle - large,
+                                                                        x_coord_rectangle,               y_coord_rectangle),
+                                                                      ncol=2, byrow=TRUE))),
+                                               crs = as.numeric(code_epsg_ty())))
         }
 
         # On ajoute un cadre blanc autour de la legende
-        y_coord_rectangle <- min(get(paste0("rectangle_",nb_typo))[[1]][,2])
-
+        
+        typo_leg_texte <- c()
+        for(i in 1:nb_typo)
+        {
+          if(is.null(input[[paste0("lib_typo_", i,"_ty_id")]]))
+          {
+            typo_leg_texte <- c(typo_leg_texte, sort(unique(analyse_ty()[[1]]$valeur))[i])
+          }else
+          {
+            typo_leg_texte <- c(typo_leg_texte, input[[paste0("lib_typo_", i,"_ty_id")]])
+          }
+        }
+        
+        ltext <- max(nchar(typo_leg_texte)) / 2
+        
+        vec <- matrix(c(position_leg[1] - large / 2,                     position_leg[2] + large * 2,
+                        position_leg[1] + large * 1.5 + (large * ltext), position_leg[2] + large * 2,
+                        position_leg[1] + large * 1.5 + (large * ltext), position_leg[2] - large * (nb_typo + 3.5),
+                        position_leg[1] - large / 2,                     position_leg[2] - large * (nb_typo + 3.5),
+                        position_leg[1] - large / 2,                     position_leg[2] + large * 2),
+                      5,2,byrow=T)
+        
+        rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(code_epsg_ty()))
+        
+        rectangle <- st_transform(rectangle, crs = 4326)
+        
         # leaflet du cadre blanc en 1er
-        proxy <- addRectangles(map = proxy,
-                               lng1 = position_leg[1]-coeff*0.5, lat1 = position_leg[2]+coeff*0.5, #x_titre_1 et y_titre_2
-                               lng2 = x_coord_rectangle+coeff*6, lat2 = y_coord_rectangle-coeff*0.8,
-                               stroke = TRUE,
-                               color = paste0("#2B3E50", ";background: #ffffff;
-                                              border-left:2px solid #2B3E50;
-                                              border-right:2px solid #2B3E50;
-                                              border-top:2px solid #2B3E50;
-                                              border-bottom:2px solid #2B3E50;
-                                              border-radius: 5%"),
-                               weight = 1,
-                               options = pathOptions(pane = "fond_legende", clickable = F),
-                               fill = T,
-                               fillColor = "white",
-                               fillOpacity = 0.8,
-                               group="leg"
-                               )
 
+        proxy <- addPolygons(map = proxy,
+                             data = rectangle,
+                             stroke = FALSE,
+                             options = pathOptions(pane = "fond_legende", clickable = F),
+                             fill = T,
+                             fillColor = "white",
+                             fillOpacity = 0.8,
+                             group = "leg"
+        )
+        
         palette <- unique(palette_ty()[order(palette_ty()$valeur),"col"])
-
+        
         for(i in 1: nb_typo)
         {
-          if(is.null(input$lib_typo_1_ty_id))
+          proxy <- addPolygons(map = proxy,
+                               data = st_transform(get(paste0("rectangle_",i)), crs = 4326),
+                               stroke = FALSE,
+                               options = pathOptions(pane = "fond_legende", clickable = F),
+                               fill = T,
+                               fillColor = palette[i],
+                               fillOpacity = 1,
+                               group = "leg"
+          )
+
+          pt_label <- st_sfc(st_geometry(st_point(c(max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1]) + large / 10,
+                                                    mean(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])))),
+                       crs = as.numeric(code_epsg_ty()))
+          pt_label <- st_transform(pt_label, crs = 4326)
+          
+          if(is.null(input[[paste0("lib_typo_", i,"_ty_id")]]))
           {
             typo_leg_texte <- sort(unique(analyse_ty()[[1]]$valeur))[i]
           }else
           {
             typo_leg_texte <- input[[paste0("lib_typo_", i,"_ty_id")]]
           }
-
-          proxy <- addPolygons(map = proxy, data = st_polygon(get(paste0("rectangle_",i))),
-                               stroke = FALSE,
-                               options = pathOptions(pane = "fond_legende", clickable = F),
-                               fill = T,
-                               fillColor = palette[i],
-                               fillOpacity = 1,
-                               group="leg"
-          )
-
+          
           proxy <- addLabelOnlyMarkers(map = proxy,
-                                       lng = (max(get(paste0("rectangle_",i))[[1]][,1])+coeff*0.1), lat = mean(get(paste0("rectangle_",i))[[1]][,2]),
+                                       lng = st_coordinates(pt_label)[1],
+                                       lat = st_coordinates(pt_label)[2],
                                        label = typo_leg_texte,
                                        labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                                    style = list(
                                                                      "color" = "black",
                                                                      "font-size" = "12px"
                                                                    )),
-                                       group="leg"
+                                       group = "leg"
           )
         }
-
+        
         # leaflet titre
-        x_titre_2 <- min(st_coordinates(st_polygon(get("rectangle_1")))[,"X"])
-        y_titre_2 <- max(st_coordinates(st_polygon(get("rectangle_1")))[,"Y"])+coeff*0.2
-
+        pt_titre <- st_sfc(st_geometry(st_point(c(min(st_coordinates(pt)[,"X"]),
+                                                  max(st_coordinates(pt)[,"Y"]) + large))),
+                           crs = as.numeric(code_epsg_ty()))
+        pt_titre <- st_transform(pt_titre, crs = 4326)
+        
         proxy <- addLabelOnlyMarkers(map = proxy,
-                                     lng = x_titre_2, lat = y_titre_2,
+                                     lng = st_coordinates(pt_titre)[1],
+                                     lat = st_coordinates(pt_titre)[2],
                                      label = input$titre_typo_legende_ty_id,
                                      labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                                  style = list(
                                                                    "color" = "black",
                                                                    "font-size" = "14px"
                                                                  )),
-                                     group="leg"
+                                     group = "leg"
         )
       })
 
@@ -981,21 +1033,23 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
 
           if(!is.null(fondSuppl))
           {
-            if(input$ajout_territoire_ty_id)
+            if(isolate(input$ajout_territoire_ty_id))
             {
-              m_save <- addPolygons(map = m_save, data = fond_territoire_ty(),
+              m_save <- addPolygons(map = m_save,
+                                    data = isolate(fond_territoire_ty()),
                                     stroke = TRUE, color = "#BFBFBF", opacity = 1,
                                     weight = 0.5,
                                     options = pathOptions(pane = "fond_territoire", clickable = T),
-                                    popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fond_territoire_ty())[,"LIBELLE"], "</font> </b>"),
+                                    popup = paste0("<b> <font color=#2B3E50>",as.data.frame(isolate(fond_territoire_ty()))[,"LIBELLE"], "</font> </b>"),
                                     fill = T, fillColor = "white", fillOpacity = 0.001
               )
             }
           }
 
-          if(input$ajout_reg_ty_id)
+          if(isolate(input$ajout_reg_ty_id))
           {
-            m_save <- addPolygons(map = m_save, data = fond_region_ty(),
+            m_save <- addPolygons(map = m_save,
+                                  data = isolate(fond_region_ty()),
                                   stroke = TRUE, color = "grey", opacity = 1,
                                   weight = 1.5,
                                   options = pathOptions(pane = "fond_reg", clickable = F),
@@ -1003,9 +1057,10 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
             )
           }
 
-          if(input$ajout_dep_ty_id)
+          if(isolate(input$ajout_dep_ty_id))
           {
-            m_save <- addPolygons(map = m_save, data = fond_departement_ty(),
+            m_save <- addPolygons(map = m_save,
+                                  data = isolate(fond_departement_ty()),
                                   stroke = TRUE, color = "grey", opacity = 1,
                                   weight = 0.5,
                                   options = pathOptions(pane = "fond_dep", clickable = F),
@@ -1015,23 +1070,25 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
 
           i <- 1 #pour gerer l'ordre des fonds dans le pane
 
-          for(fond in liste_fonds_ty$a)
+          for(fond in isolate(liste_fonds_ty$a))
           {
             if(fond=="analyse/maille")
             {
-              m_save <- addPolygons(map = m_save, data = analyse_ty()[[2]], opacity = 1,
+              m_save <- addPolygons(map = m_save,
+                                    data = isolate(analyse_ty())[[2]], opacity = 1,
                                     stroke = TRUE, color = "white", weight = 1,
                                     options = pathOptions(pane = paste0("fond_duo",i), clickable = T),
-                                    popup = paste0("<b> <font color=#2B3E50>",as.data.frame(analyse_ty()[[2]])[,"LIBELLE"], "</font> </b><br><b><font color=#2B3E50>",varTypo," : </font></b>",analyse_ty()[[2]]$TXT1,"<br>"),
+                                    popup = paste0("<b> <font color=#2B3E50>",as.data.frame(isolate(analyse_ty())[[2]])[,"LIBELLE"], "</font> </b><br><b><font color=#2B3E50>",varTypo," : </font></b>",isolate(analyse_ty())[[2]]$TXT1,"<br>"),
                                     fill = T,
-                                    fillColor = palette_ty()$col,
+                                    fillColor = isolate(palette_ty())$col,
                                     fillOpacity = 1
               )
             }
 
             if(fond=="contour")
             {
-              m_save <- addPolygons(map = m_save, data = fond_select_contour_ty(),
+              m_save <- addPolygons(map = m_save,
+                                    data = isolate(fond_select_contour_ty()),
                                     stroke = TRUE, weight = 5,
                                     color="black", opacity = 1,
                                     options = pathOptions(pane = paste0("fond_duo",i), clickable = T),
@@ -1042,92 +1099,136 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
             i <- i + 1
           }
 
-          zoom <- as.numeric(input$mymap_ty_zoom)
+          zoom <- as.numeric(isolate(input$mymap_ty_zoom))
           coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
 
-          position_leg <- t(data.frame(c(lon_lat_ty()[[1]],lon_lat_ty()[[2]])))
-
+          pt <- st_sfc(st_geometry(st_point(c(isolate(lon_lat_ty())[[1]],isolate(lon_lat_ty())[[2]]))), crs = 4326)
+          pt <- st_transform(pt, crs = as.numeric(code_epsg_ty()))
+          coord_pt <- st_coordinates(pt)[1:2]
+          
+          position_leg <- t(data.frame(c(coord_pt[1],coord_pt[2])))
+          
           # On cree les rectangles
-          nb_typo <- length(unique(analyse_ty()[[1]]$classe))
-
+          nb_typo <- length(unique(isolate(analyse_ty())[[1]]$classe))
+          
+          large <- as.numeric((st_bbox(fondMaille)[4] - st_bbox(fondMaille)[2]) / 20)
+          
           for(i in 1:nb_typo)
           {
             # Coordonnees du point haut/gauche des rectangles de la legende
             x_coord_rectangle <- position_leg[1]
             if(i==1) #1er rectangle
             {
-              y_coord_rectangle <- position_leg[2]-coeff
+              y_coord_rectangle <- position_leg[2]
             }else
             {
-              y_coord_rectangle <- y_coord_rectangle-coeff*0.7
+              y_coord_rectangle <- y_coord_rectangle - large - large / 4
             }
-            assign(paste0("rectangle_",i),list(matrix(c(x_coord_rectangle,y_coord_rectangle,x_coord_rectangle+coeff*1,y_coord_rectangle,x_coord_rectangle+coeff*1,y_coord_rectangle+coeff*0.5,x_coord_rectangle,y_coord_rectangle+coeff*0.5,x_coord_rectangle,y_coord_rectangle),ncol=2, byrow=TRUE)))
+            assign(paste0("rectangle_",i),st_sfc(st_polygon(list(matrix(c(x_coord_rectangle,               y_coord_rectangle,
+                                                                          x_coord_rectangle + large * 1.5, y_coord_rectangle,
+                                                                          x_coord_rectangle + large * 1.5, y_coord_rectangle - large,
+                                                                          x_coord_rectangle,               y_coord_rectangle - large,
+                                                                          x_coord_rectangle,               y_coord_rectangle),
+                                                                        ncol=2, byrow=TRUE))),
+                                                 crs = as.numeric(code_epsg_ty())))
           }
-
+          
           # On ajoute un cadre blanc autour de la legende
-          y_coord_rectangle <- min(get(paste0("rectangle_",nb_typo))[[1]][,2])
-
+          
+          typo_leg_texte <- c()
+          for(i in 1:nb_typo)
+          {
+            if(is.null(isolate(input[[paste0("lib_typo_", i,"_ty_id")]])))
+            {
+              typo_leg_texte <- c(typo_leg_texte, sort(unique(isolate(analyse_ty())[[1]]$valeur))[i])
+            }else
+            {
+              typo_leg_texte <- c(typo_leg_texte, isolate(input[[paste0("lib_typo_", i,"_ty_id")]]))
+            }
+          }
+          
+          ltext <- max(nchar(typo_leg_texte)) / 2
+          
+          vec <- matrix(c(position_leg[1] - large / 2,                     position_leg[2] + large * 2,
+                          position_leg[1] + large * 1.5 + (large * ltext), position_leg[2] + large * 2,
+                          position_leg[1] + large * 1.5 + (large * ltext), position_leg[2] - large * (nb_typo + 3.5),
+                          position_leg[1] - large / 2,                     position_leg[2] - large * (nb_typo + 3.5),
+                          position_leg[1] - large / 2,                     position_leg[2] + large * 2),
+                        5,2,byrow=T)
+          
+          rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(code_epsg_ty()))
+          
+          rectangle <- st_transform(rectangle, crs = 4326)
+          
           # leaflet du cadre blanc en 1er
-          m_save <- addRectangles(map = m_save,
-                                  lng1 = position_leg[1]-coeff*0.5, lat1 = position_leg[2]+coeff*0.5, #x_titre_1 et y_titre_2
-                                  lng2 = x_coord_rectangle+coeff*6, lat2 = y_coord_rectangle-coeff*0.8,
-                                  stroke = TRUE,
-                                  color = paste0("#2B3E50", ";background: #ffffff;
-                                                 border-left:2px solid #2B3E50;
-                                                 border-right:2px solid #2B3E50;
-                                                 border-top:2px solid #2B3E50;
-                                                 border-bottom:2px solid #2B3E50;
-                                                 border-radius: 5%"),
-                                  weight = 1,
-                                  options = pathOptions(pane = "fond_legende", clickable = F),
-                                  fill = T,
-                                  fillColor = "white",
-                                  fillOpacity = 0.8
-                                  )
-
-          palette <- unique(palette_ty()[order(palette_ty()$valeur),"col"])
-
+          
+          m_save <- addPolygons(map = m_save,
+                                data = rectangle,
+                                stroke = FALSE,
+                                options = pathOptions(pane = "fond_legende", clickable = F),
+                                fill = T,
+                                fillColor = "white",
+                                fillOpacity = 0.8,
+                                group = "leg"
+          )
+          
+          palette <- unique(isolate(palette_ty())[order(isolate(palette_ty())$valeur),"col"])
+          
           for(i in 1: nb_typo)
           {
-            if(is.null(input$lib_typo_1_ty_id))
-            {
-              typo_leg_texte <- sort(unique(analyse_ty()[[1]]$valeur))[i]
-            }else
-            {
-              typo_leg_texte <- input[[paste0("lib_typo_", i,"_ty_id")]]
-            }
-
-            m_save <- addPolygons(map = m_save, data = st_polygon(get(paste0("rectangle_",i))),
+            m_save <- addPolygons(map = m_save,
+                                  data = st_transform(get(paste0("rectangle_",i)), crs = 4326),
                                   stroke = FALSE,
                                   options = pathOptions(pane = "fond_legende", clickable = F),
                                   fill = T,
                                   fillColor = palette[i],
-                                  fillOpacity = 1
+                                  fillOpacity = 1,
+                                  group = "leg"
             )
-
+            
+            pt_label <- st_sfc(st_geometry(st_point(c(max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1]) + large / 10,
+                                                      mean(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])))),
+                               crs = as.numeric(code_epsg_ty()))
+            pt_label <- st_transform(pt_label, crs = 4326)
+            
+            if(is.null(isolate(input[[paste0("lib_typo_", i,"_ty_id")]])))
+            {
+              typo_leg_texte <- sort(unique(isolate(analyse_ty())[[1]]$valeur))[i]
+            }else
+            {
+              typo_leg_texte <- isolate(input[[paste0("lib_typo_", i,"_ty_id")]])
+            }
+            
             m_save <- addLabelOnlyMarkers(map = m_save,
-                                          lng = (max(get(paste0("rectangle_",i))[[1]][,1])+coeff*0.1), lat = mean(get(paste0("rectangle_",i))[[1]][,2]),
+                                          lng = st_coordinates(pt_label)[1],
+                                          lat = st_coordinates(pt_label)[2],
                                           label = typo_leg_texte,
                                           labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                                       style = list(
                                                                         "color" = "black",
                                                                         "font-size" = "12px"
-                                                                      ))
+                                                                      )),
+                                          group = "leg"
             )
           }
-
+          
           # leaflet titre
-          x_titre_2 <- min(st_coordinates(st_polygon(get("rectangle_1")))[,"X"])
-          y_titre_2 <- max(st_coordinates(st_polygon(get("rectangle_1")))[,"Y"])+coeff*0.2
-
+          
+          pt_titre <- st_sfc(st_geometry(st_point(c(min(st_coordinates(pt)[,"X"]),
+                                                    max(st_coordinates(pt)[,"Y"]) + large))),
+                             crs = as.numeric(code_epsg_ty()))
+          pt_titre <- st_transform(pt_titre, crs = 4326)
+          
           m_save <- addLabelOnlyMarkers(map = m_save,
-                                        lng = x_titre_2, lat = y_titre_2,
-                                        label = input$titre_typo_legende_ty_id,
+                                        lng = st_coordinates(pt_titre)[1],
+                                        lat = st_coordinates(pt_titre)[2],
+                                        label = isolate(input$titre_typo_legende_ty_id),
                                         labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                                     style = list(
                                                                       "color" = "black",
                                                                       "font-size" = "14px"
-                                                                    ))
+                                                                    )),
+                                        group = "leg"
           )
 
           removeModal()

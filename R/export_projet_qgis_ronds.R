@@ -1,9 +1,10 @@
 export_projet_qgis_ronds <-
 function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,annee)
   {
-    chemin_fonds <- paste0(chemin_fonds,"/")
+    chemin_fonds <- paste0(chemin_fonds,"/layers/")
     
     fond_maille <- read_sf(paste0(chemin_fonds,"fond_maille.shp"))
+    
     xmin=st_bbox(fond_maille)[1]-0.10*(st_bbox(fond_maille)[3]-st_bbox(fond_maille)[1])
     xmax=st_bbox(fond_maille)[3]+0.10*(st_bbox(fond_maille)[3]-st_bbox(fond_maille)[1])
     ymin=st_bbox(fond_maille)[2]-0.10*(st_bbox(fond_maille)[4]-st_bbox(fond_maille)[2])
@@ -37,6 +38,7 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,annee)
     BLOCLAYERITEM=data.frame()
     
     l <- liste_fonds
+    
     for (i in 1:length(l))
     {
       #BLOCLEG 
@@ -61,7 +63,7 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,annee)
       #param idcouche, chemincouche, nomcouche
       nomcouche=l[i]
       chemincouche=paste0(chemin_fonds,nomcouche,".shp")
-      chemincoucherelatif=paste0("./",nomcouche,".shp")
+      chemincoucherelatif=paste0("./layers/",nomcouche,".shp")
       
       BLOCCATEGORIES=data.frame()      
       #cas ou le fond selectionne est l'analyse en ronds ou les ronds de la legende
@@ -74,18 +76,13 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,annee)
         name="0"
         typeanalyse="singleSymbol"
         #preparation des param du BLOCSYMBOL
-        if(str_sub(l[i][length(l[i])],start=-9) %in% c("pos_carte","neg_carte","leg_carte")) #par les fonctions autres que shy
+        if(str_sub(l[i][length(l[i])],start=-9) %in% c("pos_carte","neg_carte")) #par les fonctions autres que shiny_
         {
-          if(str_sub(l[i][length(l[i])],start=-9)!="leg_carte") couleurbordure=unique(analyse_ronds$COL_BOR)# par defaut : "255,255,255" white
+          couleurbordure=unique(analyse_ronds$COL_BOR)# par defaut : "255,255,255" white
           stylebordure="solid"
           epaisseurbordure=0.26
           if(str_sub(l[i][length(l[i])],start=-9)=="pos_carte") couleurfond=unique(analyse_ronds$COL)# par defaut : "205,133,63" orange peru
           if(str_sub(l[i][length(l[i])],start=-9)=="neg_carte") couleurfond=unique(analyse_ronds$COL)# par defaut : "100,149,237" cornflowerblue
-          if(str_sub(l[i][length(l[i])],start=-9)=="leg_carte")
-          {
-            couleurbordure="0,0,0"
-            couleurfond="transparent"
-          }
         }else if(str_sub(l[i][length(l[i])],start=-16) %in% c("pos_elargi_carte","neg_elargi_carte"))
         {
           couleurbordure=unique(analyse_ronds$COL_BOR)# par defaut : "255,255,255" white
@@ -93,13 +90,13 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,annee)
           epaisseurbordure=0.26
           if(str_sub(l[i][length(l[i])],start=-16)=="pos_elargi_carte") couleurfond=unique(analyse_ronds$COL)# par defaut : "205,133,63" orange peru
           if(str_sub(l[i][length(l[i])],start=-16)=="neg_elargi_carte") couleurfond=unique(analyse_ronds$COL)# par defaut : "100,149,237" cornflowerblue
-        }else #par les fonctions shy_
+        }else #par les fonctions shiny_
         {
           couleurbordure="255,255,255"
           stylebordure="solid"
           epaisseurbordure=0.26
-          couleurfond="205,133,63" #orange peru
-          if(str_sub(l[i][length(l[i])],start=-10)=="rupt_carte") couleurfond="100,149,237" #cornflowerblue
+          couleurfond="235,97,127"
+          if(str_sub(l[i][length(l[i])],start=-10)=="rupt_carte") couleurfond="40,106,199"
         }
         remplissagefond="solid"
         BLOCSYMBOLS=modif_blocsymbolsPolygon(couleurfond,couleurbordure,remplissagefond,stylebordure,epaisseurbordure,name)
@@ -139,7 +136,7 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,annee)
         }
         
         stylebordure="solid"
-        if (l[i] %in% c("fond_maille","fond_maille_elargi","fond_ronds","fond_lignes","fond_departement","fond_pays","fond_etranger","fond_territoire","fond_lignes_leg"))
+        if (l[i] %in% c("fond_maille","fond_maille_elargi","fond_ronds","fond_departement","fond_pays","fond_etranger","fond_territoire","fond_lignes_leg"))
         {
           epaisseurbordure=0.26
         }else
@@ -173,16 +170,27 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,annee)
         bloclayeritem=data.frame(V1=c(bloclayeritem[1,],blocvector[,1],bloclayeritem[3,]))
         BLOCLAYERITEM=rbind(BLOCLAYERITEM,bloclayeritem)
         
+        if (l[i]=="fond_ronds_leg")
+        {
+          BLOCSYMBOLSGENERATOR <- balises_qgis()[[11]]
+          BLOCLABELING <- balises_qgis()[[12]]
+        }else
+        {
+          BLOCSYMBOLSGENERATOR <- data.frame()
+          BLOCLABELING <- data.frame()
+        }
+        
         toto=modif_blocprojectlayers(geometrie,idcouche,chemincoucherelatif,nomcouche,projcouche,attr,typeanalyse)
-        toto=rbind(data.frame(V1=toto[1:13,]),BLOCCATEGORIES,data.frame(V1=toto[15,]),BLOCSYMBOLS,data.frame(V1=toto[17:23,]))
+        toto=rbind(data.frame(V1=toto[1:13,]),BLOCCATEGORIES,data.frame(V1=toto[15,]),data.frame(V1=BLOCSYMBOLS[1:11,]),BLOCSYMBOLSGENERATOR,data.frame(V1=BLOCSYMBOLS[12,]),data.frame(V1=toto[17:20,]),BLOCLABELING,data.frame(V1=toto[21:23,]))
         BLOCPROJECT=rbind(BLOCPROJECT,toto)
       }
     }
     projproj=projcouche
     qgs1=modif_canevas(xmin,xmax,ymin,ymax,projproj,length(l))
     #etape finale
+    blocproperties <- balises_qgis()[[13]]
     BLOCCOMPOSER=data.frame(V1=c(BLOCCOMPOSER[1:43,],BLOCLAYERITEM[,1],BLOCCOMPOSER[45:94,]))
-    canevas_final=data.frame(V1=c(qgs1[1:19,],BLOCLEG[,1],qgs1[21,],BLOCCOMPOSER[,1],qgs1[23,],BLOCPROJECT[,1],qgs1[25:26,]))
+    canevas_final=data.frame(V1=c(qgs1[1:19,],BLOCLEG[,1],qgs1[21,],BLOCCOMPOSER[,1],qgs1[23,],BLOCPROJECT[,1],qgs1[25,],blocproperties[,1],qgs1[26,]))
     colnames(canevas_final)=NULL
-    write.csv(canevas_final,paste0(chemin_fonds,nom_projet,".qgs"),row.names = F, quote = F, fileEncoding = "UTF-8")
+    write.csv(canevas_final,paste0(substr(chemin_fonds,1,nchar(chemin_fonds)-7),nom_projet,".qgs"),row.names = F, quote = F, fileEncoding = "UTF-8")
   }

@@ -99,7 +99,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
                               sidebarLayout(
 
                                 sidebarPanel(width = 3,
-                                             style = "overflow-y:scroll; min-height: 840px; max-height: 840px",
+                                             style = "overflow-y:scroll; min-height: 1000px; max-height: 1000px",
                                              h4(HTML("<b><font color=#95BAE2>VARIABLES</font></b>")),
                                              uiOutput("variable_flux_ou"),
                                              tags$hr(style="border: 5px solid #5182B6"), #337ab7
@@ -160,17 +160,17 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
                                   ),
                                   tabsetPanel(id="onglets_ou",
                                               tabPanel(title=HTML("<b>Carte</b>"),value="carte",
-                                                       leafletOutput("mymap_ou",width="100%",height = 800)
+                                                       leafletOutput("mymap_ou",width="112%",height = 950)
                                               ),
                                               tabPanel(title=HTML(paste0("<b>Donn","\u00e9","es</b>")),value="donnees",
                                                        h5("S\u00e9lectionnez une ou plusieurs lignes pour ensuite les visualiser sur la carte."),
-                                                       DT::dataTableOutput("mydonnees_ou",width="100%",height = 800)),
+                                                       DT::dataTableOutput("mydonnees_ou",width="112%",height = 950)),
                                               tabPanel(title=HTML("<b>Maille</b>"),value="maille",
                                                        h5("S\u00e9lectionnez une ou plusieurs lignes pour ensuite les visualiser sur la carte."),
-                                                       DT::dataTableOutput("mymaille_ou",width="100%",height = 800)),
+                                                       DT::dataTableOutput("mymaille_ou",width="112%",height = 950)),
                                               tabPanel(title=HTML("<b>Contour</b>"),value="contour",
                                                        h5("S\u00e9lectionnez une ou plusieurs lignes pour ensuite les visualiser sur la carte."),
-                                                       DT::dataTableOutput("mycontour_ou",width="100%",height = 800))
+                                                       DT::dataTableOutput("mycontour_ou",width="112%",height = 950))
                                   )
                                 )
                      )
@@ -372,9 +372,18 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
                                                         paste0(input$sortie_qgis_ou_id,".zip")
                                                       },
                                                       content = function(file){
+                                                        owd <- setwd(tempdir())
+                                                        on.exit(setwd(owd))
+                                                        
+                                                        rep_sortie <- dirname(file)
+                                                        
+                                                        dir.create("layers",showWarnings = F)
+                                                        
                                                         files <- EXPORT_PROJET_QGIS_OU(file)
-
-                                                        zip(file,files, flags = "-j9X")
+                                                        
+                                                        zip::zip(zipfile = paste0("./",basename(file)),
+                                                                 files = files,
+                                                                 mode = "cherry-pick")
                                                       }
       )
 
@@ -384,8 +393,10 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
         showModal(modalDialog(HTML("<i class=\"fa fa-spinner fa-spin fa-2x fa-fw\"></i> <font size=+1>Export du projet Qgis en cours...</font> "), size="m", footer=NULL, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
 
         sortie <- input$sortie_qgis_ou_id
+        
+        files <- c("layers", paste0(sortie,".qgs"))
+        
         rep_sortie <- dirname(file)
-        files <- c(paste0(rep_sortie,"/",sortie,".qgs"))
 
         # fond_flux <- st_sf(analyse_ou()[[1]])
         fond_flux <- analyse_apres_filtre_ou()[[1]]
@@ -399,23 +410,14 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
         fond_france <- st_transform(fond_habillage_ou()[[1]], crs= as.numeric(code_epsg_ou()))
         fond_pays <- st_transform(fond_habillage_ou()[[2]], crs= as.numeric(code_epsg_ou()))
 
-        suppressWarnings(st_write(fond_flux, paste0(rep_sortie,"/fond_flux.shp"), delete_dsn = TRUE, quiet = TRUE))
-        suppressWarnings(st_write(fond_maille, paste0(rep_sortie,"/fond_maille.shp"), delete_dsn = TRUE, quiet = TRUE))
-        suppressWarnings(st_write(fond_contour,paste0(rep_sortie,"/fond_contour.shp"), delete_dsn = TRUE, quiet = TRUE))
-        if(exists("fond_territoire")) if(!is.null(fond_territoire)) suppressWarnings(st_write(fond_territoire, paste0(rep_sortie,"/fond_territoire.shp"), delete_dsn = TRUE, quiet = TRUE))
-        if(exists("fond_departement")) if(!is.null(fond_departement)) suppressWarnings(st_write(fond_departement, paste0(rep_sortie,"/fond_departement.shp"), delete_dsn = TRUE, quiet = TRUE))
-        if(exists("fond_region")) if(!is.null(fond_region)) suppressWarnings(st_write(fond_region,paste0(rep_sortie,"/fond_region.shp"), delete_dsn = TRUE, quiet = TRUE))
-        suppressWarnings(st_write(fond_france,paste0(rep_sortie,"/fond_france.shp"), delete_dsn = TRUE, quiet = TRUE))
-        if(exists("fond_pays")) if(!is.null(fond_pays)) suppressWarnings(st_write(fond_pays,paste0(rep_sortie,"/fond_pays.shp"), delete_dsn = TRUE, quiet = TRUE))
-
-        files <- c(paste0(rep_sortie,"/fond_flux.shp"),paste0(rep_sortie,"/fond_flux.dbf"),paste0(rep_sortie,"/fond_flux.prj"),paste0(rep_sortie,"/fond_flux.shx"),files)
-        files <- c(paste0(rep_sortie,"/fond_maille.shp"),paste0(rep_sortie,"/fond_maille.dbf"),paste0(rep_sortie,"/fond_maille.prj"),paste0(rep_sortie,"/fond_maille.shx"),files)
-        files <- c(paste0(rep_sortie,"/fond_contour.shp"),paste0(rep_sortie,"/fond_contour.dbf"),paste0(rep_sortie,"/fond_contour.prj"),paste0(rep_sortie,"/fond_contour.shx"),files)
-        if(exists("fond_territoire")) if(!is.null(fond_territoire)) files <- c(paste0(rep_sortie,"/fond_territoire.shp"),paste0(rep_sortie,"/fond_territoire.dbf"),paste0(rep_sortie,"/fond_territoire.prj"),paste0(rep_sortie,"/fond_territoire.shx"),files)
-        if(exists("fond_departement")) if(!is.null(fond_departement)) files <- c(paste0(rep_sortie,"/fond_departement.shp"),paste0(rep_sortie,"/fond_departement.dbf"),paste0(rep_sortie,"/fond_departement.prj"),paste0(rep_sortie,"/fond_departement.shx"),files)
-        if(exists("fond_region")) if(!is.null(fond_region)) files <- c(paste0(rep_sortie,"/fond_region.shp"),paste0(rep_sortie,"/fond_region.dbf"),paste0(rep_sortie,"/fond_region.prj"),paste0(rep_sortie,"/fond_region.shx"),files)
-        files <- c(paste0(rep_sortie,"/fond_france.shp"),paste0(rep_sortie,"/fond_france.dbf"),paste0(rep_sortie,"/fond_france.prj"),paste0(rep_sortie,"/fond_france.shx"),files)
-        if(exists("fond_pays")) if(!is.null(fond_pays)) files <- c(paste0(rep_sortie,"/fond_pays.shp"),paste0(rep_sortie,"/fond_pays.dbf"),paste0(rep_sortie,"/fond_pays.prj"),paste0(rep_sortie,"/fond_pays.shx"),files)
+        suppressWarnings(st_write(fond_flux, paste0(rep_sortie,"/layers/fond_flux.shp"), delete_dsn = TRUE, quiet = TRUE))
+        suppressWarnings(st_write(fond_maille, paste0(rep_sortie,"/layers/fond_maille.shp"), delete_dsn = TRUE, quiet = TRUE))
+        suppressWarnings(st_write(fond_contour,paste0(rep_sortie,"/layers/fond_contour.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_territoire")) if(!is.null(fond_territoire)) suppressWarnings(st_write(fond_territoire, paste0(rep_sortie,"/layers/fond_territoire.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_departement")) if(!is.null(fond_departement)) suppressWarnings(st_write(fond_departement, paste0(rep_sortie,"/layers/fond_departement.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_region")) if(!is.null(fond_region)) suppressWarnings(st_write(fond_region,paste0(rep_sortie,"/layers/fond_region.shp"), delete_dsn = TRUE, quiet = TRUE))
+        suppressWarnings(st_write(fond_france,paste0(rep_sortie,"/layers/fond_france.shp"), delete_dsn = TRUE, quiet = TRUE))
+        if(exists("fond_pays")) if(!is.null(fond_pays)) suppressWarnings(st_write(fond_pays,paste0(rep_sortie,"/layers/fond_pays.shp"), delete_dsn = TRUE, quiet = TRUE))
 
         chemin_fonds <- rep_sortie
         titre1 <- paste0(input$titre1_qgis_ou_id,"\n")
@@ -425,17 +427,15 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
         variable_a_representer <- varFlux
 
         l <- c()
-        if(exists("fond_territoire")) l <- "fond_territoire"
+        
+        l <- c(l,"fond_flux")
+        
+        l <- c(l,"fond_france","fond_contour","fond_maille")
+        
+        if(exists("fond_territoire")) l <- c(l,"fond_territoire")
         if(exists("fond_departement")) l <- c(l,"fond_departement")
         if(exists("fond_region")) l <- c(l,"fond_region")
-
-        l=c("fond_france",
-            "fond_contour",
-            "fond_maille",
-            l,
-            "fond_flux"
-        )
-
+        
         if(exists("fond_pays")) l <- c(l,"fond_pays")
 
         export_projet_qgis_oursins(l,rep_sortie,sortie,titre1,titre2,source,2,"#303030",annee)
@@ -680,12 +680,24 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
         {
           showModal(modalDialog(HTML("<i class=\"fa fa-spinner fa-spin fa-2x fa-fw\"></i><font size=+1>\u00c9laboration de la carte...</font> "), size="m", footer=NULL, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
 
+          if(is.null(fondEtranger))
+          {
+            proj4 <- st_crs(fondMaille)$proj4string
+          }else{
+            proj4 <- st_crs(fondEtranger)$proj4string
+          }
+          
           # Construction de la map par defaut
 
           m <- leaflet(padding = 0,
                        options = leafletOptions(
                          preferCanvas = TRUE,
-                         transition = 2
+                         transition = 2,
+                         crs = leafletCRS(crsClass = "L.Proj.CRS",
+                                          code = paste0("EPSG:", code_epsg_ou()),
+                                          proj4def = proj4,
+                                          resolutions = 2^(16:1)
+                         )
                        )) %>%
 
             setMapWidgetStyle(list(background = "#AFC9E0")) %>%
@@ -706,16 +718,15 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
             # Pour gerer l'ordre des calques
             addMapPane(name = "fond_pays", zIndex = 401) %>%
             addMapPane(name = "fond_france", zIndex = 402) %>%
-            addMapPane(name = "fond_habillage", zIndex = 403) %>%
-            addMapPane(name = "fond_dep", zIndex = 404) %>%
-            addMapPane(name = "fond_reg", zIndex = 405) %>%
-            addMapPane(name = "fond_territoire", zIndex = 406) %>%
-            addMapPane(name = "fond_trio3", zIndex = 407) %>%
-            addMapPane(name = "fond_trio2", zIndex = 408) %>%
-            addMapPane(name = "fond_trio1", zIndex = 409) %>%
-            addMapPane(name = "selection", zIndex = 410) %>%
+            addMapPane(name = "fond_dep", zIndex = 403) %>%
+            addMapPane(name = "fond_reg", zIndex = 404) %>%
+            addMapPane(name = "fond_territoire", zIndex = 405) %>%
+            addMapPane(name = "fond_trio3", zIndex = 406) %>%
+            addMapPane(name = "fond_trio2", zIndex = 407) %>%
+            addMapPane(name = "fond_trio1", zIndex = 408) %>%
+            addMapPane(name = "selection", zIndex = 409) %>%
 
-            addMapPane(name = "fond_legende", zIndex = 411)
+            addMapPane(name = "fond_legende", zIndex = 410)
 
           # AFFICHAGE DES FONDS D'HABILLAGE
 
@@ -1042,21 +1053,21 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
 
           if(!is.null(fondSuppl))
           {
-            if(input$ajout_territoire_ou_id)
+            if(isolate(input$ajout_territoire_ou_id))
             {
-              m_save <- addPolygons(map = m_save, data = fond_territoire_ou(),
+              m_save <- addPolygons(map = m_save, data = isolate(fond_territoire_ou()),
                                     stroke = TRUE, color = "#BFBFBF", opacity = 1,
                                     weight = 0.5,
                                     options = pathOptions(pane = "fond_territoire", clickable = T),
-                                    popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fond_territoire_ou())[,"LIBELLE"], "</font> </b>"),
+                                    popup = paste0("<b> <font color=#2B3E50>",as.data.frame(isolate(fond_territoire_ou()))[,"LIBELLE"], "</font> </b>"),
                                     fill = T, fillColor = "white", fillOpacity = 0.001
               )
             }
           }
 
-          if(input$ajout_reg_ou_id)
+          if(isolate(input$ajout_reg_ou_id))
           {
-            m_save <- addPolygons(map = m_save, data = fond_region_ou(),
+            m_save <- addPolygons(map = m_save, data = isolate(fond_region_ou()),
                                   stroke = TRUE, color = "grey", opacity = 1,
                                   weight = 1.5,
                                   options = pathOptions(pane = "fond_reg", clickable = F),
@@ -1064,9 +1075,9 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
             )
           }
 
-          if(input$ajout_dep_ou_id)
+          if(isolate(input$ajout_dep_ou_id))
           {
-            m_save <- addPolygons(map = m_save, data = fond_departement_ou(),
+            m_save <- addPolygons(map = m_save, data = isolate(fond_departement_ou()),
                                   stroke = TRUE, color = "grey", opacity = 1,
                                   weight = 0.5,
                                   options = pathOptions(pane = "fond_dep", clickable = F),
@@ -1076,18 +1087,18 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
 
           i <- 1 #pour gerer l'ordre des fonds dans le pane
 
-          for(fond in liste_fonds$a)
+          for(fond in isolate(liste_fonds$a))
           {
             if(fond=="analyse")
             {
-              analyse_WGS84 <- analyse_apres_filtre_ou()[[1]]
-              donnees <- analyse_apres_filtre_ou()[[2]]
+              analyse_WGS84 <- isolate(analyse_apres_filtre_ou())[[1]]
+              donnees <- isolate(analyse_apres_filtre_ou())[[2]]
 
               m_save <- addPolylines(map = m_save,
                                      data = analyse_WGS84,
                                      stroke = TRUE, color = "#303030",
                                      opacity = 1,
-                                     weight = input$epaisseur_trait_ou_id,
+                                     weight = isolate(input$epaisseur_trait_ou_id),
                                      options = pathOptions(pane = paste0("fond_trio",i), clickable = T),
                                      popup = paste0("<b><font color=#2B3E50>",varFlux," : ",donnees,"</font></b>")
               )
@@ -1095,20 +1106,20 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idDataDepart,idDataArrivee,v
 
             if(fond=="maille")
             {
-              m_save <- addPolygons(map = m_save, data = fond_contour_maille_ou()[[2]], opacity = 1,
+              m_save <- addPolygons(map = m_save, data = isolate(fond_contour_maille_ou())[[2]], opacity = 1,
                                     stroke = TRUE, color = "grey", weight = 1,
                                     options = pathOptions(pane = paste0("fond_trio",i), clickable = T),
-                                    popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fond_contour_maille_ou()[[2]])[,"LIBELLE"], "</font> </b>"),
+                                    popup = paste0("<b> <font color=#2B3E50>",as.data.frame(isolate(fond_contour_maille_ou())[[2]])[,"LIBELLE"], "</font> </b>"),
                                     fill = T, fillColor = "white", fillOpacity = 0.001
               )
             }
 
             if(fond=="contour")
             {
-              m_save <- addPolygons(map = m_save, data = fond_contour_maille_ou()[[1]], opacity = 0.3,
+              m_save <- addPolygons(map = m_save, data = isolate(fond_contour_maille_ou())[[1]], opacity = 0.3,
                                     stroke = TRUE, color = "black", weight = 3,
                                     options = pathOptions(pane = paste0("fond_trio",i), clickable = T),
-                                    popup = paste0("<b> <font color=#2B3E50>",as.data.frame(fond_contour_maille_ou()[[1]])[,"LIBELLE"], "</font> </b>"),
+                                    popup = paste0("<b> <font color=#2B3E50>",as.data.frame(isolate(fond_contour_maille_ou())[[1]])[,"LIBELLE"], "</font> </b>"),
                                     fill = T, fillColor = "white", fillOpacity = 0.3
               )
             }

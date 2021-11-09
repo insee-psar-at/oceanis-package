@@ -1,6 +1,7 @@
 k_joignantes <-
 function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,var_depart_k,var_arrivee_k,var_flux_k,largeur_k,decalage_aller_retour_k,decalage_centroid_k)
   {
+    donnees_k$save <- donnees_k[,var_flux_k]
     donnees_k[,var_flux_k] <- as.numeric(donnees_k[,var_flux_k])
     
     donnees_k <- donnees_k[!is.na(donnees_k[,var_flux_k]),]
@@ -228,7 +229,7 @@ function(fond_carto_k,variable_jointure_fond_carto_k,donnees_k,var_depart_k,var_
       l[[i]] <- st_polygon(list(fleche))
     }
     
-    fleche <- st_sf(cbind(base[,c(var_depart_k,var_arrivee_k,var_flux_k)],geometry=st_sfc(l)), crs=st_crs(fond_carto_k))
+    fleche <- st_sf(cbind(base[,c(var_depart_k,var_arrivee_k,var_flux_k,"save")],geometry=st_sfc(l)), crs=st_crs(fond_carto_k))
     
     return(list(analyse=fleche))
   }

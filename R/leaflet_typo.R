@@ -60,6 +60,7 @@ function(data,fondMaille,fondSuppl=NULL,idData,varTypo,emprise="FRM",fondEtrange
 
     analyse <- analyse[[1]]
     analyse[,"TXT1"] <- paste0("<b> <font color=#2B3E50>",format(as.data.frame(analyse)[,varTypo], big.mark=" ",decimal.mark=",",nsmall=0),"</font></b>")
+    analyse <- analyse[order(as.data.frame(analyse)[,varTypo]),]
     analyse_WGS84 <- st_transform(analyse,crs=4326)
 
     # Fonds habillages
@@ -133,13 +134,25 @@ function(data,fondMaille,fondSuppl=NULL,idData,varTypo,emprise="FRM",fondEtrange
     analyse <- analyse[,-which(names(analyse) %in% "idx_oceanis")]
 
     # Construction de la map par defaut
-
+    
     if(is.null(map_proxy) | (!is.null(map_proxy) & class(map_proxy)=="character"))
     {
+      if(is.null(fondEtranger))
+      {
+        proj4 <- st_crs(fondMaille)$proj4string
+      }else{
+        proj4 <- st_crs(fondEtranger)$proj4string
+      }
+      
       map <- leaflet(padding = 0,
                      options = leafletOptions(
                        preferCanvas = TRUE,
-                       transition = 2
+                       transition = 2,
+                       crs = leafletCRS(crsClass = "L.Proj.CRS",
+                                        code = paste0("EPSG:", code_epsg),
+                                        proj4def = proj4,
+                                        resolutions = 2^(16:1)
+                       )
                      )) %>%
 
         setMapWidgetStyle(list(background = "#AFC9E0")) %>%

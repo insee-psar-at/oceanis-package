@@ -43,9 +43,9 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
           ronds <- T
         }
       }
-      if(map$x$calls[[i]]$method %in% "addRectangles")
+      if(map$x$calls[[i]]$method %in% "addPolygons")
       {
-        if(map$x$calls[[i]]$args[[6]]=="legende_classes") idx_legende <- c(idx_legende,i)
+        if(map$x$calls[[i]]$args[[3]]=="legende_classes_rectangle") idx_legende <- c(idx_legende,i)
       }
       if(!is.null(idx_legende)) # la legende existe
       {
@@ -87,13 +87,22 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
       {
         if(map$x$calls[[i]]$method %in% "addPolygons")
         {
-          idx_carte <- c(idx_carte,i)
+          if(!is.null(map$x$calls[[i]]$args[[2]]$nom_fond))
+          {
+            if(map$x$calls[[i]]$args[[2]]$nom_fond %in% c("fond_pays","fond_france","fond_territoire","fond_maille","fond_maille_carte","fond_maille_elargi","fond_maille_elargi_carte"))
+            {
+              idx_carte <- c(idx_carte,i)
+            }
+          }
         }
         if(map$x$calls[[i]]$method %in% "addCircles")
         {
-          if(map$x$calls[[i]]$args[[4]]$nom_fond %in% c("fond_ronds_classes_carte","fond_ronds_classes_elargi_carte"))
+          if(!is.null(map$x$calls[[i]]$args[[4]]$nom_fond))
           {
-            idx_carte <- c(idx_carte,i)
+            if(map$x$calls[[i]]$args[[4]]$nom_fond %in% c("fond_ronds_classes_carte","fond_ronds_classes_elargi_carte"))
+            {
+              idx_carte <- c(idx_carte,i)
+            }
           }
         }
       }
@@ -107,24 +116,22 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
       }
       nb_classes <- length(pal_classes)
 
-      # Coordonnees du point haut/gauche des rectangles de la legende
-      if(typeLegende==1) decalage <- 0.7 else decalage <- 0.5
-      x_coord_rectangle <- lng
-      for(i in 1:nb_classes)
-      {
-        if(i==1) #1er rectangle
-        {
-          y_coord_rectangle <- lat-coeff
-        }else
-        {
-          y_coord_rectangle <- y_coord_rectangle-coeff*decalage
-        }
-        assign(paste0("rectangle_",i),list(matrix(c(x_coord_rectangle,y_coord_rectangle,x_coord_rectangle+coeff*1,y_coord_rectangle,x_coord_rectangle+coeff*1,y_coord_rectangle+coeff*0.5,x_coord_rectangle,y_coord_rectangle+coeff*0.5,x_coord_rectangle,y_coord_rectangle),ncol=2, byrow=TRUE)))
-      }
-
       if(ronds) arg <- 4 else arg <- 2
       precision <- as.numeric(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$precision)
-
+      
+      pt <- st_sfc(st_geometry(st_point(c(lng,lat))), crs = 4326)
+      pt <- st_transform(pt, crs = as.numeric(code_epsg))
+      coord_pt <- st_coordinates(pt)[1:2]
+      
+      pt_up <- st_sfc(st_geometry(st_point(c(map$x$fitBounds[[2]],map$x$fitBounds[[3]]))), crs = 4326)
+      pt_up <- st_transform(pt_up, crs = as.numeric(code_epsg))
+      pt_down <- st_sfc(st_geometry(st_point(c(map$x$fitBounds[[2]],map$x$fitBounds[[1]]))), crs = 4326)
+      pt_down <- st_transform(pt_down, crs = as.numeric(code_epsg))
+      
+      large <- abs(st_coordinates(pt_up)[2] - st_coordinates(pt_down)[2]) / 20
+      
+      position_leg <- t(data.frame(c(coord_pt[1],coord_pt[2] - large)))
+      
       if(!is.null(map_leaflet))
       {
         map_leaflet <- map
@@ -132,41 +139,43 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
         clearGroup(map, group = "legende_classes")
       }
 
+      # On cree les rectangles
+      
+      if(!is.null(map_leaflet))
+      {
+        bornes <- sort(map_leaflet$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes, decreasing = TRUE)
+      }else
+      {
+        bornes <- sort(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes, decreasing = TRUE)
+      }
+      
       if(typeLegende==1) # Litterale
       {
-        # On ajoute un cadre blanc autour de la legende
-        y_coord_rectangle <- min(get(paste0("rectangle_",nb_classes))[[1]][,2])
-
-        # leaflet du cadre blanc en 1er
-        map <- addRectangles(map = map,
-                             lng1 = lng-coeff*0.5, lat1 = lat+coeff*0.5,
-                             lng2 = x_coord_rectangle+coeff*10, lat2 = y_coord_rectangle-coeff*0.8,
-                             stroke = TRUE,
-                             color = paste0("#2B3E50", ";background: #ffffff;
-                                            border-left:2px solid #2B3E50;
-                                            border-right:2px solid #2B3E50;
-                                            border-top:2px solid #2B3E50;
-                                            border-bottom:2px solid #2B3E50;
-                                            border-radius: 5%"),
-                             weight = 1,
-                             options = pathOptions(pane = "fond_legende", clickable = F),
-                             fill = T,
-                             fillColor = "white",
-                             fillOpacity = 0.5,
-                             group = "legende_classes"
-                             )
-
-        # leaflet rectangles et valeurs classes
-        label_rectangle <- NULL
-
-        if(!is.null(map_leaflet))
+        for(i in 1:nb_classes)
         {
-          map_proxy <- map
-          map <- map_leaflet
+          # Coordonnees du point haut/gauche des rectangles de la legende
+          x_coord_rectangle <- position_leg[1]
+          if(i==1) #1er rectangle
+          {
+            y_coord_rectangle <- position_leg[2]
+          }else
+          {
+            y_coord_rectangle <- y_coord_rectangle - large - large / 4
+          }
+          assign(paste0("rectangle_",i),st_sfc(st_polygon(list(matrix(c(x_coord_rectangle,               y_coord_rectangle,
+                                                                        x_coord_rectangle + large * 1.5, y_coord_rectangle,
+                                                                        x_coord_rectangle + large * 1.5, y_coord_rectangle - large,
+                                                                        x_coord_rectangle,               y_coord_rectangle - large,
+                                                                        x_coord_rectangle,               y_coord_rectangle),
+                                                                      ncol=2, byrow=TRUE))),
+                                               crs = as.numeric(code_epsg)))
         }
         
-        bornes <- sort(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes, decreasing = TRUE)
-
+        # On ajoute un cadre blanc autour de la legende
+        
+        # leaflet rectangles et valeurs classes
+        label_rectangle <- c()
+        
         for(i in 1:nb_classes)
         {
           if(i==1)
@@ -180,17 +189,51 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
             label_rectangle <- c(label_rectangle,paste0("De ", format(round(as.numeric(bornes[i+1]),precision), big.mark=" ",decimal.mark=",",nsmall=0)," \u00E0 moins de ", format(round(as.numeric(bornes[i]),precision), big.mark=" ",decimal.mark=",",nsmall=0)))
           }
         }
-
-        if(!is.null(map_leaflet))
-        {
-          map_leaflet <- map
-          map <- map_proxy
-        }
-
+        
+        ltext <- max(nchar(label_rectangle)) / 2.5
+        
+        vec <- matrix(c(position_leg[1] - large / 2,                     position_leg[2] + large * 2,
+                        position_leg[1] + large * 1.5 + (large * ltext), position_leg[2] + large * 2,
+                        position_leg[1] + large * 1.5 + (large * ltext), position_leg[2] - large * (nb_classes + (nb_classes-1)/4 + 1),
+                        position_leg[1] - large / 2,                     position_leg[2] - large * (nb_classes + (nb_classes-1)/4 + 1),
+                        position_leg[1] - large / 2,                     position_leg[2] + large * 2),
+                      5,2,byrow=T)
+        
+        rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(code_epsg))
+        
+        rectangle <- st_transform(rectangle, crs = 4326)
+        
+        # leaflet du cadre blanc en 1er
+        map <- addPolygons(map = map,
+                           data = rectangle,
+                           stroke = FALSE,
+                           options = pathOptions(pane = "fond_legende", clickable = F),
+                           fill = T,
+                           fillColor = "white",
+                           fillOpacity = 0.8,
+                           group = "legende_classes_rectangle"
+        )
+        
         for(i in 1:nb_classes)
         {
+          map <- addPolygons(map = map,
+                             data = st_transform(get(paste0("rectangle_",i)), crs = 4326),
+                             stroke = FALSE,
+                             options = pathOptions(pane = "fond_legende", clickable = F),
+                             fill = T,
+                             fillColor = pal_classes[i],
+                             fillOpacity = 1,
+                             group = "legende_classes"
+          )
+          
+          pt_label <- st_sfc(st_geometry(st_point(c(max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1]) + large / 10,
+                                                    mean(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])))),
+                             crs = as.numeric(code_epsg))
+          pt_label <- st_transform(pt_label, crs = 4326)
+          
           map <- addLabelOnlyMarkers(map = map,
-                                     lng = (max(get(paste0("rectangle_",i))[[1]][,1])+coeff*0.1), lat = mean(get(paste0("rectangle_",i))[[1]][,2]),
+                                     lng = st_coordinates(pt_label)[1],
+                                     lat = st_coordinates(pt_label)[2],
                                      label = label_rectangle[i],
                                      labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                                  style = list(
@@ -200,28 +243,19 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
                                      group = "legende_classes"
           )
         }
-
-        # On cree les polygons ensemble a la fin de l'objet leaflet juste avant le titre
-
-        for(i in 1:nb_classes)
-        {
-          map <- addPolygons(map = map, data = st_polygon(get(paste0("rectangle_",i))),
-                             stroke = FALSE,
-                             options = pathOptions(pane = "fond_legende", clickable = F),
-                             fill = T,
-                             fillColor = pal_classes[i],
-                             fillOpacity = 1,
-                             group = "legende_classes",
-                             layerId = list(typeLegende=typeLegende, zoom=zoom)
-          )
-        }
-
+        
+        # On ajoute la legende de classes a l'analyse
+        
         # leaflet titre
-        x_titre <- min(st_coordinates(st_polygon(get("rectangle_1")))[,"X"])
-        y_titre <- max(st_coordinates(st_polygon(get("rectangle_1")))[,"Y"])+coeff*0.4
-
+        
+        pt_titre <- st_sfc(st_geometry(st_point(c(min(st_coordinates(pt)[,"X"]),
+                                                  max(st_coordinates(pt)[,"Y"])))),
+                           crs = as.numeric(code_epsg))
+        pt_titre <- st_transform(pt_titre, crs = 4326)
+        
         map <- addLabelOnlyMarkers(map = map,
-                                   lng = x_titre, lat = y_titre,
+                                   lng = st_coordinates(pt_titre)[1],
+                                   lat = st_coordinates(pt_titre)[2],
                                    label = titre,
                                    labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                                style = list(
@@ -234,60 +268,91 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
 
       if(typeLegende==2) # En echelle
       {
-        # On ajoute un cadre blanc autour de la legende
-        y_coord_rectangle <- min(get(paste0("rectangle_",nb_classes))[[1]][,2])
-
-        # leaflet du cadre blanc en 1er
-        map <- addRectangles(map = map,
-                             lng1 = lng-coeff*0.5, lat1 = lat+coeff*0.5,
-                             lng2 = x_coord_rectangle+coeff*5, lat2 = y_coord_rectangle-coeff*0.8,
-                             stroke = TRUE,
-                             color = paste0("#2B3E50", ";background: #ffffff;
-                                            border-left:2px solid #2B3E50;
-                                            border-right:2px solid #2B3E50;
-                                            border-top:2px solid #2B3E50;
-                                            border-bottom:2px solid #2B3E50;
-                                            border-radius: 5%"),
-                             weight = 1,
-                             options = pathOptions(pane = "fond_legende", clickable = F),
-                             fill = T,
-                             fillColor = "white",
-                             fillOpacity = 0.5,
-                             group = "legende_classes"
-                             )
-
-        if(ronds) arg <- 4 else arg <- 2
-
-        if(!is.null(map_leaflet))
-        {
-          bornes <- sort(map_leaflet$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes, decreasing = TRUE)
-        }else
-        {
-          bornes <- sort(map$x$calls[[idx_carte[length(idx_carte)]]]$args[[arg]]$bornes, decreasing = TRUE)
-        }
-
         for(i in 1:nb_classes)
         {
+          # Coordonnees du point haut/gauche des rectangles de la legende
+          x_coord_rectangle <- position_leg[1]
+          if(i==1) #1er rectangle
+          {
+            y_coord_rectangle <- position_leg[2]
+          }else
+          {
+            y_coord_rectangle <- y_coord_rectangle - large
+          }
+          assign(paste0("rectangle_",i),st_sfc(st_polygon(list(matrix(c(x_coord_rectangle,               y_coord_rectangle,
+                                                                        x_coord_rectangle + large * 1.5, y_coord_rectangle,
+                                                                        x_coord_rectangle + large * 1.5, y_coord_rectangle - large,
+                                                                        x_coord_rectangle,               y_coord_rectangle - large,
+                                                                        x_coord_rectangle,               y_coord_rectangle),
+                                                                      ncol=2, byrow=TRUE))),
+                                               crs = as.numeric(code_epsg)))
+        }
+        
+        # On ajoute un cadre blanc autour de la legende
+        
+        # leaflet rectangles et valeurs classes
+        ltext <- max(nchar(bornes)) / 2.5
+        
+        vec <- matrix(c(position_leg[1] - large / 2,                     position_leg[2] + large * 2,
+                        position_leg[1] + large * 1.5 + (large * ltext), position_leg[2] + large * 2,
+                        position_leg[1] + large * 1.5 + (large * ltext), position_leg[2] - large * (nb_classes + 1),
+                        position_leg[1] - large / 2,                     position_leg[2] - large * (nb_classes + 1),
+                        position_leg[1] - large / 2,                     position_leg[2] + large * 2),
+                      5,2,byrow=T)
+        
+        rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(code_epsg))
+        
+        rectangle <- st_transform(rectangle, crs = 4326)
+        
+        # leaflet du cadre blanc en 1er
+        map <- addPolygons(map = map,
+                           data = rectangle,
+                           stroke = FALSE,
+                           options = pathOptions(pane = "fond_legende", clickable = F),
+                           fill = T,
+                           fillColor = "white",
+                           fillOpacity = 0.8,
+                           group = "legende_classes_rectangle"
+        )
+        
+        for(i in 1:nb_classes)
+        {
+          map <- addPolygons(map = map,
+                             data = st_transform(get(paste0("rectangle_",i)), crs = 4326),
+                             stroke = FALSE,
+                             options = pathOptions(pane = "fond_legende", clickable = F),
+                             fill = T,
+                             fillColor = pal_classes[i],
+                             fillOpacity = 1,
+                             group = "legende_classes"
+          )
+          
           if(i<nb_classes)
           {
-            x1 <- max(get(paste0("rectangle_",i))[[1]][,1])
-            y1 <- min(get(paste0("rectangle_",i))[[1]][,2])
-            x2 <- max(get(paste0("rectangle_",i))[[1]][,1])+coeff*0.2
-            y2 <- min(get(paste0("rectangle_",i))[[1]][,2])
-            ligne <- st_linestring(rbind(c(x1,y1),c(x2,y2)))
-
-            map <- addPolylines(map = map, data = ligne,
-                                color = "black",
-                                weight = 1,
-                                options = pathOptions(pane = "fond_legende", clickable = F),
-                                fill = F,
-                                fillOpacity = 1,
-                                group = "legende_classes"
+            x1 <- max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1])
+            y1 <- min(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])
+            x2 <- max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1]) + large*0.2
+            y2 <- min(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])
+            ligne <- st_sfc(st_linestring(rbind(c(x1,y1),c(x2,y2))), crs = as.numeric(code_epsg))
+            
+            map <- addPolygons(map = map,
+                               data = st_transform(ligne, crs = 4326),
+                               color = "black",
+                               weight = 1,
+                               options = pathOptions(pane = "fond_legende", clickable = F),
+                               fill = F,
+                               fillOpacity = 1,
+                               group = "legende_classes"
             )
-
+            
+            pt_label <- st_sfc(st_geometry(st_point(c(x2,y2))),
+                               crs = as.numeric(code_epsg))
+            pt_label <- st_transform(pt_label, crs = 4326)
+            
             map <- addLabelOnlyMarkers(map = map,
-                                       lng = x2, lat = y2,
-                                       label = as.character(format(round(as.numeric(bornes[i+1]),precision),big.mark=" ",decimal.mark=",",nsmall=0)),
+                                       lng = st_coordinates(pt_label)[1],
+                                       lat = st_coordinates(pt_label)[2],
+                                       label = as.character(format(round(bornes[i+1],3),big.mark=" ",decimal.mark=",",nsmall=0)),
                                        labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                                    style = list(
                                                                      "color" = "black",
@@ -295,29 +360,20 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
                                                                    )),
                                        group = "legende_classes"
             )
+            
           }
         }
-
-        # On cree les polygons ensemble a la fin de l'objet leaflet juste avant le titre
-        for(i in 1:nb_classes)
-        {
-          map <- addPolygons(map = map, data = st_polygon(get(paste0("rectangle_",i))),
-                             stroke = FALSE,
-                             options = pathOptions(pane = "fond_legende", clickable = F),
-                             fill = T,
-                             fillColor = pal_classes[i],
-                             fillOpacity = 1,
-                             group = "legende_classes",
-                             layerId = list(typeLegende=typeLegende, zoom=zoom)
-          )
-        }
-
+        
         # leaflet titre
-        x_titre <- min(get("rectangle_1")[[1]][,1])
-        y_titre <- max(get("rectangle_1")[[1]][,2])+coeff*0.6
-
+        
+        pt_titre <- st_sfc(st_geometry(st_point(c(min(st_coordinates(pt)[,"X"]),
+                                                  max(st_coordinates(pt)[,"Y"])))),
+                           crs = as.numeric(code_epsg))
+        pt_titre <- st_transform(pt_titre, crs = 4326)
+        
         map <- addLabelOnlyMarkers(map = map,
-                                   lng = x_titre, lat = y_titre,
+                                   lng = st_coordinates(pt_titre)[1],
+                                   lat = st_coordinates(pt_titre)[2],
                                    label = titre,
                                    labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                                style = list(

@@ -235,10 +235,22 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
 
     if(is.null(map_proxy) | (!is.null(map_proxy) & class(map_proxy)=="character"))
     {
+      if(is.null(fondEtranger))
+      {
+        proj4 <- st_crs(fondMaille)$proj4string
+      }else{
+        proj4 <- st_crs(fondEtranger)$proj4string
+      }
+      
       map <- leaflet(padding = 0,
                      options = leafletOptions(
                        preferCanvas = TRUE,
-                       transition = 2
+                       transition = 2,
+                       crs = leafletCRS(crsClass = "L.Proj.CRS",
+                                        code = paste0("EPSG:", code_epsg),
+                                        proj4def = proj4,
+                                        resolutions = 2^(16:1)
+                       )
                      )) %>%
 
         setMapWidgetStyle(list(background = "#AFC9E0")) %>%
@@ -347,7 +359,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
 
     if(!is.null(fondMailleElargi))
     {
-      map <- addPolygons(map = map, data = maille_WGS84_elargi,
+      map <- addPolygons(map = map,
+                         data = maille_WGS84_elargi,
                          stroke = TRUE, color = "grey", opacity = opacityElargi,
                          weight = 0.5,
                          options = pathOptions(pane = "fond_maille_elargi", clickable = T),
@@ -356,52 +369,119 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
                          group = "carte_ronds_elargi",
                          layerId = list(maille_WGS84_elargi=maille_WGS84_elargi,code_epsg=code_epsg,nom_fond="fond_maille_elargi")
       )
-    }
-
-    if(!is.null(fondMailleElargi))
-    {
+      
       # AFFICHAGE DE L'ANALYSE ELARGIE
 
+      if(max(analyse$donnees_elargi$save) > 0)
+      {
+        idx <- which(analyse$donnees_elargi$save > 0)
+        analyse_pos <- list()
+        analyse_pos$analyse_points <- analyse$analyse_points[idx]
+        analyse_pos$donnees_elargi <- analyse$donnees_elargi[idx,]
+        analyse_WGS84_elargi_pos <- analyse_WGS84_elargi[idx]
+        map <- addCircles(map = map,
+                          lng = st_coordinates(analyse_WGS84_elargi_pos)[,1],
+                          lat = st_coordinates(analyse_WGS84_elargi_pos)[,2],
+                          stroke = TRUE,
+                          color = colBorderPos,
+                          opacity = opacityElargi,
+                          weight = epaisseurBorder,
+                          radius = rayonRond*sqrt(analyse_pos$donnees_elargi[,varVolume]/max_var),
+                          options = pathOptions(pane = "fond_ronds_elargi", clickable = T),
+                          popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse_pos$donnees_elargi[,"TXT1"]),
+                          fill = T,
+                          fillColor = colPos,
+                          fillOpacity = opacityElargi,
+                          group = "carte_ronds",
+                          layerId = list(analyse=analyse_pos,analyse_WGS84_elargi=analyse_WGS84_elargi_pos,rayonRond=rayonRond,code_epsg=code_epsg,emprise=emprise,
+                                         nom_fond="fond_ronds_pos_elargi_carte",
+                                         max_var=max_var,var_volume=varVolume,colPos=colPos,colBorderPos=colBorderPos,epaisseurBorder=epaisseurBorder)
+        )
+      }
+      
+      if(min(analyse$donnees_elargi$save) < 0)
+      {
+        idx <- which(analyse$donnees_elargi$save < 0)
+        analyse_neg <- list()
+        analyse_neg$analyse_points <- analyse$analyse_points[idx]
+        analyse_neg$donnees_elargi <- analyse$donnees_elargi[idx,]
+        analyse_WGS84_elargi_neg <- analyse_WGS84_elargi[idx]
+        map <- addCircles(map = map,
+                          lng = st_coordinates(analyse_WGS84_elargi_neg)[,1],
+                          lat = st_coordinates(analyse_WGS84_elargi_neg)[,2],
+                          stroke = TRUE,
+                          color = colBorderNeg,
+                          opacity = opacityElargi,
+                          weight = epaisseurBorder,
+                          radius = rayonRond*sqrt(analyse_neg$donnees_elargi[,varVolume]/max_var),
+                          options = pathOptions(pane = "fond_ronds_elargi", clickable = T),
+                          popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse_neg$donnees_elargi[,"TXT1"]),
+                          fill = T,
+                          fillColor = colNeg,
+                          fillOpacity = opacityElargi,
+                          group = "carte_ronds",
+                          layerId = list(analyse=analyse_neg,analyse_WGS84_elargi=analyse_WGS84_elargi_pos,rayonRond=rayonRond,code_epsg=code_epsg,emprise=emprise,
+                                         nom_fond="fond_ronds_neg_elargi_carte",
+                                         max_var=max_var,var_volume=varVolume,colNeg=colNeg,colBorderNeg=colBorderNeg,epaisseurBorder=epaisseurBorder)
+        )
+      }
+    }
+    
+    # AFFICHAGE DE L'ANALYSE
+
+    if(max(analyse$donnees$save) > 0)
+    {
+      idx <- which(analyse$donnees$save > 0)
+      analyse_pos <- list()
+      analyse_pos$analyse_points <- analyse$analyse_points[idx]
+      analyse_pos$donnees <- analyse$donnees[idx,]
+      analyse_WGS84_pos <- analyse_WGS84[idx]
       map <- addCircles(map = map,
-                        lng = st_coordinates(analyse_WGS84_elargi)[,1],
-                        lat = st_coordinates(analyse_WGS84_elargi)[,2],
-                        stroke = TRUE, color = sapply(analyse$donnees_elargi$save, function(x) if(x>0){colBorderPos}else{colBorderNeg}),
-                        opacity = opacityElargi,
+                        lng = st_coordinates(analyse_WGS84_pos)[,1],
+                        lat = st_coordinates(analyse_WGS84_pos)[,2],
+                        stroke = TRUE,
+                        color = colBorderPos,
+                        opacity = 1,
                         weight = epaisseurBorder,
-                        radius = rayonRond*sqrt(analyse$donnees_elargi[,varVolume]/max_var),
-                        options = pathOptions(pane = "fond_ronds_elargi", clickable = T),
-                        popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse$donnees_elargi$TXT1),
+                        radius = rayonRond*sqrt(analyse_pos$donnees[,varVolume]/max_var),
+                        options = pathOptions(pane = "fond_ronds", clickable = T),
+                        popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse_pos$donnees[,"TXT1"]),
                         fill = T,
-                        fillColor = sapply(analyse$donnees_elargi$save, function(x) if(x>0){colPos}else{colNeg}),
-                        fillOpacity = opacityElargi,
-                        group = "carte_ronds_elargi",
-                        layerId = list(analyse=analyse,analyse_WGS84_elargi=analyse_WGS84_elargi,rayonRond=rayonRond,code_epsg=code_epsg,emprise=emprise,
-                                       nom_fond=c(if(max(analyse$donnees_elargi$save)>0){"fond_ronds_pos_elargi_carte"}else{" "},
-                                                  if(min(analyse$donnees_elargi$save)<0){"fond_ronds_neg_elargi_carte"}else{" "}),
-                                      max_var=max_var,var_volume=varVolume,colPos=colPos,colNeg=colNeg,colBorderPos=colBorderPos,colBorderNeg=colBorderNeg,epaisseurBorder=epaisseurBorder)
+                        fillColor = colPos,
+                        fillOpacity = 1,
+                        group = "carte_ronds",
+                        layerId = list(analyse=analyse_pos,analyse_WGS84=analyse_WGS84_pos,rayonRond=rayonRond,code_epsg=code_epsg,emprise=emprise,
+                                       nom_fond="fond_ronds_pos_carte",
+                                       max_var=max_var,var_volume=varVolume,colPos=colPos,colBorderPos=colBorderPos,epaisseurBorder=epaisseurBorder)
       )
     }
 
-    # AFFICHAGE DE L'ANALYSE
-
-    map <- addCircles(map = map,
-                      lng = st_coordinates(analyse_WGS84)[,1],
-                      lat = st_coordinates(analyse_WGS84)[,2],
-                      stroke = TRUE, color = sapply(analyse$donnees$save, function(x) if(x>0){colBorderPos}else{colBorderNeg}),
-                      opacity = 1,
-                      weight = epaisseurBorder,
-                      radius = rayonRond*sqrt(analyse$donnees[,varVolume]/max_var),
-                      options = pathOptions(pane = "fond_ronds", clickable = T),
-                      popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse$donnees$TXT1),
-                      fill = T,
-                      fillColor = sapply(analyse$donnees$save, function(x) if(x>0){colPos}else{colNeg}),
-                      fillOpacity = 1,
-                      group = "carte_ronds",
-                      layerId = list(analyse=analyse,analyse_WGS84=analyse_WGS84,rayonRond=rayonRond,code_epsg=code_epsg,emprise=emprise,
-                                     nom_fond=c(if(max(analyse$donnees$save)>0){"fond_ronds_pos_carte"}else{" "},
-                                                if(min(analyse$donnees$save)<0){"fond_ronds_neg_carte"}else{" "}),
-                                   max_var=max_var,var_volume=varVolume,colPos=colPos,colNeg=colNeg,colBorderPos=colBorderPos,colBorderNeg=colBorderNeg,epaisseurBorder=epaisseurBorder)
-    )
+    if(min(analyse$donnees$save) < 0)
+    {
+      idx <- which(analyse$donnees$save < 0)
+      analyse_neg <- list()
+      analyse_neg$analyse_points <- analyse$analyse_points[idx]
+      analyse_neg$donnees <- analyse$donnees[idx,]
+      analyse_WGS84_neg <- analyse_WGS84[idx]
+      map <- addCircles(map = map,
+                        lng = st_coordinates(analyse_WGS84_neg)[,1],
+                        lat = st_coordinates(analyse_WGS84_neg)[,2],
+                        stroke = TRUE,
+                        color = colBorderNeg,
+                        opacity = 1,
+                        weight = epaisseurBorder,
+                        radius = rayonRond*sqrt(analyse_neg$donnees[,varVolume]/max_var),
+                        options = pathOptions(pane = "fond_ronds", clickable = T),
+                        popup = paste0("<b> <font color=#2B3E50>",varVolume," : </font></b>",analyse_neg$donnees[,"TXT1"]),
+                        fill = T,
+                        fillColor = colNeg,
+                        fillOpacity = 1,
+                        group = "carte_ronds",
+                        layerId = list(analyse=analyse_neg,analyse_WGS84=analyse_WGS84_neg,rayonRond=rayonRond,code_epsg=code_epsg,emprise=emprise,
+                                       nom_fond="fond_ronds_neg_carte",
+                                       max_var=max_var,var_volume=varVolume,colNeg=colNeg,colBorderNeg=colBorderNeg,epaisseurBorder=epaisseurBorder)
+      )
+    }
 
     return(map)
   }

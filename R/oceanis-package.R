@@ -1604,9 +1604,10 @@ NULL
 #' varFlux = "MIGR", direction = "Ent")
 #' }
 #'
-#' @import shinythemes shinyjs shinyBS leaflet sf ggplot2 classInt leaflet.extras utils dplyr
-#' @importFrom lwgeom st_geod_length
 #' @rawNamespace import(shiny, except = runExample)
+#' @import shinyBS shinythemes shinyjs leaflet sf ggplot2 classInt leaflet.extras utils dplyr
+#' @importFrom lwgeom st_geod_length
+#' @importFrom zip zip
 #'
 #' @export shiny_ronds
 #' @export shiny_classes

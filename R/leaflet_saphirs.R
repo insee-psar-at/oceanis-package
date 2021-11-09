@@ -149,15 +149,27 @@ function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,va
     }
 
     coord_fleche_max_pl <- st_coordinates(analyse[[1]][abs(data.frame(analyse[[1]])[,varFlux])==max(abs(donnees[,varFlux])),])
-    large_pl <- max(st_distance(st_sfc(st_point(c(coord_fleche_max_pl[2,1],coord_fleche_max_pl[2,2])),st_point(c(coord_fleche_max_pl[6,1],coord_fleche_max_pl[6,2])))))
+    large_pl <- as.numeric(max(st_distance(st_sfc(st_point(c(coord_fleche_max_pl[2,1],coord_fleche_max_pl[2,2])),st_point(c(coord_fleche_max_pl[6,1],coord_fleche_max_pl[6,2])), crs = code_epsg))))
 
     # Construction de la map par defaut
     if(is.null(map_proxy) | (!is.null(map_proxy) & class(map_proxy)=="character"))
     {
+      if(is.null(fondEtranger))
+      {
+        proj4 <- st_crs(fondMaille)$proj4string
+      }else{
+        proj4 <- st_crs(fondEtranger)$proj4string
+      }
+      
       map <- leaflet(padding = 0,
                      options = leafletOptions(
                        preferCanvas = TRUE,
-                       transition = 2
+                       transition = 2,
+                       crs = leafletCRS(crsClass = "L.Proj.CRS",
+                                        code = paste0("EPSG:", code_epsg),
+                                        proj4def = proj4,
+                                        resolutions = 2^(16:1)
+                       )
                      )) %>%
 
         setMapWidgetStyle(list(background = "#AFC9E0")) %>%

@@ -7,9 +7,11 @@ function(map,cheminDossier,nomFichier,titre1="",titre2="",source="")
 
     list_fonds <- extract_fond_leaflet_oursins(map)
 
+    dir.create(paste0(rep_sortie,"/layers"),showWarnings = F)
+    
     for(i in 1:length(list_fonds[[1]]))
     {
-      suppressWarnings(st_write(list_fonds[[1]][[i]], paste0(rep_sortie,"/",list_fonds[[2]][[i]],".shp"), delete_dsn = TRUE, quiet = TRUE))
+      suppressWarnings(st_write(list_fonds[[1]][[i]], paste0(rep_sortie,"/layers/",list_fonds[[2]][[i]],".shp"), delete_dsn = TRUE, quiet = TRUE))
     }
 
     annee <- format(Sys.time(), format = "%Y")
