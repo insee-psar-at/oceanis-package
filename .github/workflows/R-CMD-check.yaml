@@ -25,6 +25,7 @@ jobs:
         run: |
           sudo apt-get install -y libcurl4-openssl-dev
           sudo apt-get install -y libudunits2-dev
+          sudo apt-get install -y libgdal-dev
       - name: Install Depends
         run: install.packages(c("shiny", "shinyBS"))
         shell: Rscript {0}
