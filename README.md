@@ -10,6 +10,7 @@
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![R build status](https://github.com/insee-psar-at/oceanis-package/workflows/R-CMD-check/badge.svg)](https://github.com/insee-psar-at/oceanis-package/actions)
 [![License](http://img.shields.io/badge/license-GPL%20%28%3E=%202%29-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-2.0.html)
+[![minimal R version](https://img.shields.io/badge/R%3E%3D-3.6.0-6666ff.svg)](https://cran.r-project.org/)
 <!-- badges: end -->
 
 Le package _oceanis_ permet de réaliser des cartes d'analyses. Il propose plusieurs représentations cartographiques possibles :
@@ -45,7 +46,8 @@ La vignette propose notamment un exemple de scénario de réalisation de cartes 
 
 Pour installer le package _oceanis_ depuis GitHub et le charger dans R :
 ```r
-devtools::install_github("insee-psar-at/oceanis-package")
+# install.packages("remotes")
+remotes::install_github("insee-psar-at/oceanis-package")
 library(oceanis)
 ```
 ou à partir du CRAN :
