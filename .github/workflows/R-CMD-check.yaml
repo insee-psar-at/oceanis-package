@@ -30,7 +30,7 @@ jobs:
         run: install.packages(c("shiny", "shinyBS"))
         shell: Rscript {0}
       - name: Install Imports
-        run: install.packages(c("classInt" , "sf", "utils", "shinyjs", "shinythemes", "DT", "stringr", "leaflet", "leaflet.extras", "grDevices", "ggplot2", "dplyr", "graphics", "lwgeom", "mapview", "zip"))
+        run: install.packages(c("raster" , "proxy" , "classInt" , "sf", "shinyjs", "shinythemes", "DT", "stringr", "leaflet", "leaflet.extras", "ggplot2", "dplyr", "lwgeom", "mapview", "zip"))
         shell: Rscript {0}
       - name: Install Suggests
         run: install.packages(c("knitr", "rmarkdown", "markdown", "rio"))
