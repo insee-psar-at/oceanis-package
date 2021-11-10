@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        r-version: [3.3, 3.6, 4.0, 4.1]
+        r-version: [3.6, 4.0, 4.1]
         
     steps:
       - uses: actions/checkout@v2
@@ -30,7 +30,7 @@ jobs:
         run: install.packages(c("shiny", "shinyBS"))
         shell: Rscript {0}
       - name: Install Imports
-        run: install.packages(c("raster" , "proxy" , "classInt" , "sf", "shinyjs", "shinythemes", "DT", "stringr", "leaflet", "leaflet.extras", "ggplot2", "dplyr", "lwgeom", "mapview", "zip"))
+        run: install.packages(c("classInt" , "sf", "shinyjs", "shinythemes", "DT", "stringr", "leaflet", "leaflet.extras", "ggplot2", "dplyr", "lwgeom", "mapview", "zip"))
         shell: Rscript {0}
       - name: Install Suggests
         run: install.packages(c("knitr", "rmarkdown", "markdown", "rio"))
