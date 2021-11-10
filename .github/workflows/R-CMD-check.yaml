@@ -21,11 +21,22 @@ jobs:
         uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.r-version }}
-      - name: Install libcurl
+      - name: Install libraries Debian
         run: |
-          sudo apt-get install -y libcurl4-openssl-dev
           sudo apt-get install -y libudunits2-dev
           sudo apt-get install -y libgdal-dev
+          sudo apt-get install -y qpdf
+          sudo apt-get install -y curl
+          sudo apt-get install -y pandoc
+          sudo apt-get install -y texlive-latex-base
+          sudo apt-get install -y texlive-latex-recommended
+          sudo apt-get install -y texlive-latex-extra
+          sudo apt-get install -y texlive-extra-utils
+          sudo apt-get install -y libmagick++-dev
+          sudo apt-get install -y cargo
+          sudo apt-get install -y lmodern
+          sudo apt-get install -y libharfbuzz-dev
+          sudo apt-get install -y libfribidi-dev
       - name: Install Depends
         run: install.packages(c("shiny", "shinyBS"))
         shell: Rscript {0}
