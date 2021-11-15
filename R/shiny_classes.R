@@ -287,7 +287,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           
           output$distribution_ac <- renderPlot({
             dt_donnees <- data.frame(VAR=as.numeric(analyse_ac()$donnees[,varRatio]))
-            ggplot(dt_donnees, aes(x=VAR)) +
+            ggplot(dt_donnees, aes(x=.data$VAR)) +
                    stat_bin(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR, na.rm = TRUE)))), closed = "left", fill="#5182B6", col="white") +
                    scale_x_continuous(breaks=unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR, na.rm = TRUE)))), labels = round(unique(sort(c(min(dt_donnees$VAR),new_bornes_ac(),max(dt_donnees$VAR, na.rm = TRUE)))),2)) +
                    ggtitle(label=paste0("Distribution de la variable  : ",varRatio)) +
