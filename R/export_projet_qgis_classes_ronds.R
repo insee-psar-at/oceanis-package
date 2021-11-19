@@ -92,23 +92,6 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,titre_leg_classe
           
           remplissagefond="solid"
           BLOCSYMBOLS=modif_blocsymbolsPolygon(couleurfond,couleurbordure,remplissagefond,stylebordure,epaisseurbordure,name)
-        }else if (str_sub(l[i][length(l[i])],start=-9)=="leg_carte")
-        {
-          attr=""
-          name="0"
-          typeanalyse="singleSymbol"
-          
-          stylebordure="solid"
-          epaisseurbordure=0.26
-          couleurbordure="0,0,0"
-          couleurfond="transparent"
-          
-          remplissagefond="solid"
-          BLOCSYMBOLS=modif_blocsymbolsPolygon(couleurfond,couleurbordure,remplissagefond,stylebordure,epaisseurbordure,name)
-          
-          toto=modif_blocprojectlayers(geometrie,idcouche,chemincoucherelatif,nomcouche,projcouche,attr,typeanalyse)
-          toto=rbind(data.frame(V1=toto[1:13,]),BLOCCATEGORIES,data.frame(V1=toto[15,]),BLOCSYMBOLS,data.frame(V1=toto[17:23,]))
-          BLOCPROJECT=rbind(BLOCPROJECT,toto)
         }else
         {
           attr="attr='classe'"

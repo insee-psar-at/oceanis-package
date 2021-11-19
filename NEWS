@@ -1,3 +1,8 @@
+Changes in version 1.8.4
+
+BUG FIXES and IMPROVEMENTS
+
+- Correction de bugs divers
 
 Changes in version 1.8.3
 
@@ -6,6 +11,7 @@ BUG FIXES and IMPROVEMENTS
 - Pour les fonctions leaflet_xxx et shiny_xxx, modification de la gestion d'affichage des légendes des ronds, classes et flèches : construction de la légende et initialisation de l'objet leaflet en projection locale métrique. La reprojection en WGS84 est faite automatiquement à l'affichage de la carte. Cela permet de supprimer les éventuelles déformations de la légende selon la position lon/lat choisie.
 - Lors d'un export Qgis, les valeurs des légendes des ronds et des flèches sont affichées directement dans le canevas de la carte et non plus que dans le composeur d'impression.
 - Corrections de bugs dans la gestion des bornes de classes.
+
 
 Changes in version 1.8.2
 

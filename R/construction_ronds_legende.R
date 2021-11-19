@@ -12,9 +12,6 @@ function(lon,lat,code_epsg,taille_rond_m)
     #On cree le grand cercle en pl
     ronds_pl_leg_1 <- st_buffer(ronds_pl_leg, taille_rond_m)
 
-    #que l'on convertit en WGS84
-    # ronds_sf_leg_1 <- st_transform(ronds_pl_leg_1,crs=4326)
-
     #On cree le petit cercle en pl
     ronds_pl_leg_2 <- st_buffer(ronds_pl_leg, taille_rond_m/sqrt(3))
 

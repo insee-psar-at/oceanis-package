@@ -17,8 +17,6 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
     if(is.null(titre)) titre <- " "
     titre<-iconv(titre,"latin1","utf8")
 
-    coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-
     if(any(class(map) %in% "leaflet"))
     {
       idx_carte <- NULL
@@ -156,7 +154,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
 
       ronds_sf_leg <- ronds_leg[[1]]
 
-      lignes <- construction_lignes_legende(ronds_leg,coeff,code_epsg)
+      lignes <- construction_lignes_legende(ronds_leg,code_epsg)
       
       # On ajoute un cadre blanc autour de la legende
       bbox_ronds <- st_bbox(ronds_leg[[2]])

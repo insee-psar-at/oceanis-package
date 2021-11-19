@@ -81,58 +81,38 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,titre_leg_classe
         geometrie=attr(analyse_classes$geometry[[1]],"class")[2]
         projcouche=st_crs(analyse_classes$geometry)$proj4string
         
-        #preparation des param du BLOCSYMBOL
-        if(str_sub(l[i][length(l[i])],start=-9)=="leg_carte")
+        attr="attr='classe'"
+        typeanalyse="categorizedSymbol"
+        BLOCSYMBOLS=data.frame()
+        BLOCCATEGORIES=data.frame(V1="                <categories>")
+        BLOCVECTOR=data.frame()
+        
+        for(j in 1:dim(table_classe)[1])
         {
-          attr=""
-          name="0"
-          typeanalyse="singleSymbol"
-          
+          #creer le bloc categories
+          symbol=name=as.character(j)
+          value=table_classe[j,1]
+          label=table_classe[j,2]
+          #value=label=table_classe[j,2]
+          temp=modif_bloccategories(symbol,value,label)
+          BLOCCATEGORIES=rbind(BLOCCATEGORIES,temp)
+          #creer autant de bloc symbols que de classes avec le bon canevas symbols
           stylebordure="solid"
           epaisseurbordure=0.26
-          couleurbordure="0,0,0"
-          couleurfond="transparent"
-          
+          couleurbordure=unique(analyse_classes$COL_BOR)
+          couleurfond=as.character(table_classe[j,3])
           remplissagefond="solid"
-          BLOCSYMBOLS=modif_blocsymbolsPolygon(couleurfond,couleurbordure,remplissagefond,stylebordure,epaisseurbordure,name)
-          
-          toto=modif_blocprojectlayers(geometrie,idcouche,chemincoucherelatif,nomcouche,projcouche,attr,typeanalyse)
-          toto=rbind(data.frame(V1=toto[1:13,]),BLOCCATEGORIES,data.frame(V1=toto[15,]),BLOCSYMBOLS,data.frame(V1=toto[17:23,]))
-          BLOCPROJECT=rbind(BLOCPROJECT,toto)
-        }else
-        {
-          attr="attr='classe'"
-          typeanalyse="categorizedSymbol"
-          BLOCSYMBOLS=data.frame()
-          BLOCCATEGORIES=data.frame(V1="                <categories>")
-          BLOCVECTOR=data.frame()
-          
-          for(j in 1:dim(table_classe)[1])
-          {
-            #creer le bloc categories
-            symbol=name=as.character(j)
-            value=table_classe[j,1]
-            label=table_classe[j,2]
-            #value=label=table_classe[j,2]
-            temp=modif_bloccategories(symbol,value,label)
-            BLOCCATEGORIES=rbind(BLOCCATEGORIES,temp)
-            #creer autant de bloc symbols que de classes avec le bon canevas symbols
-            stylebordure="solid"
-            epaisseurbordure=0.26
-            couleurbordure=unique(analyse_classes$COL_BOR)
-            couleurfond=as.character(table_classe[j,3])
-            remplissagefond="solid"
-            temp=modif_blocsymbolsPolygon(couleurfond,couleurbordure,remplissagefond,stylebordure,epaisseurbordure,name)
-            BLOCSYMBOLS=rbind(BLOCSYMBOLS,temp)  
-            #MEP
-            blocvector=modif_blocvectorClassification(table_classe[j,2])
-            blocvector=data.frame(V1=c(blocvector[1:2,],temp[,1],blocvector[4:5,]))
-            BLOCVECTOR=rbind(BLOCVECTOR,blocvector)  
-          }
-          BLOCCATEGORIES=rbind(BLOCCATEGORIES,data.frame(V1="                </categories>"))
-          bloclayeritem=data.frame(V1=c(bloclayeritem[1,],BLOCVECTOR[,1],bloclayeritem[3,]))
-          BLOCLAYERITEM=rbind(BLOCLAYERITEM,bloclayeritem)
+          temp=modif_blocsymbolsPolygon(couleurfond,couleurbordure,remplissagefond,stylebordure,epaisseurbordure,name)
+          BLOCSYMBOLS=rbind(BLOCSYMBOLS,temp)  
+          #MEP
+          blocvector=modif_blocvectorClassification(table_classe[j,2])
+          blocvector=data.frame(V1=c(blocvector[1:2,],temp[,1],blocvector[4:5,]))
+          BLOCVECTOR=rbind(BLOCVECTOR,blocvector)  
         }
+        BLOCCATEGORIES=rbind(BLOCCATEGORIES,data.frame(V1="                </categories>"))
+        bloclayeritem=data.frame(V1=c(bloclayeritem[1,],BLOCVECTOR[,1],bloclayeritem[3,]))
+        BLOCLAYERITEM=rbind(BLOCLAYERITEM,bloclayeritem)
+        
         toto=modif_blocprojectlayers(geometrie,idcouche,chemincoucherelatif,nomcouche,projcouche,attr,typeanalyse)
         toto=rbind(data.frame(V1=toto[1:13,]),BLOCCATEGORIES,data.frame(V1=toto[15,]),BLOCSYMBOLS,data.frame(V1=toto[17:23,]))
         BLOCPROJECT=rbind(BLOCPROJECT,toto)

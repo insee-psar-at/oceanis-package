@@ -702,13 +702,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       nb_classes_ac_rp <- reactive({
         if(is.null(varRatio)) return(NULL)
         
-        if(elargi_ac_rp())
-        {
-          donnees <- analyse_ac_rp()[[1]]$donnees_elargi[,varRatio]
-        }else
-        {
-          donnees <- analyse_ac_rp()[[1]]$donnees[,varRatio]
-        }
+        donnees <- analyse_ac_rp()[[1]]$donnees[,varRatio]
         
         suppressWarnings(
           if(min(donnees)<0 & max(donnees)>0) # Si + et -
@@ -776,7 +770,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
       EXPORT_PROJET_QGIS_AC_RP <- function(file)
       {
         showModal(modalDialog(HTML("<i class=\"fa fa-spinner fa-spin fa-2x fa-fw\"></i> <font size=+1>Export du projet Qgis en cours...</font> "), size="m", footer=NULL, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-
+        
         sortie <- input$sortie_qgis_ac_rp_id
         
         files <- c("layers", paste0(sortie,".qgs"))
@@ -807,42 +801,38 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           showModal(modalDialog(HTML("<font size=+1><i class=\"fa fa-hand-pointer-o fa-fw\"></i><b>Double-cliquez</b> d'abord sur la carte pour afficher la l\u00e9gende.</font> "), size="m", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #DF691A; border-color: #2e6da4")) #337ab7
           return(NULL)
         }
-
+        
         if(elargi_ac_rp())
         {
           analyse_donnees_elargi <- analyse_ac_rp()[[1]][[4]] #donnees elargi
           analyse_maille_elargi <- fondMailleElargi #fond maille elargi
-
           names_donnees_elargi <- names(analyse_donnees_elargi)
           analyse_donnees_elargi <- data.frame(analyse_donnees_elargi,val=analyse_donnees_elargi[,varRatio],classe=palette_ac_rp()[[1]](analyse_donnees_elargi[,varRatio]))
           names(analyse_donnees_elargi) <- c(names_donnees_elargi,"val","classe")
-
           analyse_classes_elargi <- merge(table_classe,analyse_donnees_elargi,by.x="couleurs",by.y="classe")
-
           analyse_classes_elargi <- analyse_classes_elargi[,c("CODE","LIBELLE",varVolume,varRatio,"val","classe")]
 
           analyse_classes_elargi <- analyse_classes_elargi[order(analyse_classes_elargi[,varVolume],decreasing = T),]
-
+          
           analyse_ronds_elargi <- analyse_ronds_sf_ac_rp()[[2]]
 
           analyse_ronds_elargi$classe <- analyse_classes_elargi$classe
           analyse_ronds_elargi$COL_BOR <- "white"
-
+          
           fond_elargi_ronds <- analyse_ronds_elargi
-
+          
           analyse_maille_elargi <- merge(analyse_maille_elargi,analyse_classes_elargi[,c("CODE",varVolume,varRatio,"val","classe")],by="CODE")
-          names(analyse_maille_elargi) <- c("CODE","LIBELLE",varVolume,varRatio,"val","classe","geometry")
+          analyse_maille_elargi <- analyse_maille_elargi[,c("CODE","LIBELLE",varVolume,varRatio,"val","classe","geometry")]
           analyse_maille_elargi <- st_sf(analyse_maille_elargi,stringsAsFactors = FALSE)
-
           fond_elargi_classes <- analyse_maille_elargi
 
           fond_maille_elargi <- st_transform(fondMailleElargi, crs= as.numeric(code_epsg_ac_rp()))
-
+          
           suppressWarnings(st_write(fond_elargi_ronds, paste0(rep_sortie,"/layers/fond_elargi_ronds_carte.shp"), delete_dsn = TRUE, quiet = TRUE))
           suppressWarnings(st_write(fond_elargi_classes, paste0(rep_sortie,"/layers/fond_maille_elargi_carte.shp"), delete_dsn = TRUE, quiet = TRUE))
           suppressWarnings(st_write(fond_maille_elargi, paste0(rep_sortie,"/layers/fond_maille_elargi.shp"), delete_dsn = TRUE, quiet = TRUE))
         }
-
+        
         analyse_donnees <- analyse_ac_rp()[[1]][[2]] #donnees
         analyse_maille <- fondMaille #fond maille
 
@@ -857,7 +847,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         analyse_ronds <- analyse_ronds_sf_ac_rp()[[1]]
 
         analyse_ronds$classe <- analyse_classes$classe
-        analyse_ronds$COL_BOR <- "#303030"
+        analyse_ronds$COL_BOR <- "white"
 
         analyse_maille <- merge(analyse_maille,analyse_classes[,c("CODE",varVolume,varRatio,"val","classe")],by="CODE")
         analyse_maille <- analyse_maille[,c("CODE","LIBELLE",varVolume,varRatio,"val","classe","geometry")]
@@ -865,8 +855,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
         fond_classes <- analyse_maille
         fond_ronds <- analyse_ronds
-
-        fond_ronds_leg <- construction_legende_ac_rp()[[1]][[2]]
+        
+        fond_ronds_leg <- construction_ronds_legende(lon_lat_ac_rp()[[1]],lon_lat_ac_rp()[[2]],code_epsg_ac_rp(),input$taille_rond_ac_rp_id)[[2]]
         
         fond_maille <- st_transform(fondMaille, crs= as.numeric(code_epsg_ac_rp()))
         fond_contour <- st_transform(fondContour, crs= as.numeric(code_epsg_ac_rp()))
@@ -875,7 +865,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         if(input$ajout_reg_ac_rp_id) fond_region <- st_transform(fond_region_ac_rp(), crs= as.numeric(code_epsg_ac_rp()))
         fond_france <- st_transform(fond_habillage_ac_rp()[[1]], crs= as.numeric(code_epsg_ac_rp()))
         fond_pays <- st_transform(fond_habillage_ac_rp()[[2]], crs= as.numeric(code_epsg_ac_rp()))
-
+        
         suppressWarnings(st_write(fond_ronds, paste0(rep_sortie,"/layers/fond_ronds_carte.shp"), delete_dsn = TRUE, quiet = TRUE))
         suppressWarnings(st_write(fond_classes, paste0(rep_sortie,"/layers/fond_maille_carte.shp"), delete_dsn = TRUE, quiet = TRUE))
         suppressWarnings(st_write(fond_ronds_leg, paste0(rep_sortie,"/layers/fond_ronds_leg.shp"), delete_dsn = TRUE, quiet = TRUE))
@@ -886,14 +876,14 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         if(exists("fond_region")) if(!is.null(fond_region)) suppressWarnings(st_write(fond_region,paste0(rep_sortie,"/layers/fond_region.shp"), delete_dsn = TRUE, quiet = TRUE))
         suppressWarnings(st_write(fond_france,paste0(rep_sortie,"/layers/fond_france.shp"), delete_dsn = TRUE, quiet = TRUE))
         if(exists("fond_pays")) if(!is.null(fond_pays)) suppressWarnings(st_write(fond_pays,paste0(rep_sortie,"/layers/fond_pays.shp"), delete_dsn = TRUE, quiet = TRUE))
-
+        
         titre1 <- paste0(input$titre1_qgis_ac_rp_id,"\n")
         titre2 <- input$titre2_qgis_ac_rp_id
         source <- input$source_qgis_ac_rp_id
         annee <- format(Sys.time(), format = "%Y")
         variable_a_representer <- varRatio
         titre_leg_classes <- input$titre_classes_legende_ac_rp_id
-
+        
         l <- c()
         
         l <- c(l,"fond_ronds_leg")
@@ -922,9 +912,9 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         if(exists("fond_region")) l <- c(l,"fond_region")
         
         if(exists("fond_pays")) l <- c(l,"fond_pays")
-
+        
         export_projet_qgis_classes_ronds(l,rep_sortie,sortie,titre1,titre2,source,titre_leg_classes,table_classe,variable_a_representer,annee)
-
+        
         removeModal()
 
         showModal(modalDialog(HTML(paste0("<font size=+1>Le projet Qgis a \u00e9t\u00e9 cr","\u00e9","ee.</font>")), size="m", footer=NULL, easyClose = TRUE, style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
@@ -1789,7 +1779,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         lat <- click$lat
         return(list(lon,lat))
       })
-
+      
       observeEvent(list(input$mymap_ac_rp_zoom,input$mymap_ac_rp_click,input$type_legende_ac_rp_id,input$titre_ronds_legende_ac_rp_id,input$titre_classes_legende_ac_rp_id,input$taille_rond_ac_rp_id,input$nb_classes_ac_rp_id,input$methode_ac_rp_id,input$palette_insee_ac_rp_id,input$valid_bornes_ac_rp_id),{
         req(input$taille_rond_ac_rp_id)
 
@@ -1804,9 +1794,6 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         proxy <- clearGroup(map=proxy, group="leg")
         proxy <- clearMarkers(map=proxy)
 
-        zoom <- as.numeric(input$mymap_ac_rp_zoom)
-        coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-
         large <- as.numeric((st_bbox(fondMaille)[4] - st_bbox(fondMaille)[2]) / 20)
         
         pt_ronds <- st_sfc(st_geometry(st_point(c(lon_lat_ac_rp()[[1]],
@@ -1820,7 +1807,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         pt_ronds <- st_transform(pt_ronds, crs = 4326)
         
         ronds_leg <- construction_ronds_legende(st_coordinates(pt_ronds)[,1],st_coordinates(pt_ronds)[,2],code_epsg_ac_rp(),input$taille_rond_ac_rp_id)
-        lignes <- construction_lignes_legende(ronds_leg,coeff,code_epsg_ac_rp())
+        lignes <- construction_lignes_legende(ronds_leg,code_epsg_ac_rp())
         
         pt <- st_sfc(st_geometry(st_point(c(lon_lat_ac_rp()[[1]],lon_lat_ac_rp()[[2]]))), crs = 4326)
         pt <- st_transform(pt, crs = as.numeric(code_epsg_ac_rp()))
@@ -2155,15 +2142,6 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         )
       })
 
-      construction_legende_ac_rp <- reactive({
-        zoom <- as.numeric(input$mymap_ac_rp_zoom)
-        coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-        ronds_leg <- construction_ronds_legende(lon_lat_ac_rp()[[1]],lon_lat_ac_rp()[[2]],code_epsg_ac_rp(),input$taille_rond_ac_rp_id)
-        lignes <- construction_lignes_legende(ronds_leg,coeff,code_epsg_ac_rp())
-        ronds_leg[[2]] <- cbind(ronds_leg[[2]],ETI_VAL=c(max(data[,varVolume], na.rm = TRUE),max(data[,varVolume], na.rm = TRUE)/3))
-        return(list(ronds_leg,lignes,coeff))
-      })
-
       # AJOUT DES ONGLETS SAUVEGARDE
 
       observeEvent(input$save_carte_ac_rp_id,{
@@ -2311,251 +2289,128 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
             )
           }
 
-          zoom <- as.numeric(isolate(input$mymap_ac_rp_zoom))
-          coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-
-          large <- as.numeric((st_bbox(fondMaille)[4] - st_bbox(fondMaille)[2]) / 20)
-          
-          pt_ronds <- st_sfc(st_geometry(st_point(c(isolate(lon_lat_ac_rp())[[1]],
-                                                            isolate(lon_lat_ac_rp())[[2]]))),
-                             crs = 4326)
-          pt_ronds <- st_transform(pt_ronds, crs = as.numeric(code_epsg_ac_rp()))
-          
-          pt_ronds <- st_sfc(st_geometry(st_point(c(st_coordinates(pt_ronds)[,1] + large*3,
-                                                    st_coordinates(pt_ronds)[,2] - large*3))),
-                             crs = as.numeric(code_epsg_ac_rp()))
-          pt_ronds <- st_transform(pt_ronds, crs = 4326)
-          
-          ronds_leg <- construction_ronds_legende(st_coordinates(pt_ronds)[,1],st_coordinates(pt_ronds)[,2],code_epsg_ac_rp(),isolate(input$taille_rond_ac_rp_id))
-          lignes <- construction_lignes_legende(ronds_leg,coeff,code_epsg_ac_rp())
-          
-          pt <- st_sfc(st_geometry(st_point(c(isolate(lon_lat_ac_rp())[[1]],isolate(lon_lat_ac_rp())[[2]]))), crs = 4326)
-          pt <- st_transform(pt, crs = as.numeric(code_epsg_ac_rp()))
-          coord_pt <- st_coordinates(pt)[1:2]
-          
-          position_leg_ronds <- t(data.frame(c(coord_pt[1],coord_pt[2])))
-          position_leg_classes <- t(data.frame(c(coord_pt[1],as.numeric(st_bbox(ronds_leg[[2]])[2]) - large*2)))
-          
-          if(is.null(isolate(input$type_legende_ac_rp_id))) return(NULL)
-          
-          if(is.null(isolate(input$nb_classes_ac_rp_id))) return(NULL)
-          
-          max_classes <- as.numeric(isolate(input$nb_classes_ac_rp_id))
-          
-          if(isolate(input$type_legende_ac_rp_id==1)) # Litterale
+          if(!is.null(isolate(lon_lat_ac_rp())[[1]]))
           {
-            # On cree les rectangles
+            large <- as.numeric((st_bbox(fondMaille)[4] - st_bbox(fondMaille)[2]) / 20)
             
-            for(i in 1:max_classes)
+            pt_ronds <- st_sfc(st_geometry(st_point(c(isolate(lon_lat_ac_rp())[[1]],
+                                                              isolate(lon_lat_ac_rp())[[2]]))),
+                               crs = 4326)
+            pt_ronds <- st_transform(pt_ronds, crs = as.numeric(isolate(code_epsg_ac_rp())))
+            
+            pt_ronds <- st_sfc(st_geometry(st_point(c(st_coordinates(pt_ronds)[,1] + large*3,
+                                                      st_coordinates(pt_ronds)[,2] - large*3))),
+                               crs = as.numeric(isolate(code_epsg_ac_rp())))
+            pt_ronds <- st_transform(pt_ronds, crs = 4326)
+            
+            ronds_leg <- construction_ronds_legende(st_coordinates(pt_ronds)[,1],st_coordinates(pt_ronds)[,2],isolate(code_epsg_ac_rp()),isolate(input$taille_rond_ac_rp_id))
+            lignes <- construction_lignes_legende(ronds_leg,isolate(code_epsg_ac_rp()))
+            
+            pt <- st_sfc(st_geometry(st_point(c(isolate(lon_lat_ac_rp())[[1]],isolate(lon_lat_ac_rp())[[2]]))), crs = 4326)
+            pt <- st_transform(pt, crs = as.numeric(isolate(code_epsg_ac_rp())))
+            coord_pt <- st_coordinates(pt)[1:2]
+            
+            position_leg_ronds <- t(data.frame(c(coord_pt[1],coord_pt[2])))
+            position_leg_classes <- t(data.frame(c(coord_pt[1],as.numeric(st_bbox(ronds_leg[[2]])[2]) - large*2)))
+            
+            if(is.null(isolate(input$type_legende_ac_rp_id))) return(NULL)
+            
+            if(is.null(isolate(input$nb_classes_ac_rp_id))) return(NULL)
+            
+            max_classes <- as.numeric(isolate(input$nb_classes_ac_rp_id))
+            
+            if(isolate(input$type_legende_ac_rp_id==1)) # Litterale
             {
-              # Coordonnees du point haut/gauche des rectangles de la legende
-              x_coord_rectangle <- position_leg_classes[1]
-              if(i==1) #1er rectangle
+              # On cree les rectangles
+              
+              for(i in 1:max_classes)
               {
-                y_coord_rectangle <- position_leg_classes[2]
-              }else
-              {
-                y_coord_rectangle <- y_coord_rectangle - large - large / 4
+                # Coordonnees du point haut/gauche des rectangles de la legende
+                x_coord_rectangle <- position_leg_classes[1]
+                if(i==1) #1er rectangle
+                {
+                  y_coord_rectangle <- position_leg_classes[2]
+                }else
+                {
+                  y_coord_rectangle <- y_coord_rectangle - large - large / 4
+                }
+                assign(paste0("rectangle_",i),st_sfc(st_polygon(list(matrix(c(x_coord_rectangle,               y_coord_rectangle,
+                                                                              x_coord_rectangle + large * 1.5, y_coord_rectangle,
+                                                                              x_coord_rectangle + large * 1.5, y_coord_rectangle - large,
+                                                                              x_coord_rectangle,               y_coord_rectangle - large,
+                                                                              x_coord_rectangle,               y_coord_rectangle),
+                                                                            ncol=2, byrow=TRUE))),
+                                                     crs = as.numeric(isolate(code_epsg_ac_rp()))))
               }
-              assign(paste0("rectangle_",i),st_sfc(st_polygon(list(matrix(c(x_coord_rectangle,               y_coord_rectangle,
-                                                                            x_coord_rectangle + large * 1.5, y_coord_rectangle,
-                                                                            x_coord_rectangle + large * 1.5, y_coord_rectangle - large,
-                                                                            x_coord_rectangle,               y_coord_rectangle - large,
-                                                                            x_coord_rectangle,               y_coord_rectangle),
-                                                                          ncol=2, byrow=TRUE))),
-                                                   crs = as.numeric(code_epsg_ac_rp())))
-            }
-            
-            # On ajoute un cadre blanc autour de la legende
-            
-            # leaflet rectangles et valeurs classes
-            classes_leg_texte <- isolate(analyse_leg_ac_rp())$rupture_classes
-            
-            label_rectangle <- c()
-            for(i in 1:max_classes)
-            {
-              if(i==1)
+              
+              # On ajoute un cadre blanc autour de la legende
+              
+              # leaflet rectangles et valeurs classes
+              classes_leg_texte <- isolate(analyse_leg_ac_rp())$rupture_classes
+              
+              label_rectangle <- c()
+              for(i in 1:max_classes)
               {
-                lbl <- paste0(format(round(classes_leg_texte[i+1],3), big.mark=" ",decimal.mark=",",nsmall=0)," et plus")
-                label_rectangle <- c(label_rectangle, lbl)
-              }else if (i>1 && i<max_classes)
-              {
-                lbl <- paste0("De ", format(round(classes_leg_texte[i+1],3), big.mark=" ",decimal.mark=",",nsmall=0)," \u00E0 moins de ", format(round(classes_leg_texte[i],3), big.mark=" ",decimal.mark=",",nsmall=0))
-                label_rectangle <- c(label_rectangle, lbl)
-              }else #i==length(max_classes)
-              {
-                lbl <- paste0("Moins de ", format(round(classes_leg_texte[i],3), big.mark=" ",decimal.mark=",",nsmall=0))
-                label_rectangle <- c(label_rectangle, lbl)
+                if(i==1)
+                {
+                  lbl <- paste0(format(round(classes_leg_texte[i+1],3), big.mark=" ",decimal.mark=",",nsmall=0)," et plus")
+                  label_rectangle <- c(label_rectangle, lbl)
+                }else if (i>1 && i<max_classes)
+                {
+                  lbl <- paste0("De ", format(round(classes_leg_texte[i+1],3), big.mark=" ",decimal.mark=",",nsmall=0)," \u00E0 moins de ", format(round(classes_leg_texte[i],3), big.mark=" ",decimal.mark=",",nsmall=0))
+                  label_rectangle <- c(label_rectangle, lbl)
+                }else #i==length(max_classes)
+                {
+                  lbl <- paste0("Moins de ", format(round(classes_leg_texte[i],3), big.mark=" ",decimal.mark=",",nsmall=0))
+                  label_rectangle <- c(label_rectangle, lbl)
+                }
               }
-            }
-            
-            ltext <- max(nchar(label_rectangle)) / 2.5
-            
-            vec <- matrix(c(position_leg_ronds[1] - large / 2,                     position_leg_ronds[2] + large / 2,
-                            position_leg_ronds[1] + large * 1.5 + (large * ltext), position_leg_ronds[2] + large / 2,
-                            position_leg_ronds[1] + large * 1.5 + (large * ltext), position_leg_classes[2] - large * (max_classes + (max_classes-1)/4 + 1),
-                            position_leg_ronds[1] - large / 2,                     position_leg_classes[2] - large * (max_classes + (max_classes-1)/4 + 1),
-                            position_leg_ronds[1] - large / 2,                     position_leg_ronds[2] + large / 2),
-                          5,2,byrow=T)
-            
-            rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(code_epsg_ac_rp()))
-            
-            rectangle <- st_transform(rectangle, crs = 4326)
-            
-            # leaflet du cadre blanc en 1er
-            m_save <- addPolygons(map = m_save,
-                                  data = rectangle,
-                                  stroke = FALSE,
-                                  options = pathOptions(pane = "fond_legende", clickable = F),
-                                  fill = T,
-                                  fillColor = "white",
-                                  fillOpacity = 0.8,
-                                  group = "leg"
-            )
-            
-            for(i in 1:max_classes)
-            {
+              
+              ltext <- max(nchar(label_rectangle)) / 2.5
+              
+              vec <- matrix(c(position_leg_ronds[1] - large / 2,                     position_leg_ronds[2] + large / 2,
+                              position_leg_ronds[1] + large * 1.5 + (large * ltext), position_leg_ronds[2] + large / 2,
+                              position_leg_ronds[1] + large * 1.5 + (large * ltext), position_leg_classes[2] - large * (max_classes + (max_classes-1)/4 + 1),
+                              position_leg_ronds[1] - large / 2,                     position_leg_classes[2] - large * (max_classes + (max_classes-1)/4 + 1),
+                              position_leg_ronds[1] - large / 2,                     position_leg_ronds[2] + large / 2),
+                            5,2,byrow=T)
+              
+              rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(isolate(code_epsg_ac_rp())))
+              
+              rectangle <- st_transform(rectangle, crs = 4326)
+              
+              # leaflet du cadre blanc en 1er
               m_save <- addPolygons(map = m_save,
-                                    data = st_transform(get(paste0("rectangle_",i)), crs = 4326),
+                                    data = rectangle,
                                     stroke = FALSE,
                                     options = pathOptions(pane = "fond_legende", clickable = F),
                                     fill = T,
-                                    fillColor = isolate(analyse_leg_ac_rp())$pal_classes[i],
-                                    fillOpacity = 1,
+                                    fillColor = "white",
+                                    fillOpacity = 0.8,
                                     group = "leg"
               )
               
-              pt_label <- st_sfc(st_geometry(st_point(c(max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1]) + large / 10,
-                                                        mean(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])))),
-                                 crs = as.numeric(code_epsg_ac_rp()))
-              pt_label <- st_transform(pt_label, crs = 4326)
-              
-              m_save <- addLabelOnlyMarkers(map = m_save,
-                                            lng = st_coordinates(pt_label)[1],
-                                            lat = st_coordinates(pt_label)[2],
-                                            label = label_rectangle[i],
-                                            labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
-                                                                        style = list(
-                                                                          "color" = "black",
-                                                                          "font-size" = "12px"
-                                                                        )),
-                                            group = "leg"
-              )
-            }
-            
-            # On ajoute la legende de classes a l'analyse
-            
-            # leaflet titre
-            
-            pt_titre <- st_sfc(st_geometry(st_point(c(position_leg_classes[1],
-                                                      position_leg_classes[2] + large/2))),
-                               crs = as.numeric(code_epsg_ac_rp()))
-            pt_titre <- st_transform(pt_titre, crs = 4326)
-            
-            m_save <- addLabelOnlyMarkers(map = m_save,
-                                          lng = st_coordinates(pt_titre)[1],
-                                          lat = st_coordinates(pt_titre)[2],
-                                          label = isolate(input$titre_classes_legende_ac_rp_id),
-                                          labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
-                                                                      style = list(
-                                                                        "color" = "black",
-                                                                        "font-size" = "14px"
-                                                                      )),
-                                          group = "leg"
-            )
-          }
-          
-          if(isolate(input$type_legende_ac_rp_id)==2) # Numerique
-          {
-            # On cree les rectangles
-            
-            for(i in 1:max_classes)
-            {
-              # Coordonnees du point haut/gauche des rectangles de la legende
-              x_coord_rectangle <- position_leg_classes[1]
-              if(i==1) #1er rectangle
+              for(i in 1:max_classes)
               {
-                y_coord_rectangle <- position_leg_classes[2]
-              }else
-              {
-                y_coord_rectangle <- y_coord_rectangle - large
-              }
-              assign(paste0("rectangle_",i),st_sfc(st_polygon(list(matrix(c(x_coord_rectangle,               y_coord_rectangle,
-                                                                            x_coord_rectangle + large * 1.5, y_coord_rectangle,
-                                                                            x_coord_rectangle + large * 1.5, y_coord_rectangle - large,
-                                                                            x_coord_rectangle,               y_coord_rectangle - large,
-                                                                            x_coord_rectangle,               y_coord_rectangle),
-                                                                          ncol=2, byrow=TRUE))),
-                                                   crs = as.numeric(code_epsg_ac_rp())))
-            }
-            
-            # On ajoute un cadre blanc autour de la legende
-            
-            # leaflet rectangles et valeurs classes
-            classes_leg_num <- isolate(analyse_leg_ac_rp())$rupture_classes
-            
-            ltext <- max(nchar(classes_leg_num)) / 2.5
-            
-            vec <- matrix(c(position_leg_ronds[1] - large / 2,                         position_leg_ronds[2] + large / 2,
-                            position_leg_ronds[1] + large * 1.5 + (large * ltext * 4), position_leg_ronds[2] + large / 2,
-                            position_leg_ronds[1] + large * 1.5 + (large * ltext * 4), position_leg_classes[2] - large * (max_classes + 1),
-                            position_leg_ronds[1] - large / 2,                         position_leg_classes[2] - large * (max_classes + 1),
-                            position_leg_ronds[1] - large / 2,                         position_leg_ronds[2] + large / 2),
-                          5,2,byrow=T)
-            
-            rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(code_epsg_ac_rp()))
-            
-            rectangle <- st_transform(rectangle, crs = 4326)
-            
-            # leaflet du cadre blanc en 1er
-            m_save <- addPolygons(map = m_save,
-                                  data = rectangle,
-                                  stroke = FALSE,
-                                  options = pathOptions(pane = "fond_legende", clickable = F),
-                                  fill = T,
-                                  fillColor = "white",
-                                  fillOpacity = 0.8,
-                                  group = "leg"
-            )
-            
-            for(i in 1:max_classes)
-            {
-              m_save <- addPolygons(map = m_save,
-                                    data = st_transform(get(paste0("rectangle_",i)), crs = 4326),
-                                    stroke = FALSE,
-                                    options = pathOptions(pane = "fond_legende", clickable = F),
-                                    fill = T,
-                                    fillColor = isolate(analyse_leg_ac_rp())$pal_classes[i],
-                                    fillOpacity = 1,
-                                    group = "leg"
-              )
-              
-              if(i<max_classes)
-              {
-                x1 <- max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1])
-                y1 <- min(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])
-                x2 <- max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1]) + large*0.2
-                y2 <- min(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])
-                ligne <- st_sfc(st_linestring(rbind(c(x1,y1),c(x2,y2))), crs = as.numeric(code_epsg_ac_rp()))
-                
                 m_save <- addPolygons(map = m_save,
-                                      data = st_transform(ligne, crs = 4326),
-                                      color = "black",
-                                      weight = 1,
+                                      data = st_transform(get(paste0("rectangle_",i)), crs = 4326),
+                                      stroke = FALSE,
                                       options = pathOptions(pane = "fond_legende", clickable = F),
-                                      fill = F,
+                                      fill = T,
+                                      fillColor = isolate(analyse_leg_ac_rp())$pal_classes[i],
                                       fillOpacity = 1,
                                       group = "leg"
                 )
                 
-                pt_label <- st_sfc(st_geometry(st_point(c(x2,y2))),
-                                   crs = as.numeric(code_epsg_ac_rp()))
+                pt_label <- st_sfc(st_geometry(st_point(c(max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1]) + large / 10,
+                                                          mean(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])))),
+                                   crs = as.numeric(isolate(code_epsg_ac_rp())))
                 pt_label <- st_transform(pt_label, crs = 4326)
                 
                 m_save <- addLabelOnlyMarkers(map = m_save,
                                               lng = st_coordinates(pt_label)[1],
                                               lat = st_coordinates(pt_label)[2],
-                                              label = as.character(format(round(classes_leg_num[i+1],3),big.mark=" ",decimal.mark=",",nsmall=0)),
+                                              label = label_rectangle[i],
                                               labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                                           style = list(
                                                                             "color" = "black",
@@ -2563,21 +2418,216 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                                                                           )),
                                               group = "leg"
                 )
-                
               }
+              
+              # On ajoute la legende de classes a l'analyse
+              
+              # leaflet titre
+              
+              pt_titre <- st_sfc(st_geometry(st_point(c(position_leg_classes[1],
+                                                        position_leg_classes[2] + large/2))),
+                                 crs = as.numeric(isolate(code_epsg_ac_rp())))
+              pt_titre <- st_transform(pt_titre, crs = 4326)
+              
+              m_save <- addLabelOnlyMarkers(map = m_save,
+                                            lng = st_coordinates(pt_titre)[1],
+                                            lat = st_coordinates(pt_titre)[2],
+                                            label = isolate(input$titre_classes_legende_ac_rp_id),
+                                            labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
+                                                                        style = list(
+                                                                          "color" = "black",
+                                                                          "font-size" = "14px"
+                                                                        )),
+                                            group = "leg"
+              )
             }
             
-            # leaflet titre
+            if(isolate(input$type_legende_ac_rp_id)==2) # Numerique
+            {
+              # On cree les rectangles
+              
+              for(i in 1:max_classes)
+              {
+                # Coordonnees du point haut/gauche des rectangles de la legende
+                x_coord_rectangle <- position_leg_classes[1]
+                if(i==1) #1er rectangle
+                {
+                  y_coord_rectangle <- position_leg_classes[2]
+                }else
+                {
+                  y_coord_rectangle <- y_coord_rectangle - large
+                }
+                assign(paste0("rectangle_",i),st_sfc(st_polygon(list(matrix(c(x_coord_rectangle,               y_coord_rectangle,
+                                                                              x_coord_rectangle + large * 1.5, y_coord_rectangle,
+                                                                              x_coord_rectangle + large * 1.5, y_coord_rectangle - large,
+                                                                              x_coord_rectangle,               y_coord_rectangle - large,
+                                                                              x_coord_rectangle,               y_coord_rectangle),
+                                                                            ncol=2, byrow=TRUE))),
+                                                     crs = as.numeric(isolate(code_epsg_ac_rp()))))
+              }
+              
+              # On ajoute un cadre blanc autour de la legende
+              
+              # leaflet rectangles et valeurs classes
+              classes_leg_num <- isolate(analyse_leg_ac_rp())$rupture_classes
+              
+              ltext <- max(nchar(classes_leg_num)) / 2.5
+              
+              vec <- matrix(c(position_leg_ronds[1] - large / 2,                         position_leg_ronds[2] + large / 2,
+                              position_leg_ronds[1] + large * 1.5 + (large * ltext * 4), position_leg_ronds[2] + large / 2,
+                              position_leg_ronds[1] + large * 1.5 + (large * ltext * 4), position_leg_classes[2] - large * (max_classes + 1),
+                              position_leg_ronds[1] - large / 2,                         position_leg_classes[2] - large * (max_classes + 1),
+                              position_leg_ronds[1] - large / 2,                         position_leg_ronds[2] + large / 2),
+                            5,2,byrow=T)
+              
+              rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(isolate(code_epsg_ac_rp())))
+              
+              rectangle <- st_transform(rectangle, crs = 4326)
+              
+              # leaflet du cadre blanc en 1er
+              m_save <- addPolygons(map = m_save,
+                                    data = rectangle,
+                                    stroke = FALSE,
+                                    options = pathOptions(pane = "fond_legende", clickable = F),
+                                    fill = T,
+                                    fillColor = "white",
+                                    fillOpacity = 0.8,
+                                    group = "leg"
+              )
+              
+              for(i in 1:max_classes)
+              {
+                m_save <- addPolygons(map = m_save,
+                                      data = st_transform(get(paste0("rectangle_",i)), crs = 4326),
+                                      stroke = FALSE,
+                                      options = pathOptions(pane = "fond_legende", clickable = F),
+                                      fill = T,
+                                      fillColor = isolate(analyse_leg_ac_rp())$pal_classes[i],
+                                      fillOpacity = 1,
+                                      group = "leg"
+                )
+                
+                if(i<max_classes)
+                {
+                  x1 <- max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1])
+                  y1 <- min(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])
+                  x2 <- max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1]) + large*0.2
+                  y2 <- min(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])
+                  ligne <- st_sfc(st_linestring(rbind(c(x1,y1),c(x2,y2))), crs = as.numeric(isolate(code_epsg_ac_rp())))
+                  
+                  m_save <- addPolygons(map = m_save,
+                                        data = st_transform(ligne, crs = 4326),
+                                        color = "black",
+                                        weight = 1,
+                                        options = pathOptions(pane = "fond_legende", clickable = F),
+                                        fill = F,
+                                        fillOpacity = 1,
+                                        group = "leg"
+                  )
+                  
+                  pt_label <- st_sfc(st_geometry(st_point(c(x2,y2))),
+                                     crs = as.numeric(isolate(code_epsg_ac_rp())))
+                  pt_label <- st_transform(pt_label, crs = 4326)
+                  
+                  m_save <- addLabelOnlyMarkers(map = m_save,
+                                                lng = st_coordinates(pt_label)[1],
+                                                lat = st_coordinates(pt_label)[2],
+                                                label = as.character(format(round(classes_leg_num[i+1],3),big.mark=" ",decimal.mark=",",nsmall=0)),
+                                                labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
+                                                                            style = list(
+                                                                              "color" = "black",
+                                                                              "font-size" = "12px"
+                                                                            )),
+                                                group = "leg"
+                  )
+                  
+                }
+              }
+              
+              # leaflet titre
+              
+              pt_titre <- st_sfc(st_geometry(st_point(c(position_leg_classes[1],
+                                                        position_leg_classes[2] + large/2))),
+                                 crs = as.numeric(isolate(code_epsg_ac_rp())))
+              pt_titre <- st_transform(pt_titre, crs = 4326)
+              
+              m_save <- addLabelOnlyMarkers(map = m_save,
+                                            lng = st_coordinates(pt_titre)[1],
+                                            lat = st_coordinates(pt_titre)[2],
+                                            label = isolate(input$titre_classes_legende_ac_rp_id),
+                                            labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
+                                                                        style = list(
+                                                                          "color" = "black",
+                                                                          "font-size" = "14px"
+                                                                        )),
+                                            group = "leg"
+              )
+            }
             
-            pt_titre <- st_sfc(st_geometry(st_point(c(position_leg_classes[1],
-                                                      position_leg_classes[2] + large/2))),
-                               crs = as.numeric(code_epsg_ac_rp()))
+            suppressWarnings(m_save <- addCircles(map = m_save,
+                                                  lng = st_coordinates(st_centroid(ronds_leg[[1]]))[,1],
+                                                  lat = st_coordinates(st_centroid(ronds_leg[[1]]))[,2],
+                                                  stroke = TRUE,
+                                                  opacity = 1,
+                                                  color = "#2B3E50",
+                                                  weight = 2,
+                                                  radius = c(isolate(calcul_rond_ac_rp()),isolate(calcul_rond_ac_rp())/sqrt(3)),
+                                                  options = pathOptions(pane = "fond_legende", clickable = F),
+                                                  fill = T,
+                                                  fillColor = "white",
+                                                  fillOpacity = 1,
+                                                  group = "leg")
+            )
+            
+            # leaflet lignes
+            m_save <- addPolygons(map = m_save,
+                                  data = lignes[[1]],
+                                  stroke = TRUE,
+                                  opacity = 1,
+                                  color = "#2B3E50",
+                                  weight = 2,
+                                  options = pathOptions(pane = "fond_legende", clickable = F),
+                                  fill = F,
+                                  fillOpacity = 1,
+                                  group = "leg"
+            )
+            
+            # leaflet valeur ronds
+            m_save <- addLabelOnlyMarkers(map = m_save,
+                                          lng = st_bbox(lignes[[1]][1,])[3],
+                                          lat = st_bbox(lignes[[1]][1,])[4], #ligne_grand
+                                          label = as.character(format(round(isolate(calcul_max_rayon_metres_ac_rp())[[2]],0),big.mark=" ",decimal.mark=",",nsmall=0)),
+                                          labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
+                                                                      style = list(
+                                                                        "color" = "black",
+                                                                        "font-size" = "12px"
+                                                                      )),
+                                          group = "leg"
+            )
+            
+            m_save <- addLabelOnlyMarkers(map = m_save,
+                                          lng = st_bbox(lignes[[1]][2,])[3],
+                                          lat = st_bbox(lignes[[1]][2,])[4], #ligne_petit
+                                          label = as.character(format(round(isolate(calcul_max_rayon_metres_ac_rp())[[2]]/3,0),big.mark=" ",decimal.mark=",",nsmall=0)),
+                                          labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
+                                                                      style = list(
+                                                                        "color" = "black",
+                                                                        "font-size" = "12px"
+                                                                      )),
+                                          group = "leg"
+            )
+            
+            #leaflet titre
+            
+            pt_titre <- st_sfc(st_geometry(st_point(c(position_leg_ronds[1],
+                                                      position_leg_ronds[2]))),
+                               crs = as.numeric(isolate(code_epsg_ac_rp())))
             pt_titre <- st_transform(pt_titre, crs = 4326)
             
             m_save <- addLabelOnlyMarkers(map = m_save,
                                           lng = st_coordinates(pt_titre)[1],
                                           lat = st_coordinates(pt_titre)[2],
-                                          label = isolate(input$titre_classes_legende_ac_rp_id),
+                                          label = isolate(input$titre_ronds_legende_ac_rp_id),
                                           labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                                       style = list(
                                                                         "color" = "black",
@@ -2587,78 +2637,6 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
             )
           }
           
-          suppressWarnings(m_save <- addCircles(map = m_save,
-                                                lng = st_coordinates(st_centroid(ronds_leg[[1]]))[,1],
-                                                lat = st_coordinates(st_centroid(ronds_leg[[1]]))[,2],
-                                                stroke = TRUE,
-                                                opacity = 1,
-                                                color = "#2B3E50",
-                                                weight = 2,
-                                                radius = c(isolate(calcul_rond_ac_rp()),isolate(calcul_rond_ac_rp())/sqrt(3)),
-                                                options = pathOptions(pane = "fond_legende", clickable = F),
-                                                fill = T,
-                                                fillColor = "white",
-                                                fillOpacity = 1,
-                                                group = "leg")
-          )
-          
-          # leaflet lignes
-          m_save <- addPolygons(map = m_save,
-                                data = lignes[[1]],
-                                stroke = TRUE,
-                                opacity = 1,
-                                color = "#2B3E50",
-                                weight = 2,
-                                options = pathOptions(pane = "fond_legende", clickable = F),
-                                fill = F,
-                                fillOpacity = 1,
-                                group = "leg"
-          )
-          
-          # leaflet valeur ronds
-          m_save <- addLabelOnlyMarkers(map = m_save,
-                                        lng = st_bbox(lignes[[1]][1,])[3],
-                                        lat = st_bbox(lignes[[1]][1,])[4], #ligne_grand
-                                        label = as.character(format(round(isolate(calcul_max_rayon_metres_ac_rp())[[2]],0),big.mark=" ",decimal.mark=",",nsmall=0)),
-                                        labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
-                                                                    style = list(
-                                                                      "color" = "black",
-                                                                      "font-size" = "12px"
-                                                                    )),
-                                        group = "leg"
-          )
-          
-          m_save <- addLabelOnlyMarkers(map = m_save,
-                                        lng = st_bbox(lignes[[1]][2,])[3],
-                                        lat = st_bbox(lignes[[1]][2,])[4], #ligne_petit
-                                        label = as.character(format(round(isolate(calcul_max_rayon_metres_ac_rp())[[2]]/3,0),big.mark=" ",decimal.mark=",",nsmall=0)),
-                                        labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
-                                                                    style = list(
-                                                                      "color" = "black",
-                                                                      "font-size" = "12px"
-                                                                    )),
-                                        group = "leg"
-          )
-          
-          #leaflet titre
-          
-          pt_titre <- st_sfc(st_geometry(st_point(c(position_leg_ronds[1],
-                                                    position_leg_ronds[2]))),
-                             crs = as.numeric(code_epsg_ac_rp()))
-          pt_titre <- st_transform(pt_titre, crs = 4326)
-          
-          m_save <- addLabelOnlyMarkers(map = m_save,
-                                        lng = st_coordinates(pt_titre)[1],
-                                        lat = st_coordinates(pt_titre)[2],
-                                        label = isolate(input$titre_ronds_legende_ac_rp_id),
-                                        labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
-                                                                    style = list(
-                                                                      "color" = "black",
-                                                                      "font-size" = "14px"
-                                                                    )),
-                                        group = "leg"
-          )
-
           removeModal()
 
           m_save

@@ -868,7 +868,7 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         return(list(lon,lat))
       })
 
-      observeEvent(list(input$mymap_ty_zoom,input$mymap_ty_click,input$titre_typo_legende_ty_id),{
+      observeEvent(list(input$mymap_ty_click,input$titre_typo_legende_ty_id),{
         if(is.null(input$affiche_legende_ty_id)) return(NULL)
 
         if(input$affiche_legende_ty_id==FALSE) return(NULL)
@@ -879,9 +879,6 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
         proxy <- clearGroup(map=proxy, group="leg")
         proxy <- clearMarkers(map=proxy)
 
-        zoom <- as.numeric(input$mymap_ty_zoom)
-        coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-        
         pt <- st_sfc(st_geometry(st_point(c(lon_lat_ty()[[1]],lon_lat_ty()[[2]]))), crs = 4326)
         pt <- st_transform(pt, crs = as.numeric(code_epsg_ty()))
         coord_pt <- st_coordinates(pt)[1:2]
@@ -1099,138 +1096,138 @@ function(data,fondMaille,fondContour,fondSuppl=NULL,idData,varTypo,emprise="FRM"
             i <- i + 1
           }
 
-          zoom <- as.numeric(isolate(input$mymap_ty_zoom))
-          coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-
-          pt <- st_sfc(st_geometry(st_point(c(isolate(lon_lat_ty())[[1]],isolate(lon_lat_ty())[[2]]))), crs = 4326)
-          pt <- st_transform(pt, crs = as.numeric(code_epsg_ty()))
-          coord_pt <- st_coordinates(pt)[1:2]
-          
-          position_leg <- t(data.frame(c(coord_pt[1],coord_pt[2])))
-          
-          # On cree les rectangles
-          nb_typo <- length(unique(isolate(analyse_ty())[[1]]$classe))
-          
-          large <- as.numeric((st_bbox(fondMaille)[4] - st_bbox(fondMaille)[2]) / 20)
-          
-          for(i in 1:nb_typo)
+          if(!is.null(isolate(lon_lat_ty())[[1]]))
           {
-            # Coordonnees du point haut/gauche des rectangles de la legende
-            x_coord_rectangle <- position_leg[1]
-            if(i==1) #1er rectangle
+            pt <- st_sfc(st_geometry(st_point(c(isolate(lon_lat_ty())[[1]],isolate(lon_lat_ty())[[2]]))), crs = 4326)
+            pt <- st_transform(pt, crs = as.numeric(isolate(code_epsg_ty())))
+            coord_pt <- st_coordinates(pt)[1:2]
+            
+            position_leg <- t(data.frame(c(coord_pt[1],coord_pt[2])))
+            
+            # On cree les rectangles
+            nb_typo <- length(unique(isolate(analyse_ty())[[1]]$classe))
+            
+            large <- as.numeric((st_bbox(fondMaille)[4] - st_bbox(fondMaille)[2]) / 20)
+            
+            for(i in 1:nb_typo)
             {
-              y_coord_rectangle <- position_leg[2]
-            }else
-            {
-              y_coord_rectangle <- y_coord_rectangle - large - large / 4
+              # Coordonnees du point haut/gauche des rectangles de la legende
+              x_coord_rectangle <- position_leg[1]
+              if(i==1) #1er rectangle
+              {
+                y_coord_rectangle <- position_leg[2]
+              }else
+              {
+                y_coord_rectangle <- y_coord_rectangle - large - large / 4
+              }
+              assign(paste0("rectangle_",i),st_sfc(st_polygon(list(matrix(c(x_coord_rectangle,               y_coord_rectangle,
+                                                                            x_coord_rectangle + large * 1.5, y_coord_rectangle,
+                                                                            x_coord_rectangle + large * 1.5, y_coord_rectangle - large,
+                                                                            x_coord_rectangle,               y_coord_rectangle - large,
+                                                                            x_coord_rectangle,               y_coord_rectangle),
+                                                                          ncol=2, byrow=TRUE))),
+                                                   crs = as.numeric(isolate(code_epsg_ty()))))
             }
-            assign(paste0("rectangle_",i),st_sfc(st_polygon(list(matrix(c(x_coord_rectangle,               y_coord_rectangle,
-                                                                          x_coord_rectangle + large * 1.5, y_coord_rectangle,
-                                                                          x_coord_rectangle + large * 1.5, y_coord_rectangle - large,
-                                                                          x_coord_rectangle,               y_coord_rectangle - large,
-                                                                          x_coord_rectangle,               y_coord_rectangle),
-                                                                        ncol=2, byrow=TRUE))),
-                                                 crs = as.numeric(code_epsg_ty())))
-          }
-          
-          # On ajoute un cadre blanc autour de la legende
-          
-          typo_leg_texte <- c()
-          for(i in 1:nb_typo)
-          {
-            if(is.null(isolate(input[[paste0("lib_typo_", i,"_ty_id")]])))
+            
+            # On ajoute un cadre blanc autour de la legende
+            
+            typo_leg_texte <- c()
+            for(i in 1:nb_typo)
             {
-              typo_leg_texte <- c(typo_leg_texte, sort(unique(isolate(analyse_ty())[[1]]$valeur))[i])
-            }else
-            {
-              typo_leg_texte <- c(typo_leg_texte, isolate(input[[paste0("lib_typo_", i,"_ty_id")]]))
+              if(is.null(isolate(input[[paste0("lib_typo_", i,"_ty_id")]])))
+              {
+                typo_leg_texte <- c(typo_leg_texte, sort(unique(isolate(analyse_ty())[[1]]$valeur))[i])
+              }else
+              {
+                typo_leg_texte <- c(typo_leg_texte, isolate(input[[paste0("lib_typo_", i,"_ty_id")]]))
+              }
             }
-          }
-          
-          ltext <- max(nchar(typo_leg_texte)) / 2
-          
-          vec <- matrix(c(position_leg[1] - large / 2,                     position_leg[2] + large * 2,
-                          position_leg[1] + large * 1.5 + (large * ltext), position_leg[2] + large * 2,
-                          position_leg[1] + large * 1.5 + (large * ltext), position_leg[2] - large * (nb_typo + 3.5),
-                          position_leg[1] - large / 2,                     position_leg[2] - large * (nb_typo + 3.5),
-                          position_leg[1] - large / 2,                     position_leg[2] + large * 2),
-                        5,2,byrow=T)
-          
-          rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(code_epsg_ty()))
-          
-          rectangle <- st_transform(rectangle, crs = 4326)
-          
-          # leaflet du cadre blanc en 1er
-          
-          m_save <- addPolygons(map = m_save,
-                                data = rectangle,
-                                stroke = FALSE,
-                                options = pathOptions(pane = "fond_legende", clickable = F),
-                                fill = T,
-                                fillColor = "white",
-                                fillOpacity = 0.8,
-                                group = "leg"
-          )
-          
-          palette <- unique(isolate(palette_ty())[order(isolate(palette_ty())$valeur),"col"])
-          
-          for(i in 1: nb_typo)
-          {
+            
+            ltext <- max(nchar(typo_leg_texte)) / 2
+            
+            vec <- matrix(c(position_leg[1] - large / 2,                     position_leg[2] + large * 2,
+                            position_leg[1] + large * 1.5 + (large * ltext), position_leg[2] + large * 2,
+                            position_leg[1] + large * 1.5 + (large * ltext), position_leg[2] - large * (nb_typo + 3.5),
+                            position_leg[1] - large / 2,                     position_leg[2] - large * (nb_typo + 3.5),
+                            position_leg[1] - large / 2,                     position_leg[2] + large * 2),
+                          5,2,byrow=T)
+            
+            rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(isolate(code_epsg_ty())))
+            
+            rectangle <- st_transform(rectangle, crs = 4326)
+            
+            # leaflet du cadre blanc en 1er
+            
             m_save <- addPolygons(map = m_save,
-                                  data = st_transform(get(paste0("rectangle_",i)), crs = 4326),
+                                  data = rectangle,
                                   stroke = FALSE,
                                   options = pathOptions(pane = "fond_legende", clickable = F),
                                   fill = T,
-                                  fillColor = palette[i],
-                                  fillOpacity = 1,
+                                  fillColor = "white",
+                                  fillOpacity = 0.8,
                                   group = "leg"
             )
             
-            pt_label <- st_sfc(st_geometry(st_point(c(max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1]) + large / 10,
-                                                      mean(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])))),
-                               crs = as.numeric(code_epsg_ty()))
-            pt_label <- st_transform(pt_label, crs = 4326)
+            palette <- unique(isolate(palette_ty())[order(isolate(palette_ty())$valeur),"col"])
             
-            if(is.null(isolate(input[[paste0("lib_typo_", i,"_ty_id")]])))
+            for(i in 1: nb_typo)
             {
-              typo_leg_texte <- sort(unique(isolate(analyse_ty())[[1]]$valeur))[i]
-            }else
-            {
-              typo_leg_texte <- isolate(input[[paste0("lib_typo_", i,"_ty_id")]])
+              m_save <- addPolygons(map = m_save,
+                                    data = st_transform(get(paste0("rectangle_",i)), crs = 4326),
+                                    stroke = FALSE,
+                                    options = pathOptions(pane = "fond_legende", clickable = F),
+                                    fill = T,
+                                    fillColor = palette[i],
+                                    fillOpacity = 1,
+                                    group = "leg"
+              )
+              
+              pt_label <- st_sfc(st_geometry(st_point(c(max(st_coordinates(get(paste0("rectangle_",i))[[1]])[,1]) + large / 10,
+                                                        mean(st_coordinates(get(paste0("rectangle_",i))[[1]])[,2])))),
+                                 crs = as.numeric(isolate(code_epsg_ty())))
+              pt_label <- st_transform(pt_label, crs = 4326)
+              
+              if(is.null(isolate(input[[paste0("lib_typo_", i,"_ty_id")]])))
+              {
+                typo_leg_texte <- sort(unique(isolate(analyse_ty())[[1]]$valeur))[i]
+              }else
+              {
+                typo_leg_texte <- isolate(input[[paste0("lib_typo_", i,"_ty_id")]])
+              }
+              
+              m_save <- addLabelOnlyMarkers(map = m_save,
+                                            lng = st_coordinates(pt_label)[1],
+                                            lat = st_coordinates(pt_label)[2],
+                                            label = typo_leg_texte,
+                                            labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
+                                                                        style = list(
+                                                                          "color" = "black",
+                                                                          "font-size" = "12px"
+                                                                        )),
+                                            group = "leg"
+              )
             }
             
+            # leaflet titre
+            
+            pt_titre <- st_sfc(st_geometry(st_point(c(min(st_coordinates(pt)[,"X"]),
+                                                      max(st_coordinates(pt)[,"Y"]) + large))),
+                               crs = as.numeric(isolate(code_epsg_ty())))
+            pt_titre <- st_transform(pt_titre, crs = 4326)
+            
             m_save <- addLabelOnlyMarkers(map = m_save,
-                                          lng = st_coordinates(pt_label)[1],
-                                          lat = st_coordinates(pt_label)[2],
-                                          label = typo_leg_texte,
+                                          lng = st_coordinates(pt_titre)[1],
+                                          lat = st_coordinates(pt_titre)[2],
+                                          label = isolate(input$titre_typo_legende_ty_id),
                                           labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
                                                                       style = list(
                                                                         "color" = "black",
-                                                                        "font-size" = "12px"
+                                                                        "font-size" = "14px"
                                                                       )),
                                           group = "leg"
             )
           }
           
-          # leaflet titre
-          
-          pt_titre <- st_sfc(st_geometry(st_point(c(min(st_coordinates(pt)[,"X"]),
-                                                    max(st_coordinates(pt)[,"Y"]) + large))),
-                             crs = as.numeric(code_epsg_ty()))
-          pt_titre <- st_transform(pt_titre, crs = 4326)
-          
-          m_save <- addLabelOnlyMarkers(map = m_save,
-                                        lng = st_coordinates(pt_titre)[1],
-                                        lat = st_coordinates(pt_titre)[2],
-                                        label = isolate(input$titre_typo_legende_ty_id),
-                                        labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
-                                                                    style = list(
-                                                                      "color" = "black",
-                                                                      "font-size" = "14px"
-                                                                    )),
-                                        group = "leg"
-          )
-
           removeModal()
 
           m_save

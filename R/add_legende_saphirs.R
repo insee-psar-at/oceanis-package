@@ -247,7 +247,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
       )
     }
 
-    message(simpleMessage(paste0("Les coordonnees de la legende des fleches saphirs sont : longitude (x) = ",lng," degre ; latitude (y) = ",lat," degre")))
+    message(simpleMessage(paste0("[INFO] Les coordonnees de la legende des fleches saphirs sont : longitude (x) = ",lng," degre ; latitude (y) = ",lat," degre")))
 
     return(map)
   }

@@ -1345,6 +1345,13 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         return(list(lon,lat))
       })
 
+      construction_legende_rp <- reactive({
+        ronds_leg <- construction_ronds_legende(lon_lat_rp()[[1]],lon_lat_rp()[[2]],code_epsg_rp(),input$taille_rond_rp_id)
+        lignes <- construction_lignes_legende(ronds_leg,code_epsg_rp())
+        ronds_leg[[2]] <- cbind(ronds_leg[[2]],ETI_VAL=c(max(abs(data[,varVolume]), na.rm = TRUE),max(abs(data[,varVolume]), na.rm = TRUE)/3))
+        return(list(ronds_leg,lignes))
+      })
+      
       observeEvent(list(input$mymap_rp_zoom,input$mymap_rp_click,input$titre_ronds_legende_rp_id,input$taille_rond_rp_id),{
         req(input$taille_rond_rp_id)
 
@@ -1354,29 +1361,14 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
         if(is.null(lon_lat_rp()[[1]])) return(NULL)
 
-        CONSTRUCTION_LEGENDE_RP()
-      })
-
-      construction_legende_rp <- reactive({
-        zoom <- as.numeric(input$mymap_rp_zoom)
-        coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-        ronds_leg <- construction_ronds_legende(lon_lat_rp()[[1]],lon_lat_rp()[[2]],code_epsg_rp(),input$taille_rond_rp_id)
-        lignes <- construction_lignes_legende(ronds_leg,coeff,code_epsg_rp())
-        ronds_leg[[2]] <- cbind(ronds_leg[[2]],ETI_VAL=c(max(abs(data[,varVolume]), na.rm = TRUE),max(abs(data[,varVolume]), na.rm = TRUE)/3))
-        return(list(ronds_leg,lignes,coeff))
-      })
-
-      CONSTRUCTION_LEGENDE_RP <- function()
-      {
         proxy <- leafletProxy("mymap_rp")
-
+        
         proxy <- clearGroup(map=proxy, group="leg")
         proxy <- clearGroup(map=proxy, group="leg_rectangle")
         proxy <- clearMarkers(map=proxy)
-
+        
         ronds_leg <- construction_legende_rp()[[1]]
         lignes <- construction_legende_rp()[[2]]
-        coeff <- construction_legende_rp()[[3]]
         
         # On ajoute un cadre blanc autour de la legende
         bbox_ronds <- st_bbox(ronds_leg[[2]])
@@ -1418,7 +1410,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                                              fillOpacity = 1,
                                              group = "leg")
         )
-
+        
         # leaflet lignes
         proxy <- addPolygons(map = proxy,
                              data = lignes[[1]],
@@ -1431,7 +1423,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                              fillOpacity = 1,
                              group = "leg"
         )
-
+        
         # leaflet valeur ronds
         proxy <- addLabelOnlyMarkers(map = proxy,
                                      lng = st_bbox(lignes[[1]][1,])[3],
@@ -1444,7 +1436,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                                                                  )),
                                      group = "leg"
         )
-
+        
         proxy <- addLabelOnlyMarkers(map = proxy,
                                      lng = st_bbox(lignes[[1]][2,])[3],
                                      lat = st_bbox(lignes[[1]][2,])[4], #ligne_petit
@@ -1456,7 +1448,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                                                                  )),
                                      group = "leg"
         )
-
+        
         #leaflet titre
         
         rectangle <- st_transform(rectangle, crs = as.numeric(code_epsg_rp()))
@@ -1464,7 +1456,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         pt_titre <- st_sfc(st_geometry(st_point(c(as.numeric(st_bbox(rectangle)[1]) + large/3,
                                                   as.numeric(st_bbox(rectangle)[4]) - large/3))),
                            crs = as.numeric(code_epsg_rp()))
-
+        
         pt_titre <- st_transform(pt_titre, crs = 4326)
         
         proxy <- addLabelOnlyMarkers(map = proxy,
@@ -1478,8 +1470,8 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
                                                                  )),
                                      group = "leg"
         )
-      }
-
+      })
+      
       # AJOUT DES ONGLETS SAUVEGARDE
 
       observeEvent(input$save_carte_rp_id,{
@@ -1606,7 +1598,6 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
           {
             ronds_leg <- isolate(construction_legende_rp())[[1]]
             lignes <- isolate(construction_legende_rp())[[2]]
-            coeff <- isolate(construction_legende_rp())[[3]]
             
             # On ajoute un cadre blanc autour de la legende
             bbox_ronds <- st_bbox(ronds_leg[[2]])
@@ -1619,7 +1610,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
             rectangle[4] <- rectangle[4] + large
             
             vec <- matrix(c(rectangle[1],rectangle[2],   rectangle[3],rectangle[2],   rectangle[3],rectangle[4],   rectangle[1],rectangle[4],   rectangle[1],rectangle[2]),5,2,byrow=T)
-            rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(code_epsg_rp()))
+            rectangle <- st_sfc(st_polygon(list(vec)), crs = as.numeric(isolate(code_epsg_rp())))
             
             rectangle <- st_transform(rectangle, crs = 4326)
             
@@ -1689,11 +1680,11 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
             
             #leaflet titre
             
-            rectangle <- st_transform(rectangle, crs = as.numeric(code_epsg_rp()))
+            rectangle <- st_transform(rectangle, crs = as.numeric(isolate(code_epsg_rp())))
             
             pt_titre <- st_sfc(st_geometry(st_point(c(as.numeric(st_bbox(rectangle)[1]) + large/3,
                                                       as.numeric(st_bbox(rectangle)[4]) - large/3))),
-                               crs = as.numeric(code_epsg_rp()))
+                               crs = as.numeric(isolate(code_epsg_rp())))
             
             pt_titre <- st_transform(pt_titre, crs = 4326)
             

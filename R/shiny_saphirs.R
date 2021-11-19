@@ -13,7 +13,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
     if(any(class(idDataDepart)!="character")) msg_error5 <- "Le nom de la variable de depart doit etre de type caractere / "
     if(any(class(idDataArrivee)!="character")) msg_error6 <- "Le nom de la variable d'arrivee doit etre de type caractere / "
     if(any(class(varFlux)!="character")) msg_error7 <- "Le nom de la variable doit etre de type caractere / "
-    if(any(class(typeMaille)!="character")) msg_error8 <- "La valeur doit etre de type caractere ('REG', 'DEP', 'ZE', 'AU', 'BV', 'UU', 'EPCI' ou 'DEPCOM') / "
+    if(any(class(typeMaille)!="character")) msg_error8 <- "La valeur doit etre de type caractere ('REG', 'DEP', 'ZE', 'AU', 'BV', 'UU', 'EPCI' ou 'COM') / "
     if(any(class(direction)!="character")) msg_error9 <- "La valeur doit etre de type caractere ('Ent', 'Sor' ou 'Sol') / "
     if(any(class(emprise)!="character")) msg_error10 <- "La valeur doit etre de type caractere ('FRM', '971', '972', '973', '974', '976' ou '999') / "
 
@@ -25,7 +25,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
     if(!any(names(data) %in% idDataDepart))  msg_error15 <- "La variable identifiant de depart n'existe pas dans la table des donnees / "
     if(!any(names(data) %in% idDataArrivee))  msg_error16 <- "La variable identifiant d'arrivee n'existe pas dans la table des donnees / "
     if(!any(names(data) %in% varFlux))  msg_error17 <- "La variable a representer n'existe pas dans la table des donnees / "
-    if(!typeMaille %in% c("REG", "DEP", "ZE", "AU", "BV", "UU", "EPCI", "DEPCOM")) msg_error18 <- "La variable typeMaille doit etre 'REG', 'DEP', 'ZE', 'AU', 'BV', 'UU', 'EPCI' ou 'DEPCOM' / "
+    if(!typeMaille %in% c("REG", "DEP", "ZE", "AU", "BV", "UU", "EPCI", "COM")) msg_error18 <- "La variable typeMaille doit etre 'REG', 'DEP', 'ZE', 'AU', 'BV', 'UU', 'EPCI' ou 'COM' / "
     if(!direction %in% c("Ent", "Sor", "Sol")) msg_error19 <- "La variable direction doit etre 'Ent', 'Sor' ou 'Sol' / "
     if(!emprise %in% c("FRM","971","972","973","974","976","999")) msg_error20 <- "La variable emprise doit etre 'FRM', '971', '972', '973', '974', '976' ou '999' / "
     if(!is.null(fondEtranger)) if(any(!any(class(fondEtranger) %in% "sf"),!any(class(fondEtranger) %in% "data.frame"))) msg_error21 <- "Le fond etranger doit etre un objet sf / "
@@ -63,7 +63,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
     if (substr(typeMaille,1,2)=="BV") largeur$a<-6
     if (substr(typeMaille,1,2)=="UU") largeur$a<-6
     if (typeMaille=="EPCI") largeur$a<-4
-    if (typeMaille=="DEPCOM") largeur$a<-2
+    if (typeMaille=="COM") largeur$a<-2
 
     erreur_maille <- reactiveValues(a=FALSE)
 
@@ -247,7 +247,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         }
 
         output$largeur_fs <- renderUI({
-          numericInput("largeur_fs_id", label = h5("Largeur de la fleche la plus large (km)"), value=largeur$a, step=10)
+          numericInput("largeur_fs_id", label = h5(paste0("Largeur de la fl","\u00e8","che la plus large (km)")), value=largeur$a, step=10)
         })
 
         # LEGENDE
@@ -406,9 +406,6 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         
         if(max(donnees)>0 & min(donnees)<0) rupture <- TRUE
         
-        analyse_fs <- analyse_fs()
-        code_epsg_fs <- code_epsg_fs()
-        
         if(rupture)
         {
           fond_flux_sortie <- st_sf(analyse_fs()[[1]][analyse_fs()[[1]]$save < 0,])
@@ -451,6 +448,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         if(input$ajout_reg_fs_id) fond_region <- st_transform(fond_region_fs(),crs = as.numeric(code_epsg_fs()))
         fond_france <- st_transform(fond_habillage_fs()[[1]],crs = as.numeric(code_epsg_fs()))
         fond_pays <- st_transform(fond_habillage_fs()[[2]],crs = as.numeric(code_epsg_fs()))
+        
         if(rupture | min(donnees)>=0) suppressWarnings(st_write(fond_flux_entree, paste0(rep_sortie,"/layers/fond_flux_entree.shp"), delete_dsn = TRUE, quiet = TRUE))
         if(rupture | max(donnees)<0) suppressWarnings(st_write(fond_flux_sortie, paste0(rep_sortie,"/layers/fond_flux_sortie.shp"), delete_dsn = TRUE, quiet = TRUE))
         suppressWarnings(st_write(fond_flux_leg, paste0(rep_sortie,"/layers/fond_flux_leg.shp"), delete_dsn = TRUE, quiet = TRUE))
@@ -533,7 +531,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         if (substr(typeMaille,1,2)=="BV") largeur$a<-6
         if (substr(typeMaille,1,2)=="UU") largeur$a<-6
         if (typeMaille=="EPCI") largeur$a<-4
-        if (typeMaille=="DEPCOM") largeur$a<-2
+        if (typeMaille=="COM") largeur$a<-2
 
         if(!is.na(input$largeur_fs_id))
         {
@@ -809,8 +807,6 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
 
           analyse <- isolate(analyse_fs())
           analyse_WGS84 <- analyse[[2]]
-          fond_habillage_fs <- fond_habillage_fs()
-          fond_contour_maille_fs <- fond_contour_maille_fs()
           
           if(direction!="Sol")
           {
@@ -1182,7 +1178,7 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
         return(list(lon,lat))
       })
 
-      observeEvent(list(input$mymap_fs_zoom,input$mymap_fs_click,input$titre_flux_legende_fs_id,input$flux_min_fs_id,input$largeur_fs_id),{
+      observeEvent(list(input$mymap_fs_click,input$titre_flux_legende_fs_id,input$flux_min_fs_id,input$largeur_fs_id),{
         if(is.null(input$affiche_legende_fs_id)) return(NULL)
 
         if(input$affiche_legende_fs_id==FALSE) return(NULL)
@@ -1198,9 +1194,6 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
 
         proxy <- clearGroup(map=proxy, group="leg")
         proxy <- clearMarkers(map=proxy)
-
-        zoom <- as.numeric(input$mymap_fs_zoom)
-        coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
 
         vmax <- max(abs(data.frame(analyse_fs()[[2]])[,varFlux]))
         
@@ -1422,87 +1415,87 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
             i <- i + 1
           }
 
-          zoom <- as.numeric(isolate(input$mymap_fs_zoom))
-          coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
-
-          vmax <- max(abs(data.frame(isolate(analyse_fs())[[2]])[,varFlux]))
-
-          coord_fleche_max <- st_coordinates(isolate(analyse_fs())[[2]][abs(data.frame(isolate(analyse_fs())[[2]])[,varFlux])==vmax,])
-          large <- as.numeric(max(st_distance(st_sfc(st_point(c(coord_fleche_max[2,1],coord_fleche_max[2,2])),st_point(c(coord_fleche_max[6,1],coord_fleche_max[6,2])), crs = 4326))))
+          if(!is.null(isolate(lon_lat_fs())[[1]]))
+          {
+            vmax <- max(abs(data.frame(isolate(analyse_fs())[[2]])[,varFlux]))
+  
+            coord_fleche_max <- st_coordinates(isolate(analyse_fs())[[2]][abs(data.frame(isolate(analyse_fs())[[2]])[,varFlux])==vmax,])
+            large <- as.numeric(max(st_distance(st_sfc(st_point(c(coord_fleche_max[2,1],coord_fleche_max[2,2])),st_point(c(coord_fleche_max[6,1],coord_fleche_max[6,2])), crs = 4326))))
+            
+            long <- isolate(longueur$a)
+            
+            flux_legWGS84_s <- fleche_legende(isolate(lon_lat_fs())[[1]],isolate(lon_lat_fs())[[2]],long,large,vmax,isolate(code_epsg_fs()))
+            flux_legWGS84 <- flux_legWGS84_s[[1]]
+            pointe1 <- flux_legWGS84_s[[2]]
+            pointe2 <- flux_legWGS84_s[[3]]
+            rectangle <- flux_legWGS84_s[[4]]
+  
+            # leaflet du cadre blanc en 1er
+            m_save <- addPolygons(map = m_save,
+                                  data = rectangle,
+                                  stroke = FALSE,
+                                  options = pathOptions(pane = "fond_legende", clickable = F),
+                                  fill = T,
+                                  fillColor = "white",
+                                  fillOpacity = 0.8
+            )
+  
+            suppressWarnings(m_save <- addPolygons(map = m_save,
+                                                   data = flux_legWGS84,
+                                                   stroke = TRUE,
+                                                   opacity = 1,
+                                                   color = "#2B3E50",
+                                                   weight = 2,
+                                                   options = pathOptions(pane = "fond_legende", clickable = F),
+                                                   fill = T,
+                                                   fillColor = "white",
+                                                   fillOpacity = 1
+            ))
+  
+            # leaflet valeur flux
+            m_save <- addLabelOnlyMarkers(map = m_save,
+                                          lng = pointe1[1], lat = pointe1[2], #grande fleche
+                                          label = as.character(format(vmax,big.mark=" ",decimal.mark=",",nsmall=0)),
+                                          labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
+                                                                      style = list(
+                                                                        "color" = "black",
+                                                                        "font-size" = "12px"
+                                                                      ))
+            )
+  
+            m_save <- addLabelOnlyMarkers(map = m_save,
+                                          lng = pointe2[1], lat = pointe2[2], #petite fleche
+                                          label = as.character(format(round(vmax/3,0),big.mark=" ",decimal.mark=",",nsmall=0)),
+                                          labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
+                                                                      style = list(
+                                                                        "color" = "black",
+                                                                        "font-size" = "12px"
+                                                                      ))
+            )
+  
+            #leaflet titre
+            
+            pt <- st_sfc(st_geometry(st_point(c(isolate(lon_lat_fs())[[1]],isolate(lon_lat_fs())[[2]]))), crs = 4326)
+            pt <- st_transform(pt, crs = as.numeric(isolate(code_epsg_fs())))
+            coord_pt <- st_coordinates(pt)[1:2]
+            
+            pt_titre <- st_sfc(st_geometry(st_point(c(min(st_coordinates(pt)[,"X"]),
+                                                      max(st_coordinates(pt)[,"Y"]) + large*2))),
+                               crs = as.numeric(isolate(code_epsg_fs())))
+            pt_titre <- st_transform(pt_titre, crs = 4326)
+            
+            m_save <- addLabelOnlyMarkers(map = m_save,
+                                          lng = st_coordinates(pt_titre)[1],
+                                          lat = st_coordinates(pt_titre)[2],
+                                          label = isolate(input$titre_flux_legende_fs_id),
+                                          labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
+                                                                      style = list(
+                                                                        "color" = "black",
+                                                                        "font-size" = "14px"
+                                                                      ))
+            )
+          }
           
-          long <- isolate(longueur$a)
-          
-          flux_legWGS84_s <- fleche_legende(isolate(lon_lat_fs())[[1]],isolate(lon_lat_fs())[[2]],long,large,vmax,code_epsg_fs())
-          flux_legWGS84 <- flux_legWGS84_s[[1]]
-          pointe1 <- flux_legWGS84_s[[2]]
-          pointe2 <- flux_legWGS84_s[[3]]
-          rectangle <- flux_legWGS84_s[[4]]
-
-          # leaflet du cadre blanc en 1er
-          m_save <- addPolygons(map = m_save,
-                                data = rectangle,
-                                stroke = FALSE,
-                                options = pathOptions(pane = "fond_legende", clickable = F),
-                                fill = T,
-                                fillColor = "white",
-                                fillOpacity = 0.8
-          )
-
-          suppressWarnings(m_save <- addPolygons(map = m_save,
-                                                 data = flux_legWGS84,
-                                                 stroke = TRUE,
-                                                 opacity = 1,
-                                                 color = "#2B3E50",
-                                                 weight = 2,
-                                                 options = pathOptions(pane = "fond_legende", clickable = F),
-                                                 fill = T,
-                                                 fillColor = "white",
-                                                 fillOpacity = 1
-          ))
-
-          # leaflet valeur flux
-          m_save <- addLabelOnlyMarkers(map = m_save,
-                                        lng = pointe1[1], lat = pointe1[2], #grande fleche
-                                        label = as.character(format(vmax,big.mark=" ",decimal.mark=",",nsmall=0)),
-                                        labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
-                                                                    style = list(
-                                                                      "color" = "black",
-                                                                      "font-size" = "12px"
-                                                                    ))
-          )
-
-          m_save <- addLabelOnlyMarkers(map = m_save,
-                                        lng = pointe2[1], lat = pointe2[2], #petite fleche
-                                        label = as.character(format(round(vmax/3,0),big.mark=" ",decimal.mark=",",nsmall=0)),
-                                        labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
-                                                                    style = list(
-                                                                      "color" = "black",
-                                                                      "font-size" = "12px"
-                                                                    ))
-          )
-
-          #leaflet titre
-          
-          pt <- st_sfc(st_geometry(st_point(c(isolate(lon_lat_fs())[[1]],isolate(lon_lat_fs())[[2]]))), crs = 4326)
-          pt <- st_transform(pt, crs = as.numeric(code_epsg_fs()))
-          coord_pt <- st_coordinates(pt)[1:2]
-          
-          pt_titre <- st_sfc(st_geometry(st_point(c(min(st_coordinates(pt)[,"X"]),
-                                                    max(st_coordinates(pt)[,"Y"]) + large*2))),
-                             crs = as.numeric(code_epsg_fs()))
-          pt_titre <- st_transform(pt_titre, crs = 4326)
-          
-          m_save <- addLabelOnlyMarkers(map = m_save,
-                                        lng = st_coordinates(pt_titre)[1],
-                                        lat = st_coordinates(pt_titre)[2],
-                                        label = isolate(input$titre_flux_legende_fs_id),
-                                        labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "right",
-                                                                    style = list(
-                                                                      "color" = "black",
-                                                                      "font-size" = "14px"
-                                                                    ))
-          )
-
           removeModal()
 
           m_save

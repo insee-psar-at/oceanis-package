@@ -75,10 +75,6 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,colFleche,colBor
       {
         couleurfond=colFleche
         remplissagefond="yes"
-      }else if(l[i]=="fond_flux_rupt")
-      {
-        couleurfond="100,149,237"
-        remplissagefond="yes"
       }else
       {
         remplissagefond="no"
@@ -99,7 +95,7 @@ function(liste_fonds,chemin_fonds,nom_projet,titre,titre2,sourc,colFleche,colBor
       }
       
       stylebordure="solid"
-      if (l[i] %in% c("fond_flux","fond_flux_leg","fond_flux_rupt","fond_maille","fond_departement","fond_pays","fond_etranger","fond_territoire"))
+      if (l[i] %in% c("fond_flux","fond_flux_leg","fond_maille","fond_departement","fond_pays","fond_etranger","fond_territoire"))
       {
         epaisseurbordure=0.26
       }else

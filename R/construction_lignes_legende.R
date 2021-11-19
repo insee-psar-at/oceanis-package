@@ -1,12 +1,12 @@
 construction_lignes_legende <-
-function(ronds_leg,coeff,code_epsg)
+function(ronds_leg,code_epsg)
   {
     ronds_pl_leg <- ronds_leg[[2]]
     
     x1_grand_pl <- st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"X"][which.max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"Y"])]
     y1_grand_pl <- max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"Y"])
     pts1_grand_pl <- c(x1_grand_pl,y1_grand_pl)
-    x2_grand_pl <- x1_grand_pl+(max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"X"])-x1_grand_pl)+coeff*30000 #on est ici en Lambert93 pour l'export en Qgis
+    x2_grand_pl <- x1_grand_pl + (st_bbox(ronds_pl_leg)[3] - st_bbox(ronds_pl_leg)[1]) * 3/4
     y2_grand_pl <- max(st_coordinates(ronds_pl_leg)[which(st_coordinates(ronds_pl_leg)[,4]==1),"Y"])
     pts2_grand_pl <- c(x2_grand_pl,y2_grand_pl)
     ligne_grand_pl <- rbind(pts1_grand_pl,pts2_grand_pl)
