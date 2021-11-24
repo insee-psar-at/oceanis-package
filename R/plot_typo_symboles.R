@@ -184,7 +184,7 @@ plot_typo_symboles <-
     for(i in 1:nrow(symbLeg))
     {
       plot(sf::st_geometry(fondPointsLeg[i,]),pch=types[i],col=couleurs[i],border=colBorder[i],cex=tailles[i],lwd=epaisseurs[i],add=T)
-      text(pointsLeg[i,1]+decalageLeg,pointsLeg[i,2],labels=labels[i],cex=0.7,adj=0)
+      text(pointsLeg[i,1]+decalageLeg,pointsLeg[i,2],labels=labels[i],cex=0.9,adj=0)
     }
 
     text(pointsLeg[1,1],pointsLeg[1,2]+decalageLeg,labels=titreLeg,cex=1,adj=0)
