@@ -8,7 +8,7 @@
 [![](https://cranlogs.r-pkg.org/badges/oceanis?color=brightgreen)](https://cran.r-project.org/package=oceanis)
 [![](https://cranlogs.r-pkg.org/badges/grand-total/oceanis?color=brightgreen)](https://cran.r-project.org/package=oceanis)
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html)
-[![R build status](https://github.com/insee-psar-at/oceanis-package/workflows/R-CMD-check/badge.svg)](https://github.com/insee-psar-at/oceanis-package/actions)
+[![R build status](https://github.com/insee-psar-at/oceanis-package/workflows/R/badge.svg)](https://github.com/insee-psar-at/oceanis-package/actions)
 [![License](http://img.shields.io/badge/license-GPL%20%28%3E=%202%29-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-2.0.html)
 [![minimal R version](https://img.shields.io/badge/R%3E%3D-3.6.0-6666ff.svg)](https://cran.r-project.org/)
 <!-- badges: end -->
