@@ -1,3 +1,9 @@
+Changes in version 1.8.5
+
+BUG FIXES and IMPROVEMENTS
+
+- Correction d'un bug dans les flèches joignantes (shiny_joignantes, leaflet_joignantes et plot_joignantes). Le filtre sur la distance des flèches ne fonctionnait pas.
+
 Changes in version 1.8.4
 
 BUG FIXES and IMPROVEMENTS
