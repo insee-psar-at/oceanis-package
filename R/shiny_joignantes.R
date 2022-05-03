@@ -679,7 +679,8 @@ function(data,fondMaille,typeMaille,fondContour,fondSuppl=NULL,idDataDepart,idDa
 
         analyse_WGS84 <- st_as_sf(analyse_WGS84)
 
-        analyse_WGS84 <- analyse_WGS84[as.vector(st_length(analyse_WGS84)/2.2)<=distance_max_fj()*1000,]
+        st_agr(analyse_WGS84) <- "constant"
+        analyse_WGS84 <- analyse_WGS84[as.vector(st_length(st_cast(analyse_WGS84,"LINESTRING"))/2.2)<=distance_max_fj()*1000,]
 
         analyse_WGS84 <- analyse_WGS84[as.data.frame(analyse_WGS84)[,varFlux]>=flux_min_fj(),]
 

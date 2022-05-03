@@ -159,7 +159,8 @@ function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,va
 
     analyse_WGS84 <- st_as_sf(analyse_WGS84)
 
-    analyse_WGS84 <- analyse_WGS84[as.vector(st_length(analyse_WGS84))/2.2<=filtreDist*1000,]
+    st_agr(analyse_WGS84) <- "constant"
+    analyse_WGS84 <- analyse_WGS84[as.vector(st_length(st_cast(analyse_WGS84,"LINESTRING"))/2.2)<=filtreDist*1000,]
 
     analyse_WGS84 <- analyse_WGS84[as.data.frame(analyse_WGS84)[,varFlux]>=filtreVol,]
 
@@ -169,9 +170,13 @@ function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,va
 
     donnees <- donnees[rev(order(donnees[,varFlux])),]
 
-    coord_fleche_max_pl <- st_coordinates(analyse[[1]][abs(data.frame(analyse[[1]])[,varFlux])==max(donnees[,varFlux]),])
-    large_pl <- as.numeric(max(st_distance(st_sfc(st_point(c(coord_fleche_max_pl[2,1],coord_fleche_max_pl[2,2])),st_point(c(coord_fleche_max_pl[6,1],coord_fleche_max_pl[6,2])), crs = code_epsg))))
-
+    if(nrow(donnees) > 0){
+      coord_fleche_max_pl <- st_coordinates(analyse[[1]][abs(data.frame(analyse[[1]])[,varFlux])==max(donnees[,varFlux]),])
+      large_pl <- as.numeric(max(st_distance(st_sfc(st_point(c(coord_fleche_max_pl[2,1],coord_fleche_max_pl[2,2])),st_point(c(coord_fleche_max_pl[6,1],coord_fleche_max_pl[6,2])), crs = code_epsg))))
+    }else{
+      large_pl <- 0
+    }
+    
     # Construction de la map par defaut
 
     if(is.null(map_proxy) | (!is.null(map_proxy) & class(map_proxy)=="character"))

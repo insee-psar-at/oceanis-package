@@ -151,7 +151,9 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
     fond_joignantes <- st_as_sf(fond_joignantes)
 
     fond_joignantes_WGS84 <- st_transform(fond_joignantes, crs = 4326)
-    fond_joignantes <- fond_joignantes[as.vector(st_length(fond_joignantes_WGS84)/2.2)<=filtreDist*1000,]
+    
+    st_agr(fond_joignantes_WGS84) <- "constant"
+    fond_joignantes <- fond_joignantes[as.vector(st_length(st_cast(fond_joignantes_WGS84,"LINESTRING"))/2.2)<=filtreDist*1000,]
     rm(fond_joignantes_WGS84)
 
     fond_joignantes <- fond_joignantes[as.data.frame(fond_joignantes)[,varFlux]>=filtreVol,]
@@ -180,11 +182,15 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,typeMaille,idD
 
     donnees <- donnees[rev(order(donnees[,varFlux])),]
 
-    vmax <- max(donnees[,varFlux])
-
-    coord_fleche_max_pl <- st_coordinates(fond_joignantes[abs(as.data.frame(fond_joignantes)[,varFlux])==vmax,])
-    large_pl <- max(st_distance(st_sfc(st_point(c(coord_fleche_max_pl[2,1],coord_fleche_max_pl[2,2])),st_point(c(coord_fleche_max_pl[6,1],coord_fleche_max_pl[6,2])))))
-
+    if(nrow(donnees) > 0){
+      vmax <- max(donnees[,varFlux])
+      coord_fleche_max_pl <- st_coordinates(fond_joignantes[abs(as.data.frame(fond_joignantes)[,varFlux])==vmax,])
+      large_pl <- max(st_distance(st_sfc(st_point(c(coord_fleche_max_pl[2,1],coord_fleche_max_pl[2,2])),st_point(c(coord_fleche_max_pl[6,1],coord_fleche_max_pl[6,2])))))
+    }else{
+      vmax <- 0
+      large_pl <- 0
+    }
+    
     long_pl <- large_pl*2
 
     flux_leg <- fleche_legende(fond_points_WGS84$lng,fond_points_WGS84$lat,long_pl,large_pl,vmax,code_epsg)[[5]]
