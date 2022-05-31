@@ -43,16 +43,10 @@ function(map,stylePalette="defaut",palettePos=NULL,paletteNeg=NULL,colBorder="wh
           ronds <- T
         }
       }
-      if(map$x$calls[[i]]$method %in% "addRectangles")
+     
+      if(map$x$calls[[i]]$method %in% "addPolygons")
       {
-        if(map$x$calls[[i]]$args[[6]]=="legende_classes") legende <- T
-      }
-      if(legende) # la legende existe
-      {
-        if(map$x$calls[[i]]$method %in% "addPolygons")
-        {
-          if(map$x$calls[[i]]$args[[3]]=="legende_classes") idx_legende <- c(idx_legende,i)
-        }
+        if(map$x$calls[[i]]$args[[3]]=="legende_classes") idx_legende <- c(idx_legende,i)
       }
     }
 

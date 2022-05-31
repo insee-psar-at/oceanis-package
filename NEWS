@@ -3,6 +3,8 @@ Changes in version 1.8.5
 BUG FIXES and IMPROVEMENTS
 
 - Correction d'un bug dans les flèches joignantes (shiny_joignantes, leaflet_joignantes et plot_joignantes). Le filtre sur la distance des flèches ne fonctionnait pas.
+- Correction d'un bug lors de la modification de la couleur de l'analyse en classes d'une carte leaflet (set_couleur_classes()). Les couleurs de la légende n'étaient pas modifiées.
+- Correction de la gestion de l'encodage lors de la constitution d'une table d'étiquettes (table_etiquettes()) pour les cartes plot.
 
 Changes in version 1.8.4
 

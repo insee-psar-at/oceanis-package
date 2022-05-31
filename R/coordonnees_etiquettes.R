@@ -70,7 +70,9 @@ function(fondMaille,listeCode)
 
     names(fondMaille)[1] <- "CODE"
     names(fondMaille)[2] <- "LIBELLE"
-    fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","utf8")
+    if(any(Encoding(fondMaille$LIBELLE) %in% "latin1")){
+      fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","UTF-8")
+    }
 
     fondEtiquettes <- fondMaille[fondMaille$CODE %in% listeCode,c("CODE","LIBELLE")]
     if(nrow(fondEtiquettes)==0) stop(simpleError("Aucun CODE a etiqueter n'a ete trouve dans fondMaille."))
