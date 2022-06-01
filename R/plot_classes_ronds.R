@@ -91,7 +91,9 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
       {
         names(fondSousAnalyse[[i]])[1] <- "CODE"
         names(fondSousAnalyse[[i]])[2] <- "LIBELLE"
-        fondSousAnalyse[[i]]$LIBELLE<-iconv(fondSousAnalyse[[i]]$LIBELLE,"latin1","utf8")
+        if(any(Encoding(fondSousAnalyse[[i]]$LIBELLE) %in% "latin1")){
+          fondSousAnalyse[[i]]$LIBELLE<-iconv(fondSousAnalyse[[i]]$LIBELLE,"latin1","UTF-8")
+        }
       }
     }
     if(!is.null(fondSurAnalyse))
@@ -100,29 +102,43 @@ function(data,fondMaille,fondSousAnalyse=NULL,fondSurAnalyse=NULL,idData,varVolu
       {
         names(fondSurAnalyse[[i]])[1] <- "CODE"
         names(fondSurAnalyse[[i]])[2] <- "LIBELLE"
-        fondSurAnalyse[[i]]$LIBELLE<-iconv(fondSurAnalyse[[i]]$LIBELLE,"latin1","utf8")
+        if(any(Encoding(fondSurAnalyse[[i]]$LIBELLE) %in% "latin1")){
+          fondSurAnalyse[[i]]$LIBELLE<-iconv(fondSurAnalyse[[i]]$LIBELLE,"latin1","UTF-8")
+        }
       }
     }
-    fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","utf8")
+    if(any(Encoding(fondMaille$LIBELLE) %in% "latin1")){
+      fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","UTF-8")
+    }
     if(titreLegRonds!="")
     {
-      titreLegRonds<-iconv(titreLegRonds,"latin1","utf8")
+      if(any(Encoding(titreLegRonds) %in% "latin1")){
+        titreLegRonds<-iconv(titreLegRonds,"latin1","UTF-8")
+      }
     }
     if(titreLegClasses!="")
     {
-      titreLegClasses<-iconv(titreLegClasses,"latin1","utf8")
+      if(any(Encoding(titreLegClasses) %in% "latin1")){
+        titreLegClasses<-iconv(titreLegClasses,"latin1","UTF-8")
+      }
     }
     if(titreCarte!="")
     {
-      titreCarte<-iconv(titreCarte,"latin1","utf8")
+      if(any(Encoding(titreCarte) %in% "latin1")){
+        titreCarte<-iconv(titreCarte,"latin1","UTF-8")
+      }
     }
     if(sourceCarte!="")
     {
-      sourceCarte<-iconv(sourceCarte,"latin1","utf8")
+      if(any(Encoding(sourceCarte) %in% "latin1")){
+        sourceCarte<-iconv(sourceCarte,"latin1","UTF-8")
+      }
     }
     if(!is.null(labels))
     {
-      labels<-iconv(labels,"latin1","utf8")
+      if(any(Encoding(labels) %in% "latin1")){
+        labels<-iconv(labels,"latin1","UTF-8")
+      }
     }
 
     code_epsg <- switch(emprise, #emprise

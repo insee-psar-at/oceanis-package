@@ -41,23 +41,33 @@ plot_typo_symboles <-
 
     names(fondPoints)[1] <- "CODE"
     names(fondPoints)[2] <- "LIBELLE"
-    fondPoints$LIBELLE<-iconv(fondPoints$LIBELLE,"latin1","utf8")
+    if(any(Encoding(fondPoints$LIBELLE) %in% "latin1")){
+      fondPoints$LIBELLE<-iconv(fondPoints$LIBELLE,"latin1","UTF-8")
+    }
 
     if(titreLeg!="")
     {
-      titreLeg<-iconv(titreLeg,"latin1","utf8")
+      if(any(Encoding(titreLeg) %in% "latin1")){
+        titreLeg<-iconv(titreLeg,"latin1","UTF-8")
+      }
     }
     if(titreCarte!="")
     {
-      titreCarte<-iconv(titreCarte,"latin1","utf8")
+      if(any(Encoding(titreCarte) %in% "latin1")){
+        titreCarte<-iconv(titreCarte,"latin1","UTF-8")
+      }
     }
     if(sourceCarte!="")
     {
-      sourceCarte<-iconv(sourceCarte,"latin1","utf8")
+      if(any(Encoding(sourceCarte) %in% "latin1")){
+        sourceCarte<-iconv(sourceCarte,"latin1","UTF-8")
+      }
     }
     if(!is.null(labels))
     {
-      labels<-iconv(labels,"latin1","utf8")
+      if(any(Encoding(labels) %in% "latin1")){
+        labels<-iconv(labels,"latin1","UTF-8")
+      }
     }
 
     code_epsg <- switch(emprise, #emprise

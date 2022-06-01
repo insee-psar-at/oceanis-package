@@ -40,7 +40,9 @@ function(listFonds,popup=NULL,init=TRUE,map=NULL)
           if(affiche_popup)
           {
             names(unFond)[2] <- "LIBELLE"
-            unFond$LIBELLE<-iconv(unFond$LIBELLE,"latin1","utf8")
+            if(any(Encoding(unFond$LIBELLE) %in% "latin1")){
+              unFond$LIBELLE<-iconv(unFond$LIBELLE,"latin1","UTF-8")
+            }
             libelle <- as.data.frame(unFond)$LIBELLE
             clic <- T
           }else
@@ -74,7 +76,9 @@ function(listFonds,popup=NULL,init=TRUE,map=NULL)
           if(affiche_popup)
           {
             names(unFond)[2] <- "LIBELLE"
-            unFond$LIBELLE<-iconv(unFond$LIBELLE,"latin1","utf8")
+            if(any(Encoding(unFond$LIBELLE) %in% "latin1")){
+              unFond$LIBELLE<-iconv(unFond$LIBELLE,"latin1","UTF-8")
+            }
             libelle <- as.data.frame(unFond)$LIBELLE
             clic <- T
           }else

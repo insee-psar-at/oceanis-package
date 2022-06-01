@@ -21,20 +21,26 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
     {
       names(fondMailleElargi)[1] <- "CODE"
       names(fondMailleElargi)[2] <- "LIBELLE"
-      fondMailleElargi$LIBELLE<-iconv(fondMailleElargi$LIBELLE,"latin1","utf8")
+      if(any(Encoding(fondMailleElargi$LIBELLE) %in% "latin1")){
+        fondMailleElargi$LIBELLE<-iconv(fondMailleElargi$LIBELLE,"latin1","UTF-8")
+      }
     }
     if(!is.null(fondSuppl))
     {
       names(fondSuppl)[1] <- "CODE"
       names(fondSuppl)[2] <- "LIBELLE"
-      fondSuppl$LIBELLE<-iconv(fondSuppl$LIBELLE,"latin1","utf8")
+      if(any(Encoding(fondSuppl$LIBELLE) %in% "latin1")){
+        fondSuppl$LIBELLE<-iconv(fondSuppl$LIBELLE,"latin1","UTF-8")
+      }
     }
     epsg_etranger <- NULL
     if(!is.null(fondEtranger))
     {
       names(fondEtranger)[1] <- "CODE"
       names(fondEtranger)[2] <- "LIBELLE"
-      fondEtranger$LIBELLE<-iconv(fondEtranger$LIBELLE,"latin1","utf8")
+      if(any(Encoding(fondEtranger$LIBELLE) %in% "latin1")){
+        fondEtranger$LIBELLE<-iconv(fondEtranger$LIBELLE,"latin1","UTF-8")
+      }
 
       if(substr(st_crs(fondEtranger)[1]$input,1,5) == "EPSG:")
       {
@@ -54,7 +60,9 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
       names(fondChx)[1] <- "CODE"
     }
 
-    fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","utf8")
+    if(any(Encoding(fondMaille$LIBELLE) %in% "latin1")){
+      fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","UTF-8")
+    }
 
     if(!is.null(map_proxy))
     {

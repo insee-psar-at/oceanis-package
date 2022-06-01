@@ -18,10 +18,14 @@ function(map,titre=NULL,lng=NULL,lat=NULL,labels=NULL,choixLeg=NULL,zoom=8,map_l
     }
 
     if(is.null(titre)) titre <- " "
-    titre<-iconv(titre,"latin1","utf8")
+    if(any(Encoding(titre) %in% "latin1")){
+      titre<-iconv(titre,"latin1","UTF-8")
+    }
     if(!is.null(labels))
     {
-      labels<-iconv(labels,"latin1","utf8")
+      if(any(Encoding(labels) %in% "latin1")){
+        labels<-iconv(labels,"latin1","UTF-8")
+      }
     }
 
     if(!is.null(map_leaflet))

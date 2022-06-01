@@ -14,14 +14,18 @@ function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtr
     {
       names(fondSuppl)[1] <- "CODE"
       names(fondSuppl)[2] <- "LIBELLE"
-      fondSuppl$LIBELLE<-iconv(fondSuppl$LIBELLE,"latin1","utf8")
+      if(any(Encoding(fondSuppl$LIBELLE) %in% "latin1")){
+        fondSuppl$LIBELLE<-iconv(fondSuppl$LIBELLE,"latin1","UTF-8")
+      }
     }
     epsg_etranger <- NULL
     if(!is.null(fondEtranger))
     {
       names(fondEtranger)[1] <- "CODE"
       names(fondEtranger)[2] <- "LIBELLE"
-      fondEtranger$LIBELLE<-iconv(fondEtranger$LIBELLE,"latin1","utf8")
+      if(any(Encoding(fondEtranger$LIBELLE) %in% "latin1")){
+        fondEtranger$LIBELLE<-iconv(fondEtranger$LIBELLE,"latin1","UTF-8")
+      }
 
       if(substr(st_crs(fondEtranger)[1]$input,1,5) == "EPSG:")
       {
@@ -36,7 +40,9 @@ function(data,fondMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,varFlux,filtr
         epsg_etranger <- "3395" # Mercator
       }
     }
-    fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","utf8")
+    if(any(Encoding(fondMaille$LIBELLE) %in% "latin1")){
+      fondMaille$LIBELLE<-iconv(fondMaille$LIBELLE,"latin1","UTF-8")
+    }
 
     if(!is.null(map_proxy))
     {

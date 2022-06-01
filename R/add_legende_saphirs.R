@@ -15,7 +15,9 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
     }
 
     if(is.null(titre)) titre <- " "
-    titre<-iconv(titre,"latin1","utf8")
+    if(any(Encoding(titre) %in% "latin1")){
+      titre<-iconv(titre,"latin1","UTF-8")
+    }
 
     coeff <- ((360/(2^zoom))/7.2) # Permet de fixer une distance sur l'ecran. Il s'agit en gros d'une conversion des degres en pixels. Reste constant a longitude egale mais varie un peu selon la latitude
 

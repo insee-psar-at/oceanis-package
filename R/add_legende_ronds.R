@@ -15,13 +15,15 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
     }
 
     if(is.null(titre)) titre <- " "
-    titre<-iconv(titre,"latin1","utf8")
+    if(any(Encoding(titre) %in% "latin1")){
+      titre<-iconv(titre,"latin1","UTF-8")
+    }
 
     if(any(class(map) %in% "leaflet"))
     {
       idx_carte <- NULL
       idx_legende <- NULL
-
+      
       for(i in 1:length(map$x$calls))
       {
         if(map$x$calls[[i]]$method %in% "addPolygons")
@@ -32,12 +34,16 @@ function(map,titre=NULL,lng=NULL,lat=NULL,precision=0,zoom=8,map_leaflet=NULL)
         {
           if(any(map$x$calls[[i]]$args[[5]] %in% c("carte_ronds","carte_ronds_classes","carte_classes_ronds"))) idx_carte <- c(idx_carte,i)
         }
-        if(map$x$calls[[i]]$method %in% "addCircles")
+        if(map$x$calls[[i]]$method %in% "addPolygons")
         {
-          if(map$x$calls[[i]]$args[[5]]=="legende_ronds") idx_legende <- c(idx_legende,i)
+          if(map$x$calls[[i]]$args[[3]]=="legende_ronds") idx_legende <- c(idx_legende,i)
         }
         if(!is.null(idx_legende)) # la legende existe
         {
+          if(map$x$calls[[i]]$method %in% "addCircles")
+          {
+            if(map$x$calls[[i]]$args[[5]]=="legende_ronds") idx_legende <- c(idx_legende,i)
+          }
           if(map$x$calls[[i]]$method=="addPolylines")
           {
             if(map$x$calls[[i]]$args[[3]]=="legende_ronds") idx_legende <- c(idx_legende,i)

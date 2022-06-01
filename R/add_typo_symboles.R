@@ -84,7 +84,9 @@ function(map,fondPoints,types=NULL,couleurs=NULL,tailles=NULL,epaisseurs=NULL)
 
     names(fondPoints)[1] <- "CODE"
     names(fondPoints)[2] <- "LIBELLE"
-    fondPoints$LIBELLE<-iconv(fondPoints$LIBELLE,"latin1","utf8")
+    if(any(Encoding(fondPoints$LIBELLE) %in% "latin1")){
+      fondPoints$LIBELLE<-iconv(fondPoints$LIBELLE,"latin1","UTF-8")
+    }
 
     fondPoints <- st_transform(fondPoints,crs=4326)
 

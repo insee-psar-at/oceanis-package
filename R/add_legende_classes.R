@@ -18,7 +18,9 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
     }
 
     if(is.null(titre)) titre <- " "
-    titre<-iconv(titre,"latin1","utf8")
+    if(any(Encoding(titre) %in% "latin1")){
+      titre<-iconv(titre,"latin1","UTF-8")
+    }
 
     if(!is.null(map_leaflet))
     {
@@ -135,6 +137,7 @@ function(map,titre=NULL,lng=NULL,lat=NULL,typeLegende=1,zoom=8,map_leaflet=NULL)
         map_leaflet <- map
         map <- map_proxy
         clearGroup(map, group = "legende_classes")
+        clearGroup(map, group = "legende_classes_rectangle")
       }
 
       # On cree les rectangles
