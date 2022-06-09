@@ -2,10 +2,10 @@ Package: oceanis
 Type: Package
 Title: Cartography for Statistical Analysis
 Version: 1.8.5
-Date: 2022-05-03
+Date: 2022-06-09
 Description: Creating maps for statistical analysis such as proportional circles, chroropleth, typology and flows. Some functions use 'shiny' or 'leaflet' technologies for dynamism and interactivity.
 	The great features are :
-	- Create maps in a web environment where the parameters are modifiable on the fly ('shiny' and 'leaflet' technology).
+	- Create maps in a web environment where the parameters are modifiable on the fly ('shiny' and 'leaflet' technologies).
 	- Create interactive maps through zoom and pop-up ('leaflet' technology).
 	- Create frozen maps with the possibility to add labels.
 License: GPL (>= 2.0) | file LICENSE
@@ -17,11 +17,19 @@ Imports: classInt(>= 0.4.2),sf (>= 0.9.0),shinyjs (>= 1.1),shinythemes (>= 1.1.2
 Suggests: knitr, rmarkdown, markdown, rio
 VignetteBuilder: knitr
 Encoding: UTF-8
-Author: Sébastien CALVET - PSAR-AT - DR Provence-Alpes-Cote d'Azur - INSEE [cre, aut],
-	Sophie AUDRIC - PSAR-AT - DR Provence-Alpes-Cote d'Azur - INSEE [aut],
-	SED - DR Hauts-de-France - INSEE [ctb],
-	PSAR-SL - DR Auvergne-Rhone-Alpes - INSEE [ctb],
-	PSAR-EEP - DR Occitanie - INSEE [ctb],
-	SED - DR Pays-de-la-Loire - INSEE [ctb]
-Maintainer: Sébastien CALVET <sebastien.calvet@insee.fr>
+Authors@R: 
+    c(person(family = "PSAR-AT Unité CED - INSEE PACA",
+             role = c("aut", "cre"),
+             email = "dr13-psar-at@insee.fr"),
+      person(family = "SED - DR Hauts-de-France - INSEE",
+             role = "ctb"),
+      person(family = "PSAR-SL - DR Auvergne-Rhone-Alpes - INSEE",
+             role = "ctb"),
+      person(family = "PSAR-EER - DR Occitanie - INSEE",
+             role = "ctb"),
+      person(family = "SED - DR Pays-de-la-Loire - INSEE",
+             role = "ctb"),
+      person(family = "Institut national de la statistique et des études économiques",
+             role = "cph"))
+Maintainer: PSAR-AT Unité CED - INSEE PACA <dr13-psar-at@insee.fr>
 RoxygenNote: 7.1.1
