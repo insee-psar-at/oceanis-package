@@ -255,7 +255,8 @@ NULL
 #'  ## End(Not run)
 #' }
 #'
-#' @import mapview
+#' @importFrom htmlwidgets saveWidget
+#' @importFrom webshot webshot
 #'
 #' @export export_jpeg
 #' @export export_pdf
