@@ -349,6 +349,7 @@ NULL
 #' }
 #'
 #' @import leaflet sf utils stringr
+#' @importFrom utils write.csv
 #'
 #' @export export_qgis_ronds
 #' @export export_qgis_classes
@@ -1606,8 +1607,9 @@ NULL
 #' }
 #'
 #' @rawNamespace import(shiny, except = runExample)
-#' @import shinyBS shinythemes shinyjs leaflet sf ggplot2 classInt leaflet.extras utils dplyr
+#' @import shinyBS shinythemes shinyjs leaflet sf ggplot2 classInt leaflet.extras dplyr
 #' @importFrom lwgeom st_geod_length
+#' @importFrom utils write.csv
 #' @importFrom zip zip
 #'
 #' @export shiny_ronds
