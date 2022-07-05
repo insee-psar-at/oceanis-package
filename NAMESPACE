@@ -81,8 +81,6 @@ import(leaflet)
 import(leaflet.extras)
 import(sf)
 import(shiny, except = runExample)
-import(shiny, except = runExample)
-
 import(shinyBS)
 import(shinyjs)
 import(shinythemes)
