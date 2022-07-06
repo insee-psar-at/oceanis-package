@@ -348,7 +348,7 @@ NULL
 #'  ## End(Not run)
 #' }
 #'
-#' @import leaflet sf utils stringr
+#' @import leaflet sf stringr
 #' @importFrom utils write.csv
 #'
 #' @export export_qgis_ronds
