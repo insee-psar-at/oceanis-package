@@ -347,14 +347,14 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         })
 
         output$distribution_variable_ac_rp <- renderUI({
-          bsButton("distribution_variable_ac_rp_id",label="Distribution de la variable", style="btn btn-info", icon = icon("chart-bar"),
-                   type = "toggle", block = FALSE, disabled = FALSE,
-                   value = FALSE)
+          shinyBS::bsButton("distribution_variable_ac_rp_id",label="Distribution de la variable", style="btn btn-info", icon = icon("chart-bar"),
+                            type = "toggle", block = FALSE, disabled = FALSE,
+                            value = FALSE)
         })
 
         observeEvent(input$distribution_variable_ac_rp_id,{
           if(!input$distribution_variable_ac_rp_id) return()
-          updateButton(session, "distribution_variable_ac_rp_id", value = TRUE)
+          shinyBS::updateButton(session, "distribution_variable_ac_rp_id", value = TRUE)
         }, ignoreInit = TRUE)
 
         observeEvent(input$distribution_variable_ac_rp_id,{

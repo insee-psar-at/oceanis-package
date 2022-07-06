@@ -288,9 +288,9 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
 
         output$distribution_variable_ac <- renderUI({
           
-          bsButton(inputId="distribution_variable_ac_id",label="Distribution de la variable", style="btn btn-info", icon = icon("chart-bar"),
-                   type = "toggle", block = FALSE, disabled = FALSE,
-                   value = FALSE)
+          shinyBS::bsButton(inputId="distribution_variable_ac_id",label="Distribution de la variable", style="btn btn-info", icon = icon("chart-bar"),
+                            type = "toggle", block = FALSE, disabled = FALSE,
+                            value = FALSE)
         })
 
         observeEvent(input$distribution_variable_ac_id,{
@@ -372,7 +372,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondContour,fondSuppl=NULL,idData
         })
 
         output$valid_bornes_ac <- renderUI({
-          actionButton("valid_bornes_ac_id",label="Rafraichir la carte", icon=icon("refresh"), style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+          actionButton("valid_bornes_ac_id",label="Rafraichir la carte", icon=icon("sync"), style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
         })
 
         # LEGENDE

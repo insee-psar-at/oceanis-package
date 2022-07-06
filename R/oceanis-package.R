@@ -1607,7 +1607,8 @@ NULL
 #' }
 #'
 #' @rawNamespace import(shiny, except = runExample)
-#' @import shinyBS shinythemes shinyjs leaflet sf ggplot2 classInt leaflet.extras dplyr
+#' @import shinythemes shinyjs leaflet sf ggplot2 classInt leaflet.extras dplyr
+#' @importFrom shinyBS bsButton updateButton
 #' @importFrom lwgeom st_geod_length
 #' @importFrom utils write.csv
 #' @importFrom zip zip
