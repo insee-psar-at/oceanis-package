@@ -349,7 +349,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,v
 
     # Construction de la map par defaut
 
-    if(is.null(map_proxy) | (!is.null(map_proxy) & class(map_proxy)=="character"))
+    if(is.null(map_proxy) | (!is.null(map_proxy) & inherits(map_proxy,"character")))
     {
       if(is.null(fondEtranger))
       {

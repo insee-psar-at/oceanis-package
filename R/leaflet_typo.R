@@ -141,7 +141,7 @@ function(data,fondMaille,fondSuppl=NULL,idData,varTypo,emprise="FRM",fondEtrange
 
     # Construction de la map par defaut
     
-    if(is.null(map_proxy) | (!is.null(map_proxy) & class(map_proxy)=="character"))
+    if(is.null(map_proxy) | (!is.null(map_proxy) & inherits(map_proxy,"character")))
     {
       if(is.null(fondEtranger))
       {

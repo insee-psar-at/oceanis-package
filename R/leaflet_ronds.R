@@ -241,7 +241,7 @@ function(data,fondMaille,fondMailleElargi=NULL,fondSuppl=NULL,idData,varVolume,r
 
     # CONSTRUCTION DE LA MAP EN LEAFLET
 
-    if(is.null(map_proxy) | (!is.null(map_proxy) & class(map_proxy)=="character"))
+    if(is.null(map_proxy) | (!is.null(map_proxy) & inherits(map_proxy,"character")))
     {
       if(is.null(fondEtranger))
       {

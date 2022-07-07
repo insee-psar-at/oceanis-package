@@ -158,7 +158,7 @@ function(data,fondMaille,typeMaille,fondSuppl=NULL,idDataDepart,idDataArrivee,va
     large_pl <- as.numeric(max(st_distance(st_sfc(st_point(c(coord_fleche_max_pl[2,1],coord_fleche_max_pl[2,2])),st_point(c(coord_fleche_max_pl[6,1],coord_fleche_max_pl[6,2])), crs = code_epsg))))
 
     # Construction de la map par defaut
-    if(is.null(map_proxy) | (!is.null(map_proxy) & class(map_proxy)=="character"))
+    if(is.null(map_proxy) | (!is.null(map_proxy) & inherits(map_proxy,"character")))
     {
       if(is.null(fondEtranger))
       {
