@@ -2,6 +2,7 @@ Changes in version 1.8.5
 
 BUG FIXES and IMPROVEMENTS
 
+- Suppression de la fonction add_fond_osm() permettant d'ajouter un fond OpenStreetMap à une carte leaflet. Incompatibilité de la fonction avec un affichage rigoureux des éléments de légende (ronds proportionnels, flèches...). Le système de projection de ces derniers doit en effet coïncider avec celui de la carte finale affichée. Or, les tuiles OpenStreetMap ne seraient être affichées dans un système de projection différent de EPSG:3857.
 - Correction d'un bug lors de l'export d'une carte leaflet en png, jpeg ou pdf. La fonction mapview::mapshot est buggée (les \\ sont mal reconnus dans le chemin de fichier). Simplification de la fonction : appels directs aux fonctions htmlwidgets::saveWidget pour créer le fichier html puis webshot::webshot sur ce fichier pour créer le format png, jpeg ou pdf.
 - Correction d'un bug dans les flèches joignantes (shiny_joignantes, leaflet_joignantes et plot_joignantes). Le filtre sur la distance des flèches ne fonctionnait pas.
 - Correction d'un bug lors de la modification de la couleur de l'analyse en classes d'une carte leaflet (set_couleur_classes()). Les couleurs de la légende n'étaient pas modifiées.

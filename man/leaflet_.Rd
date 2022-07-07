@@ -438,7 +438,7 @@ varFlux = "MIGR", largeurFlecheMax = 80, direction = "Ent")
 
 \code{\link{coord_legende},}
 
-\code{\link{add_source}, \link{add_titre}, \link{add_fond_osm},}
+\code{\link{add_source}, \link{add_titre},}
 
 \code{\link{set_fonds_simples},}
 
