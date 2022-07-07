@@ -370,8 +370,7 @@ map <- set_couleur_classes(map = map,
 map <- set_opacite_elargi(map = map,
                           opacite = 0.3)
 
-# ajout d'un fond OpenStreetMap
-map <- add_fond_osm(map)
+map
 ```
 
 
