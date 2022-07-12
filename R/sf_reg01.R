@@ -6,7 +6,5 @@ function()
   # import de l'objet sf
   reg01 <- st_read(dsn = path_to_shp, quiet = TRUE)
   
-  reg01 <- st_transform(reg01, crs = 5490)
-  
 return(reg01)
 }

@@ -2,3 +2,11 @@
 ^\.Rproj\.user$
 ^\.github$
 ^\.github/workflows/R-CMD-check\.yaml$
+README.md
+vignettes/images/readme_leaflet_fj.png
+vignettes/images/readme_leaflet_rp_ac.png
+vignettes/images/readme_leaflet_typo.png
+vignettes/images/readme_leaflet_typo_symbole.png
+vignettes/images/readme_plot_ac_rp.png
+vignettes/images/readme_shiny_ac_rp.png
+vignettes/images/readme_shiny_fs.png
