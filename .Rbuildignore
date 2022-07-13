@@ -3,6 +3,7 @@
 ^\.github$
 ^\.github/workflows/R-CMD-check\.yaml$
 README.md
+data-raw
 vignettes/images/readme_leaflet_fj.png
 vignettes/images/readme_leaflet_rp_ac.png
 vignettes/images/readme_leaflet_typo.png
