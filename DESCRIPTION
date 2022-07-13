@@ -2,7 +2,7 @@ Package: oceanis
 Type: Package
 Title: Cartography for Statistical Analysis
 Version: 1.8.5
-Date: 2022-07-12
+Date: 2022-07-13
 Description: Creating maps for statistical analysis such as proportional circles, choropleth, typology and flows. Some functions use 'shiny' or 'leaflet' technologies for dynamism and interactivity.
 	The great features are :
 	- Create maps in a web environment where the parameters are modifiable on the fly ('shiny' and 'leaflet' technologies).
@@ -18,9 +18,18 @@ Suggests: knitr, rmarkdown, markdown, rio
 VignetteBuilder: knitr
 Encoding: UTF-8
 Authors@R: 
-    c(person(family = "PSAR-AT Unité CED - INSEE PACA",
-             role = c("aut", "cre"),
-             email = "dr13-psar-at@insee.fr"),
+    c(person(given = "Sébastien",
+        		 family = "Novella",
+        		 role = c("aut", "cre"),
+        		 email = "sebastien.novella@insee.fr"),
+    	person(given = "Sébastien",
+        		 family = "Calvet",
+        		 role = "aut"),
+    	person(given = "Nicolas",
+        		 family = "Chauvot",
+        		 role = "aut"),	
+	    person(family = "PSAR-AT Unité CED - INSEE PACA",
+             role = "ctb"),             
       person(family = "SED - DR Hauts-de-France - INSEE",
              role = "ctb"),
       person(family = "PSAR-SL - DR Auvergne-Rhone-Alpes - INSEE",
@@ -31,5 +40,4 @@ Authors@R:
              role = "ctb"),
       person(family = "Institut national de la statistique et des études économiques",
              role = "cph"))
-Maintainer: Sébastien NOVELLA <sebastien.novella@insee.fr>
 RoxygenNote: 7.2.0
