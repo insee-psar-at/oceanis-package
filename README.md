@@ -47,7 +47,12 @@ La vignette propose notamment un exemple de scénario de réalisation de cartes 
 Pour installer le package _oceanis_ depuis GitHub et le charger dans R :
 ```r
 # install.packages("remotes")
-remotes::install_github("insee-psar-at/oceanis-package")
+remotes::install_gitlab(
+  repo = "psar-at/unite-ced/oceanis-package",
+  host = "gitlab.insee.fr",
+  dependencies = TRUE,
+  build_vignettes = TRUE
+)
 library(oceanis)
 ```
 ou à partir du CRAN :
